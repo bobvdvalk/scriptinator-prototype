@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${status} + ' ' + ${error}"></title>
+    <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/assets/semantic-ui-css/semantic.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/semantic-ui-css/semantic.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/style.css}">
+</head>
+<body>
+<div class="ui container">
+    <h1>Oops!</h1>
+
+    <h3>It seems like an error has occurred.</h3>
+    <span>
+        <pre th:text="${status} + ' ' + ${error}"></pre>
+        <pre th:text="${message}"></pre>
+    </span>
+    <div class="ui segment">
+    <pre id="trace" th:text="${trace}">
+
+    </pre>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+#trace {
+    overflow-x: auto;
+}

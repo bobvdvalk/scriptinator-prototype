@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Scriptinator</title>
+
+    <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/assets/semantic-ui-css/semantic.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/semantic-ui-css/semantic.min.css}">
+    <link rel="stylesheet" th:href="@{/assets/style.css}">
+</head>
+<body>
+
+<div layout:fragment="navigation" id="navigation" class="ui inverted attached vertical labeled icon menu">
+    <div class="item">
+        <a th:href="@{/dashboard}">
+            <img id="logo" class="ui small image" th:src="@{/assets/logo.png}"/>
+        </a>
+    </div>
+    <a class="item"
+       th:href="@{/dashboard}"
+       th:classappend="${#httpServletRequest.getRequestURI().startsWith('/dashboard') ? 'active':''}">
+        Dashboard
+        <i class="dashboard icon"></i>
+    </a>
+    <a class="item"
+       th:href="@{/projects}"
+       th:classappend="${#httpServletRequest.getRequestURI().startsWith('/projects') ? 'active':''}">
+        Projects
+        <i class="server icon"></i>
+    </a>
+    <a class="item"
+       th:href="@{/activity}"
+       th:classappend="${#httpServletRequest.getRequestURI().startsWith('/activity') ? 'active':''}">
+        Activity
+        <i class="warning sign icon"></i>
+    </a>
+</div>
+
+<div class="ui attached segment">
+    <div class="ui raised segment">
+        <div layout:fragment="breadcrumbs" id="breadcrumbs" class="ui large breadcrumb">
+            <a class="section" th:href="@{/dashboard}">Dashboard</a>
+            <i class="right chevron icon divider"></i>
+            <a class="section" th:href="@{/section}">Section</a>
+            <i class="right arrow icon divider"></i>
+            <div class="active section">Current Page</div>
+        </div>
+    </div>
+
+    <div class="ui container">
+        <h1 id="title" layout:fragment="title">Default Content</h1>
+        <div id="content" layout:fragment="content">
+            <p>
+                This is default content. Don't mind me!
+            </p>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script">
+
+</script>
+
+</body>
+</html>
