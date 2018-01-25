@@ -3,6 +3,9 @@ package io.chapp.scriptinator.dataservices;
 import io.chapp.scriptinator.model.AbstractEntity;
 import io.chapp.scriptinator.model.Audit;
 import io.chapp.scriptinator.repositories.AuditRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -36,4 +39,7 @@ public class AuditService {
         auditRepository.save(audit);
     }
 
+    public Page<Audit> getLast(int count) {
+        return auditRepository.findAll(new PageRequest(0, count, new Sort(Sort.Direction.DESC, "time")));
+    }
 }

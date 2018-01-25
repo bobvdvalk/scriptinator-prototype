@@ -17,22 +17,36 @@
 </h1>
 
 <div layout:fragment="content">
-    <div class="ui cards">
-        <div class="card">
-            <div class="content">
-                <div class="header">
-                    Projects
-                </div>
-                <div class="meta">
-                    <span th:text="${projects.totalElements}"></span> projects
+    <div class="ui card">
+        <div class="content">
+            <div class="header">
+                Projects
+            </div>
+            <div class="meta">
+                <span th:text="${projects.totalElements}"></span> projects
+            </div>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned divided list">
+                <div class="item" th:each="project : ${projects}">
+                    <div class="content">
+                        <a class="header" th:href="@{'/project/' + ${project.id}}" th:text="${project.displayName}"></a>
+                    </div>
                 </div>
             </div>
-            <div class="content">
-                <div class="ui middle aligned divided list">
-                    <div class="item" th:each="project : ${projects}">
-                        <div class="content">
-                            <a class="header" th:href="@{'/project/' + ${project.id}}" th:text="${project.displayName}"></a>
-                        </div>
+        </div>
+    </div>
+    <div class="ui card">
+        <div class="content">
+            <div class="header">
+                Activity
+            </div>
+        </div>
+        <div class="content">
+            <div class="ui middle aligned divided list">
+                <div class="item" th:each="audit : ${auditLog}">
+                    <div class="content">
+                        <p th:text="${audit.message}"></p>
                     </div>
                 </div>
             </div>
