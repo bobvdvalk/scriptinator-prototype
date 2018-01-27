@@ -24,7 +24,7 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-public class Project {
+public class Project extends AbstractEntity {
     @NotEmpty
     @Length(min = 4)
     private String displayName;

@@ -70,6 +70,16 @@
             <name>Thomas Biesaart</name>
             <email>thomas.biesaart@gmail.com</email>
         </developer>
+        <developer>
+            <id>bobvdvalk</id>
+            <name>Bob van der Valk</name>
+            <email>bobvdvalk@gmail.com</email>
+        </developer>
+        <developer>
+            <id>LucaScorpion</id>
+            <name>Luca Scalzotto</name>
+            <email>lucascalzotto@gmail.com</email>
+        </developer>
     </developers>
 
     <properties>
