@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.chapp.scriptinator</groupId>
+    <artifactId>scriptinator-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.9.RELEASE</version>
+    </parent>
+
+    <modules>
+        <module>scriptinator-data</module>
+        <module>scriptinator-rest-api</module>
+        <module>scriptinator-web</module>
+        <module>scriptinator-worker</module>
+    </modules>
+
+    <name>Scriptinator</name>
+    <description>An open easy-to-use and easy-to-scale serverless scripting platform</description>
+    <inceptionYear>2018</inceptionYear>
+    <url>https://github.com/ChappIO/scriptinator</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/ChappIO/scriptinator.git</connection>
+        <developerConnection>scm:git:ssh://github.com:ChappIO/scriptinator.git</developerConnection>
+        <url>http://github.com/ChappIO/scriptinator/tree/master</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/ChappIO/scriptinator/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>ChappIO</id>
+            <name>Thomas Biesaart</name>
+            <email>thomas.biesaart@gmail.com</email>
+        </developer>
+    </developers>
+
+    <properties>
+        <!-- Runtime Dependencies -->
+        <java.version>1.8</java.version>
+
+        <!-- Build Dependencies -->
+        <failsafe.plugin.version>2.20.1</failsafe.plugin.version>
+        <license.plugin.version>3.0</license.plugin.version>
+
+        <!-- Build Configuration -->
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Internal Dependencies -->
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-data</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-rest-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-worker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Third Party Dependencies -->
+
+            <!-- Test Dependencies -->
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <executable>true</executable>
+                        <classifier>exec</classifier>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license.plugin.version}</version>
+                    <configuration>
+                        <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                        <properties>
+                            <owner>${project.developers[0].name}</owner>
+                            <email>${project.developers[0].email}</email>
+                        </properties>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                        <strictCheck>true</strictCheck>
+                        <mapping>
+                            <java>SLASHSTAR_STYLE</java>
+                            <Jenkinsfile>JAVADOC_STYLE</Jenkinsfile>
+                            <adoc>DOUBLESLASH_STYLE</adoc>
+                        </mapping>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>format</goal>
+                            </goals>
+                            <phase>clean</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
