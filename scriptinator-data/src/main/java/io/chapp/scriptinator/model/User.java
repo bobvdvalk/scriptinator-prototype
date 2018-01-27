@@ -20,8 +20,11 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class User extends AbstractEntity {
@@ -36,6 +39,8 @@ public class User extends AbstractEntity {
     private String displayName;
     private String email;
 
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    private List<Project> projects = new ArrayList<>();
 
     public String getUsername() {
         return username;
@@ -70,5 +75,13 @@ public class User extends AbstractEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
     }
 }
