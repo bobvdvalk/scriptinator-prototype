@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator;
 
-import io.chapp.scriptinator.model.AbstractEntity;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-@NoRepositoryBean
-public interface AbstractEntityRepository<E extends AbstractEntity> extends PagingAndSortingRepository<E, Integer> {
+@Configuration
+@ConfigurationProperties
+public class ScriptinatorWebConfiguration {
+    private int defaultPageSize = 20;
+
+    public int getDefaultPageSize() {
+        return defaultPageSize;
+    }
+
+    public void setDefaultPageSize(int defaultPageSize) {
+        this.defaultPageSize = defaultPageSize;
+    }
 }

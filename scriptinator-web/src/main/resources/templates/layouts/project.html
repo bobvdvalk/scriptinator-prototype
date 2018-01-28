@@ -1,0 +1,109 @@
+<!--
+
+    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${project.displayName} + ' - Scriptinator'"></title>
+
+
+    <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
+    <script th:src="@{/assets/ace-builds/src-min-noconflict/ace.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/semantic-ui-css/semantic.min.css}"/>
+    <script th:src="@{/assets/semantic-ui-css/semantic.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/style.css}"/>
+</head>
+<body>
+
+<div class="ui inverted attached segment">
+    <div class="ui container">
+        <div th:replace="fragments/navigation :: navigation">
+
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="ui container">
+        <h1 id="title" class="ui header">
+            <i class="book icon"></i>
+            <div class="content">
+                <span th:text="${project.displayName}"></span>
+                <div class="sub header" th:text="${project.description}"></div>
+            </div>
+        </h1>
+
+        <div id="content">
+            <div class="ui top attached tabular menu">
+                <a class="item"
+                   th:href="@{'/project/' + ${project.id} + '/scripts'}"
+                   th:classappend="${activeTab} == 'scripts' ? 'active' : ''">
+                    <i class="ui code icon"></i> Scripts
+                </a>
+                <a class="item"
+                   th:href="@{'/project/' + ${project.id} + '/actions'}"
+                   th:classappend="${activeTab} == 'actions' ? 'active' : ''">
+                    <i class="ui lightning icon"></i> Actions
+                </a>
+                <a class="item"
+                   th:href="@{'/project/' + ${project.id} + '/settings'}"
+                   th:classappend="${activeTab} == 'settings' ? 'active' : ''">
+                    <i class="ui settings icon"></i> Settings
+                </a>
+            </div>
+            <div class="ui attached clearing segment" layout:fragment="content">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load Ace Editor
+    var editor = null;
+    $(document).ready(function () {
+        $('.editor, #editor').each(function (i, block) {
+            var aceEditor = ace.edit(block);
+            aceEditor.setTheme("ace/theme/dreamweaver");
+            aceEditor.getSession().setMode("ace/mode/javascript");
+
+            if (block.classList.contains("read-only")) {
+                aceEditor.setOptions({
+                    readOnly: true,
+                    highlightActiveLine: false,
+                    highlightGutterLine: false
+                });
+            }
+
+            if (block.id === "editor") {
+                editor = aceEditor;
+            }
+        });
+    });
+</script>
+
+<script layout:fragment="script">
+</script>
+
+</body>
+</html>

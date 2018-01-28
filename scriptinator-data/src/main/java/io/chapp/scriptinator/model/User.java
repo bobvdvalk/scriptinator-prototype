@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.model;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.util.StringUtils;
 
@@ -28,6 +30,8 @@ import java.util.List;
 
 @Entity
 public class User extends AbstractEntity {
+    public static final String ATTRIBUTE = "user";
+    public static final String LIST_ATTRIBUTE = "users";
     @Pattern(regexp = "[\\w.-]{4,}")
     @Column(unique = true)
     private String username;
@@ -37,9 +41,12 @@ public class User extends AbstractEntity {
     private String password;
 
     private String displayName;
+    @Email
     private String email;
+    private String avatarUrl;
 
     @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    @NotNull
     private List<Project> projects = new ArrayList<>();
 
     public String getUsername() {
@@ -75,6 +82,19 @@ public class User extends AbstractEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAvatarUrl() {
+        if (StringUtils.isEmpty(avatarUrl) && !StringUtils.isEmpty(email)) {
+            return "https://www.gravatar.com/avatar/" + DigestUtils.md2Hex(
+                    email.toLowerCase().trim()
+            );
+        }
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public List<Project> getProjects() {

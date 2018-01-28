@@ -15,10 +15,7 @@
  */
 package io.chapp.scriptinator.repositories;
 
-import io.chapp.scriptinator.model.AbstractEntity;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import io.chapp.scriptinator.model.Action;
 
-@NoRepositoryBean
-public interface AbstractEntityRepository<E extends AbstractEntity> extends PagingAndSortingRepository<E, Integer> {
+public interface ActionRepository extends AbstractEntityRepository<Action> {
 }

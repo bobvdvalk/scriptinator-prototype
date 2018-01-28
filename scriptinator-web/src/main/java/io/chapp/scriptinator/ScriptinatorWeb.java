@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator;
 
-import io.chapp.scriptinator.model.AbstractEntity;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@NoRepositoryBean
-public interface AbstractEntityRepository<E extends AbstractEntity> extends PagingAndSortingRepository<E, Integer> {
+@SpringBootApplication
+public class ScriptinatorWeb {
+    public static void main(String[] args) {
+        SpringApplication.run(ScriptinatorWeb.class, args);
+    }
 }

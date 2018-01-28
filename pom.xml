@@ -85,10 +85,14 @@
     <properties>
         <!-- Runtime Dependencies -->
         <java.version>1.8</java.version>
+        <thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
 
         <!-- Build Dependencies -->
+        <node.version>9.3.0</node.version>
         <failsafe.plugin.version>2.20.1</failsafe.plugin.version>
         <license.plugin.version>3.0</license.plugin.version>
+        <frontend-plugin.version>1.6</frontend-plugin.version>
 
         <!-- Build Configuration -->
     </properties>
@@ -170,6 +174,10 @@
                             <Jenkinsfile>JAVADOC_STYLE</Jenkinsfile>
                             <adoc>DOUBLESLASH_STYLE</adoc>
                         </mapping>
+                        <excludes>
+                            <exclude>**/node_modules/**</exclude>
+                            <exclude>**/node/**</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
@@ -177,6 +185,27 @@
                                 <goal>format</goal>
                             </goals>
                             <phase>clean</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>${frontend-plugin.version}</version>
+                    <configuration>
+                        <nodeVersion>v${node.version}</nodeVersion>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>install-node-and-npm</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>npm install</id>
+                            <goals>
+                                <goal>npm</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>

@@ -1,0 +1,142 @@
+<!--
+
+    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/project}">
+<body>
+
+<div layout:fragment="content">
+    <h3 class="ui header">New Script</h3>
+    <form th:action="''"
+          th:method="post"
+          th:object="${script}"
+          class="ui form">
+        <table class="ui table">
+            <thead>
+            <tr>
+                <th colspan="2">
+                    <div class="ui grid">
+                        <div class="four wide column">
+                            <div class="field">
+                                Name
+                                <input type="text"
+                                       name="fullyQualifiedName"
+                                       placeholder="ScriptName"
+                                       th:field="*{fullyQualifiedName}"
+                                >
+                            </div>
+                        </div>
+                        <div class="twelve wide column">
+                            <div class="field">
+                                Description
+                                <input
+                                        type="text"
+                                        name="description"
+                                        placeholder="Description..."
+                                        th:field="*{description}"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="2"
+                    class="tight">
+                    <div id="editor"
+                         class="editor"></div>
+                    <input type="hidden"
+                           id="code_field"
+                           th:field="*{code}"
+                    />
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <th>
+                    <div class="ui error message"></div>
+                </th>
+                <th>
+                    <button class="ui primary right floated button"
+                            type="submit">
+                        Create
+                    </button>
+                </th>
+            </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+
+<script layout:fragment="script">
+
+    // Link code field to editor
+    $(document).ready(function () {
+        var codeField = $("#code_field");
+        editor.getSession().on("change", function () {
+            codeField.val(editor.getValue());
+        });
+    });
+
+    // Add code validator rule
+    $.fn.form.settings.rules.validCode = function (value) {
+        var annotations = editor.getSession().getAnnotations();
+        for (var key in annotations) {
+            if (annotations.hasOwnProperty(key) && annotations[key].type === "error") {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // Enable form validation
+    $('.ui.form')
+        .form({
+            fields: {
+                fullyQualifiedName: {
+                    identifier: 'fullyQualifiedName',
+                    rules: [
+                        {
+                            type: 'empty',
+                            prompt: 'What would you like to call this script?'
+                        },
+                        {
+                            type: 'regExp[/^[a-z0-9_]*$/gi]',
+                            prompt: 'Please rename your script to only use alphanumeric characters and underscores.'
+                        }
+                    ]
+                },
+                code: {
+                    identifier: 'code',
+                    rules: [
+                        {
+                            type: 'validCode',
+                            prompt: 'There seems to be an issue in the code. Please check the editor.'
+                        }
+                    ]
+                }
+            }
+        });
+</script>
+
+</body>
+</html>

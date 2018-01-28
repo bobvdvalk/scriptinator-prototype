@@ -1,0 +1,87 @@
+<!--
+
+    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/project}">
+<body>
+
+<div layout:fragment="content">
+    <table class="ui yellow table">
+        <thead>
+        <tr>
+            <th colspan="3">
+                <div class="ui grid">
+                    <div class="four wide column">
+                        <div class="ui label">Actions
+                            <div class="detail" th:text="${actionCount}"></div>
+                        </div>
+                    </div>
+                </div>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${actions.isEmpty()}">
+            <td colspan="3">
+                This project does not contain any actions yet.
+            </td>
+        </tr>
+        <tr th:each="action : ${actions}"
+            class="clickable">
+            <td>
+                <a th:href="@{'/project/' + ${project.id} + '/action/' + ${action.id}}">
+                    <span th:text="${action.fullyQualifiedName}"></span>
+                    <span th:text="${action.description}"
+                          class="ui right floated sub header">
+                    </span>
+                </a>
+            </td>
+            <td class="collapsing">
+                <a th:href="@{'/project/' + ${project.id} + '/script/' + ${action.script.id}}">
+                    <div class="ui right floated fluid label">Script:
+                        <div class="detail" th:text="${action.script.fullyQualifiedName}"></div>
+                    </div>
+                </a>
+            </td>
+            <td class="collapsing">
+                <form th:method="post"
+                      th:action="@{'/project/' + ${project.id} + '/action/' + ${action.id}}">
+                    <button class="ui positive icon button"
+                            type="submit">
+                        <i class="ui play icon"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th colspan="3">
+                <a th:href="@{'/project/' + ${project.id} + '/action'}"
+                   class="ui primary right floated button">
+                    Add
+                </a>
+            </th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+</body>
+</html>

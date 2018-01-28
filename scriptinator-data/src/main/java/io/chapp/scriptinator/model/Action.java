@@ -17,18 +17,13 @@ package io.chapp.scriptinator.model;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-public class Script extends AbstractEntity {
-    public static final String ATTRIBUTE = "script";
-    public static final String LIST_ATTRIBUTE = "scripts";
-    @NotNull
-    private String code;
+public class Action extends AbstractEntity {
+    public static final String ATTRIBUTE = "action";
+    public static final String LIST_ATTRIBUTE = "actions";
     @NotNull
     @Pattern(regexp = "[\\w]+")
     private String fullyQualifiedName;
@@ -37,19 +32,12 @@ public class Script extends AbstractEntity {
     private String description;
 
     @ManyToOne(optional = false)
+    @NotNull
     private Project project;
 
+    @ManyToOne(optional = false)
     @NotNull
-    @OneToMany(mappedBy = "script", orphanRemoval = true)
-    private List<Action> actions = new ArrayList<>();
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+    private Script script;
 
     public String getFullyQualifiedName() {
         return fullyQualifiedName;
@@ -73,5 +61,13 @@ public class Script extends AbstractEntity {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 }

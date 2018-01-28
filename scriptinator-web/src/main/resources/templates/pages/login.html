@@ -1,0 +1,83 @@
+<!--
+
+    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Scriptinator Login</title>
+
+    <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/semantic-ui-css/semantic.min.css}"/>
+    <script th:src="@{/assets/semantic-ui-css/semantic.min.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/assets/style.css}"/>
+</head>
+<body>
+<div id="login" class="ui middle aligned center aligned grid">
+    <div class="column">
+        <h2 class="ui big image">
+            <img th:src="@{/assets/logo.png}" class="image">
+        </h2>
+        <form class="ui large form" th:action="@{/login}" method="post">
+            <div class="ui stacked segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input autofocus
+                               required
+                               type="text"
+                               name="username"
+                               placeholder="Username"
+                        >
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input required
+                               type="password"
+                               name="password"
+                               placeholder="Password"
+                        >
+                    </div>
+                </div>
+                <button class="ui fluid large primary submit button">Login</button>
+            </div>
+        </form>
+
+        <div class="ui hidden error message">
+            We don't seem to know anyone with this username/password combination.
+        </div>
+
+        <div class="ui message">
+            New to us? <a href="#">Sign Up</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        if (window.location.search.indexOf("error") >= 0) {
+            $('.hidden.error').removeClass('hidden');
+        }
+    })
+</script>
+
+</body>
+</html>

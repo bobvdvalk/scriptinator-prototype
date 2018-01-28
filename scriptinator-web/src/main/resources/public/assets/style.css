@@ -1,0 +1,68 @@
+/**
+ * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/* GLOBAL THEMING */
+body {
+    background-color: #EAEAEA;
+}
+
+h1#title {
+    padding-top: 12px;
+}
+
+h2.sub {
+    padding-bottom: 10px;
+}
+
+tr td.clickable a, tr.clickable td a {
+    display: block;
+}
+
+tr td.clickable:hover, tr.clickable:hover td {
+    background-color: #f9fafb;
+    text-decoration: underline;
+}
+
+.tight, .ui.table tr td.tight, .tight.sub.header {
+    padding: 0;
+    margin: 0;
+}
+
+.hidden, .ui.button.hidden, .ui.buttons.hidden {
+    display: none;
+}
+
+/* LOGIN PAGE */
+#login {
+    height: 100%;
+}
+
+#login .image {
+    margin-top: -100px;
+}
+
+#login .column {
+    max-width: 450px;
+}
+
+/* Editor */
+#editor {
+    min-height: 500px;
+    width: 100%;
+}
+
+.editor.read-only .ace_layer.ace_cursor-layer {
+    display: none;
+}

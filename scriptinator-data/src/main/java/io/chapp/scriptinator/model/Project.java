@@ -21,19 +21,26 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Project extends AbstractEntity {
+    public static final String ATTRIBUTE = "project";
+    public static final String LIST_ATTRIBUTE = "projects";
     @NotEmpty
     @Length(min = 4)
     private String displayName;
-
+    private String description;
+    private boolean actionsEnabled = true;
     @ManyToOne(optional = false)
     private User owner;
-
     @OneToMany(mappedBy = "project", orphanRemoval = true)
-    private List<Script> scripts;
+    @NotNull
+    private List<Script> scripts = new ArrayList<>();
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    private List<Action> actions = new ArrayList<>();
 
     public String getDisplayName() {
         return displayName;
@@ -43,12 +50,37 @@ public class Project extends AbstractEntity {
         this.displayName = displayName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public User getOwner() {
         return owner;
     }
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public List<Action> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<Action> actions) {
+        this.actions = actions;
+    }
+
+
+    public boolean isActionsEnabled() {
+        return actionsEnabled;
+    }
+
+    public void setActionsEnabled(boolean actionsEnabled) {
+        this.actionsEnabled = actionsEnabled;
     }
 
     public List<Script> getScripts() {
