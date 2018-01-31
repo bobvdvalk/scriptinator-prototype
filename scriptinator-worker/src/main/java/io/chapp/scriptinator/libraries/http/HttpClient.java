@@ -32,11 +32,16 @@ import static io.chapp.scriptinator.libraries.EncodeUtils.toBase64;
 import static io.chapp.scriptinator.libraries.EncodeUtils.urlEncode;
 
 public class HttpClient extends HttpRequestExecutor {
-    private static final Set<String> REQUIRE_BODY = Collections.unmodifiableSet(new HashSet<String>() {{
-        add("POST");
-        add("PUT");
-        add("PATCH");
-    }});
+    private static final Set<String> REQUIRE_BODY;
+
+    static {
+        HashSet<String> methods = new HashSet<>();
+        methods.add("POST");
+        methods.add("PUT");
+        methods.add("PATCH");
+        REQUIRE_BODY = Collections.unmodifiableSet(methods);
+    }
+
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
 
