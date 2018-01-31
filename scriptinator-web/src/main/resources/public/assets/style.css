@@ -63,6 +63,45 @@ tr td.clickable:hover, tr.clickable:hover td {
     width: 100%;
 }
 
+.editor.read-only *{
+    cursor: default;
+}
+
 .editor.read-only .ace_layer.ace_cursor-layer {
     display: none;
+}
+
+/* JOBS */
+.job.finished {
+    background-color: rgba(0, 255, 0, 0.2);
+}
+
+.job.failed {
+    background-color: rgba(0, 0, 255, 0.2);
+}
+
+@keyframes queued_job {
+    from {
+        background-color: transparent;
+    }
+    to {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}
+
+.job.queued {
+    animation: queued_job 1s infinite alternate;
+}
+
+@keyframes running_job {
+    from {
+        background-color: rgba(255, 255, 0, 0.2);
+    }
+    to {
+        background-color: transparent;
+    }
+}
+
+.job.running {
+    animation: running_job 1s infinite alternate;
 }

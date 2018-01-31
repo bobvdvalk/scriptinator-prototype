@@ -22,21 +22,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectService extends AbstractEntityService<Project, ProjectRepository> {
 
-    @Override
-    public Project create(Project entity) {
-        validate(entity);
-        return super.create(entity);
-    }
-
-    @Override
-    public Project update(Project entity) {
-        validate(entity);
-        return super.update(entity);
-    }
-
-    private void validate(Project project) {
-        if (!project.isActionsEnabled() && !project.getActions().isEmpty()) {
-            throw new IllegalStateException("This project cannot have actions");
-        }
-    }
 }

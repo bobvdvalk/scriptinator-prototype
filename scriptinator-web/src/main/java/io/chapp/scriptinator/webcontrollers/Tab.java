@@ -19,7 +19,6 @@ public class Tab {
     public static final String ATTRIBUTE = "activeTab";
     public static final String OVERVIEW = "overview";
     public static final String SCRIPTS = "scripts";
-    public static final String ACTIONS = "actions";
     public static final String SETTINGS = "settings";
 
     private Tab() {

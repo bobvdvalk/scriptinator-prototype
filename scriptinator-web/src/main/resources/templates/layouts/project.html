@@ -27,6 +27,7 @@
 
     <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
     <script th:src="@{/assets/ace-builds/src-min-noconflict/ace.js}"></script>
+    <script th:src="@{/assets/ace-builds/src-min-noconflict/ext-language_tools.js}"></script>
 
     <link rel="stylesheet" th:href="@{/assets/semantic-ui-css/semantic.min.css}"/>
     <script th:src="@{/assets/semantic-ui-css/semantic.min.js}"></script>
@@ -61,11 +62,6 @@
                     <i class="ui code icon"></i> Scripts
                 </a>
                 <a class="item"
-                   th:href="@{'/project/' + ${project.id} + '/actions'}"
-                   th:classappend="${activeTab} == 'actions' ? 'active' : ''">
-                    <i class="ui lightning icon"></i> Actions
-                </a>
-                <a class="item"
                    th:href="@{'/project/' + ${project.id} + '/settings'}"
                    th:classappend="${activeTab} == 'settings' ? 'active' : ''">
                     <i class="ui settings icon"></i> Settings
@@ -79,6 +75,25 @@
 </div>
 
 <script>
+
+    function setReadOnly(editor, readOnly) {
+        if(readOnly) {
+            editor.setOptions({
+                readOnly: true,
+                highlightActiveLine: false,
+                highlightGutterLine: false,
+                enableBasicAutocompletion: false
+            });
+        } else {
+            editor.setOptions({
+                readOnly: false,
+                highlightActiveLine: true,
+                highlightGutterLine: true,
+                enableBasicAutocompletion: true
+            });
+        }
+    }
+
     // Load Ace Editor
     var editor = null;
     $(document).ready(function () {
@@ -87,13 +102,7 @@
             aceEditor.setTheme("ace/theme/dreamweaver");
             aceEditor.getSession().setMode("ace/mode/javascript");
 
-            if (block.classList.contains("read-only")) {
-                aceEditor.setOptions({
-                    readOnly: true,
-                    highlightActiveLine: false,
-                    highlightGutterLine: false
-                });
-            }
+            setReadOnly(aceEditor, block.classList.contains("read-only"));
 
             if (block.id === "editor") {
                 editor = aceEditor;

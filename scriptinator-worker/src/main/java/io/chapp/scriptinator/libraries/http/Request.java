@@ -13,9 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.model.Action;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
-public interface ActionRepository extends AbstractEntityRepository<Action> {
+import java.io.IOException;
+
+public class Request {
+    private final OkHttpClient client;
+    private final okhttp3.Request.Builder builder;
+
+    public Request(OkHttpClient client, okhttp3.Request.Builder builder) {
+        this.client = client;
+        this.builder = builder;
+    }
+
+    public Response execute() throws IOException {
+        return client.newCall(builder.build()).execute();
+    }
 }

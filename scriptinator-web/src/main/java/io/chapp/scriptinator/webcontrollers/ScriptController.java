@@ -15,27 +15,44 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
+import io.chapp.scriptinator.ScriptinatorWebConfiguration;
+import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
+import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScriptService;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+import static java.util.Collections.singletonMap;
+
 @Controller
 @RequestMapping("/project/{projectId}/script")
 public class ScriptController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptController.class);
     private final ScriptService scriptService;
     private final ProjectService projectService;
     private final ProjectController projectController;
+    private final JobService jobService;
+    private final ScriptinatorWebConfiguration configuration;
 
-    public ScriptController(ScriptService scriptService, ProjectService projectService, ProjectController projectController) {
+    public ScriptController(ScriptService scriptService, ProjectService projectService, ProjectController projectController, JobService jobService, ScriptinatorWebConfiguration configuration) {
         this.scriptService = scriptService;
         this.projectService = projectService;
         this.projectController = projectController;
+        this.jobService = jobService;
+        this.configuration = configuration;
     }
 
     @ModelAttribute
@@ -44,7 +61,7 @@ public class ScriptController {
     }
 
     @GetMapping
-    public String showCreateScriptForm(@PathVariable int projectId, Model model) {
+    public String showCreateScriptForm(@PathVariable long projectId, Model model) {
         model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
         if (!model.containsAttribute(Script.ATTRIBUTE)) {
             model.addAttribute(Script.ATTRIBUTE, new Script());
@@ -53,25 +70,66 @@ public class ScriptController {
     }
 
     @PostMapping
-    public String createNewScript(@PathVariable int projectId, @ModelAttribute("script") Script script) {
+    public String createNewScript(@PathVariable long projectId, @ModelAttribute("script") Script script, Model model) {
         // Set the project, save the script.
         Project project = projectService.get(projectId);
         script.setProject(project);
-        scriptService.create(script);
+        try {
+            scriptService.create(script);
+        } catch (DataIntegrityViolationException e) {
+            Throwable cause = e.getCause();
+
+            if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals("script_name")) {
+                model.addAttribute(Script.ATTRIBUTE, script);
+                model.addAttribute(
+                        "errors",
+                        singletonMap(
+                                "fullyQualifiedName",
+                                "There already seems to be a script with that name. Please consider a different name."
+                        )
+                );
+            }
+            return showCreateScriptForm(projectId, model);
+        }
+
 
         return "redirect:/project/" + projectId;
     }
 
     @GetMapping("{scriptId}")
-    public String showScript(@PathVariable int projectId, @PathVariable int scriptId, Model model) {
+    public String showScript(@PathVariable long projectId, @PathVariable long scriptId, Model model) {
         Script script = getSafeScript(projectId, scriptId);
         model.addAttribute(Script.ATTRIBUTE, script);
         model.addAttribute(Project.ATTRIBUTE, script.getProject());
+
+        Page<Job> jobs = jobService.get(
+                scriptId,
+                new PageRequest(
+                        0,
+                        configuration.getDefaultPageSize(),
+                        new Sort(
+                                Sort.Direction.DESC,
+                                "id"
+                        )
+                )
+        );
+
+        model.addAttribute(Job.LIST_ATTRIBUTE, jobs);
+        model.addAttribute(
+                "isRunning",
+                jobs.getContent().stream().anyMatch(job -> job.getFinishedTime() == null)
+        );
         return "pages/view_script";
     }
 
+    @PostMapping("{scriptId}")
+    public String runScript(@PathVariable long projectId, @PathVariable long scriptId, Model model) {
+        scriptService.run(scriptService.get(scriptId));
+        return showScript(projectId, scriptId, model);
+    }
+
     @PatchMapping("{scriptId}")
-    public String updateScript(@PathVariable int projectId, @PathVariable int scriptId, @RequestParam("code") String code, Model model) {
+    public String updateScript(@PathVariable long projectId, @PathVariable long scriptId, @RequestParam("code") String code, Model model) {
         Script script = getSafeScript(projectId, scriptId);
         script.setCode(code);
         scriptService.update(script);
@@ -79,12 +137,12 @@ public class ScriptController {
     }
 
     @DeleteMapping("{scriptId}")
-    public String deleteScript(@PathVariable int projectId, @PathVariable int scriptId, Model model) {
+    public String deleteScript(@PathVariable long projectId, @PathVariable long scriptId, Model model) {
         scriptService.delete(getSafeScript(projectId, scriptId).getId());
         return projectController.viewScripts(projectId, model);
     }
 
-    private Script getSafeScript(int projectId, int scriptId) {
+    private Script getSafeScript(long projectId, long scriptId) {
         Script script = scriptService.get(scriptId);
         if (!script.getProject().getId().equals(projectId)) {
             throw new NoSuchElementException();

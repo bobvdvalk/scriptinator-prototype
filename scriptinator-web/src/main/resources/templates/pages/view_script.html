@@ -49,11 +49,20 @@
         <tfoot>
         <tr>
             <th>
-                <button id="edit-btn"
-                        class="ui primary right floated button"
-                        onclick="editScript()">
-                    Edit
-                </button>
+                <div id="view-btns"
+                     class="ui right floated buttons">
+                    <button class="ui primary button"
+                            onclick="editScript()">
+                        Edit
+                    </button>
+                    <form th:method="post"
+                          th:action="@{''}">
+                        <button class="ui positive icon button"
+                                type="submit">
+                            <i class="ui play icon"></i> Run
+                        </button>
+                    </form>
+                </div>
                 <div id="edit-btns"
                      class="ui hidden right floated buttons">
                     <button class="ui button"
@@ -66,7 +75,7 @@
                     </button>
                     <button class="ui positive button"
                             onclick="saveScript()"
-                            type="submit">
+                            type="button">
                         Save
                     </button>
                 </div>
@@ -74,6 +83,80 @@
         </tr>
         </tfoot>
     </table>
+
+    <h4 class="ui header">
+        Jobs
+    </h4>
+    <div id="jobs">
+        <table class="ui compact table" th:classappend="${isRunning ? 'running' : ''}">
+            <thead>
+            <tr>
+                <th>
+                    Job
+                </th>
+                <th class="collapsing">
+                </th>
+                <th class="collapsing">
+                    Status
+                </th>
+            </tr>
+            </thead>
+            <tr th:if="${!jobs.hasContent()}">
+                <td colspan="2">
+                    This action has not been executed before.
+                </td>
+            </tr>
+            <tr th:each="job : ${jobs}"
+                class="job"
+                th:classappend="${job.status.name().toLowerCase()}">
+                <td th:text="${job.displayName}"></td>
+                <td>
+                    <th:block th:if="${!job.output.isEmpty()}">
+                        <div class="ui fullscreen modal">
+                            <div class="header">Output: <span th:text="${job.displayName}"></span></div>
+                            <div class="scrolling content">
+                                <pre th:text="${job.output}"></pre>
+                            </div>
+                        </div>
+                        <button th:data-job="${job.id}"
+                                class="ui circular icon button output-btn"
+                                data-tooltip="Show Log">
+                            <i class="ellipsis horizontal icon"></i>
+                        </button>
+                    </th:block>
+                </td>
+                <td>
+                    <th:block th:switch="${job.status}">
+                        <div th:case="${job.status.QUEUED}"
+                             class="ui circular icon button"
+                             th:data-tooltip="'Queued at ' + ${job.queuedTime}">
+                            <i class="wait icon"></i>
+                        </div>
+                        <div th:case="${job.status.RUNNING}"
+                             class="ui circular icon button"
+                             th:data-tooltip="'Started at ' + ${job.startedTime}">
+                            <i class="play icon"></i>
+                        </div>
+                        <div th:case="${job.status.FINISHED}"
+                             class="ui circular icon button"
+                             th:data-tooltip="'Finished at ' + ${job.finishedTime}">
+                            <i class="check icon"></i>
+                        </div>
+                        <div th:case="${job.status.FAILED}"
+                             class="ui circular icon button"
+                             th:data-tooltip="'Finished at ' + ${job.finishedTime}">
+                            <i class="warning icon"></i>
+                        </div>
+                    </th:block>
+                </td>
+            </tr>
+            <tfoot>
+            <tr>
+                <th colspan="3">
+                </th>
+            </tr>
+            </tfoot>
+        </table>
     <div class="ui basic modal">
         <div class="ui icon header">
             <i class="delete icon"></i>
@@ -97,18 +180,14 @@
 
 <script layout:fragment="script" th:inline="javascript">
     function editScript() {
-        editor.setOptions({
-            readOnly: false,
-            highlightActiveLine: true,
-            highlightGutterLine: true
-        });
         editor.container.classList.remove("read-only");
+        setReadOnly(editor, false);
         $('#edit-btns').removeClass('hidden');
-        $('#edit-btn').addClass('hidden');
+        $('#view-btns').addClass('hidden');
     }
 
     function cancelEdit() {
-        window.location.reload();
+        window.location.assign(window.location);
     }
 
     function promptDeleteScript() {
@@ -145,9 +224,37 @@
                 xhr.setRequestHeader(header, token);
             },
             success: function (data, textStatus, jqXHR) {
-                window.location.reload();
+                window.location.assign(window.location);
             }
         });
+    }
+
+    $(document).ready(function () {
+        refreshTable();
+        linkModals();
+    });
+
+    function refreshTable() {
+        var jobsContainer = $('#jobs');
+        var table = $('#jobs > *');
+
+        setTimeout(
+            function () {
+                // Reload the table
+                jobsContainer.load(
+                    document.URL + ' #jobs > *',
+                    linkModals
+                );
+                refreshTable();
+            },
+            table.hasClass('running') ? 2000 : 10000
+        )
+    }
+
+    function linkModals() {
+        $('.output-btn').each(function (index, btn) {
+            $(btn).siblings().modal('attach events', btn);
+        })
     }
 </script>
 

@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator;
 
-import io.chapp.scriptinator.model.Script;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public interface ScriptRepository extends AbstractEntityRepository<Script> {
-    Script findOneByProjectIdAndFullyQualifiedName(long projectId, String fullyQualifiedName);
+@SpringBootApplication
+public class ScriptinatorWorker {
+    public static void main(String[] args) {
+        SpringApplication.run(ScriptinatorWorker.class, args);
+    }
 }

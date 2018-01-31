@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.services;
+package io.chapp.scriptinator.repositories;
 
-import io.chapp.scriptinator.model.Action;
-import io.chapp.scriptinator.repositories.ActionRepository;
-import org.springframework.stereotype.Service;
+import io.chapp.scriptinator.model.Job;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Service
-public class ActionService extends AbstractEntityService<Action, ActionRepository> {
+public interface JobRepository extends AbstractEntityRepository<Job> {
+    Page<Job> findByScriptId(long scriptId, Pageable pageable);
 }

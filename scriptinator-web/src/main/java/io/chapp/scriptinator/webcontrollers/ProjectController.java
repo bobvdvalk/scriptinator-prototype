@@ -15,7 +15,6 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
-import io.chapp.scriptinator.model.Action;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
@@ -39,12 +38,12 @@ public class ProjectController {
     }
 
     @GetMapping("{projectId}")
-    public String viewOverview(@PathVariable int projectId) {
+    public String viewOverview(@PathVariable long projectId) {
         return "redirect:/project/" + projectId + "/scripts";
     }
 
     @GetMapping("{projectId}/scripts")
-    public String viewScripts(@PathVariable int projectId, Model model) {
+    public String viewScripts(@PathVariable long projectId, Model model) {
         Project project = projectService.get(projectId);
         model.addAttribute(Project.ATTRIBUTE, project);
         model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
@@ -54,18 +53,8 @@ public class ProjectController {
         return "pages/view_scripts";
     }
 
-    @GetMapping("{projectId}/actions")
-    public String viewActions(@PathVariable int projectId, Model model) {
-        Project project = projectService.get(projectId);
-        model.addAttribute(Project.ATTRIBUTE, project);
-        model.addAttribute(Action.LIST_ATTRIBUTE, project.getActions());
-        model.addAttribute(Tab.ATTRIBUTE, Tab.ACTIONS);
-        model.addAttribute("actionCount", project.getActions().size());
-        return "pages/view_actions";
-    }
-
     @GetMapping("{projectId}/settings")
-    public String editProject(@PathVariable int projectId, Model model) {
+    public String editProject(@PathVariable long projectId, Model model) {
         model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
         model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
         return "pages/edit_project";
@@ -89,7 +78,7 @@ public class ProjectController {
     }
 
     @PostMapping("{projectId}/settings")
-    public String updateProject(@PathVariable int projectId, @ModelAttribute(Project.ATTRIBUTE) Project projectChanges, Model model) {
+    public String updateProject(@PathVariable long projectId, @ModelAttribute(Project.ATTRIBUTE) Project projectChanges, Model model) {
         // Update the current project with the project changes.
         Project currentProject = projectService.get(projectId);
         currentProject.setDisplayName(projectChanges.getDisplayName());
@@ -100,7 +89,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("{projectId}")
-    public String deleteProject(@PathVariable int projectId, Model model) {
+    public String deleteProject(@PathVariable long projectId, Model model) {
         projectService.delete(projectId);
         return projectsController.projectList(model);
     }

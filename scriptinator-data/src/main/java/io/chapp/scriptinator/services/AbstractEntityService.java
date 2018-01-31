@@ -33,10 +33,10 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
      * @return the entity
      * @throws NoSuchElementException if the entity was not found
      */
-    public E get(int id) {
+    public E get(long id) {
         E entity = repository.findOne(id);
         if (entity == null) {
-            throw new NoSuchElementException(Integer.toString(id));
+            throw new NoSuchElementException(Long.toString(id));
         }
         return entity;
     }
@@ -81,7 +81,7 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
      *
      * @param id the id of the entity to delete
      */
-    public void delete(int id) {
+    public void delete(long id) {
         repository.delete(id);
     }
 

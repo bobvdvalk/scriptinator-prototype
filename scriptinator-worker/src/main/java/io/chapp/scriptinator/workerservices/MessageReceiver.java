@@ -13,36 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.services;
+package io.chapp.scriptinator.workerservices;
 
 import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Script;
-import io.chapp.scriptinator.repositories.ScriptRepository;
+import io.chapp.scriptinator.services.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 @Service
-public class ScriptService extends AbstractEntityService<Script, ScriptRepository> {
+public class MessageReceiver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
     private final JobService jobService;
+    private final ScriptExecutor scriptExecutor;
 
-    public ScriptService(JobService jobService) {
+    public MessageReceiver(JobService jobService, ScriptExecutor scriptExecutor) {
         this.jobService = jobService;
+        this.scriptExecutor = scriptExecutor;
     }
 
-    public Script get(long projectId, String fullyQualifiedName) {
-        Script result = getRepository().findOneByProjectIdAndFullyQualifiedName(projectId, fullyQualifiedName);
-        if (result == null) {
-            throw new NoSuchElementException();
+    public void executeJob(long jobId) {
+        Job job = getJob(jobId);
+        if (job == null) {
+            return;
         }
-        return result;
+
+        scriptExecutor.execute(job);
     }
 
-    public Job run(Script script) {
-        Job job = new Job();
-        job.setDisplayName(script.getFullyQualifiedName());
-        job.setProject(script.getProject());
-        job.setScript(script);
-        return jobService.create(job);
+    private Job getJob(long jobId) {
+        try {
+            return jobService.get(jobId);
+        } catch (NoSuchElementException e) {
+            // The job no longer exists
+            LOGGER.debug("The job was not found", e);
+            return null;
+        }
     }
 }

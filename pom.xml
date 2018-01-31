@@ -87,6 +87,7 @@
         <java.version>1.8</java.version>
         <thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
+        <okhttp.version>3.9.1</okhttp.version>
 
         <!-- Build Dependencies -->
         <node.version>9.3.0</node.version>
@@ -122,6 +123,11 @@
             </dependency>
 
             <!-- Third Party Dependencies -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
 
             <!-- Test Dependencies -->
         </dependencies>

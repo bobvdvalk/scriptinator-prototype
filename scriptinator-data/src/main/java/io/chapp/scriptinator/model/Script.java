@@ -15,41 +15,42 @@
  */
 package io.chapp.scriptinator.model;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(
+        name = "script_name",
+        columnNames = {"project_id", "fully_qualified_name"}
+))
 public class Script extends AbstractEntity {
     public static final String ATTRIBUTE = "script";
     public static final String LIST_ATTRIBUTE = "scripts";
-    @NotNull
-    private String code;
+
     @NotNull
     @Pattern(regexp = "[\\w]+")
+    @Column(name = "fully_qualified_name")
     private String fullyQualifiedName;
 
     @NotNull
     private String description;
 
+    private boolean runnable;
+
+    @NotNull
+    @Lob
+    private String code;
+
     @ManyToOne(optional = false)
+    @JoinColumn(name = "project_id")
     private Project project;
 
     @NotNull
-    @OneToMany(mappedBy = "script", orphanRemoval = true)
-    private List<Action> actions = new ArrayList<>();
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    private List<Job> jobs = new ArrayList<>();
 
     public String getFullyQualifiedName() {
         return fullyQualifiedName;
@@ -67,11 +68,35 @@ public class Script extends AbstractEntity {
         this.description = description;
     }
 
+    public boolean isRunnable() {
+        return runnable;
+    }
+
+    public void setRunnable(boolean runnable) {
+        this.runnable = runnable;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public Project getProject() {
         return project;
     }
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public List<Job> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 }

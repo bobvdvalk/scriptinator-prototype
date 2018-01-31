@@ -26,14 +26,16 @@
     <form th:action="''"
           th:method="post"
           th:object="${script}"
-          class="ui form">
+          class="ui form"
+          th:classappend="${errors != null ? 'error': ''}">
         <table class="ui table">
             <thead>
             <tr>
                 <th colspan="2">
                     <div class="ui grid">
                         <div class="four wide column">
-                            <div class="field">
+                            <div class="field"
+                                 th:classappend="${errors?.get('fullyQualifiedName') == null ? '' : 'error'}">
                                 Name
                                 <input type="text"
                                        name="fullyQualifiedName"
@@ -62,7 +64,8 @@
                 <td colspan="2"
                     class="tight">
                     <div id="editor"
-                         class="editor"></div>
+                         class="editor"
+                         th:text="${script.code}"></div>
                     <input type="hidden"
                            id="code_field"
                            th:field="*{code}"
@@ -73,7 +76,11 @@
             <tfoot>
             <tr>
                 <th>
-                    <div class="ui error message"></div>
+                    <div class="ui error message">
+                        <ul class="list" th:if="${errors != null && !errors.isEmpty()}">
+                            <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                        </ul>
+                    </div>
                 </th>
                 <th>
                     <button class="ui primary right floated button"

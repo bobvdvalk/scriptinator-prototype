@@ -15,11 +15,9 @@
  */
 package io.chapp.scriptinator;
 
-import io.chapp.scriptinator.model.Action;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
-import io.chapp.scriptinator.repositories.ActionRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
@@ -32,14 +30,12 @@ public class LoadDefaultContent implements CommandLineRunner {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ScriptRepository scriptRepository;
-    private final ActionRepository actionRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public LoadDefaultContent(UserRepository userRepository, ProjectRepository projectRepository, ScriptRepository scriptRepository, ActionRepository actionRepository, PasswordEncoder passwordEncoder) {
+    public LoadDefaultContent(UserRepository userRepository, ProjectRepository projectRepository, ScriptRepository scriptRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.scriptRepository = scriptRepository;
-        this.actionRepository = actionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -61,17 +57,10 @@ public class LoadDefaultContent implements CommandLineRunner {
 
             Script script = new Script();
             script.setProject(project);
-            script.setCode("print('Hello World');");
+            script.setCode("Script.info('Hello World');");
             script.setDescription("Hello World");
             script.setFullyQualifiedName("greet");
-            script = scriptRepository.save(script);
-
-            Action action = new Action();
-            action.setFullyQualifiedName("sendGreeting");
-            action.setDescription("Send a greeting to someone");
-            action.setProject(project);
-            action.setScript(script);
-            actionRepository.save(action);
+            scriptRepository.save(script);
         }
     }
 }

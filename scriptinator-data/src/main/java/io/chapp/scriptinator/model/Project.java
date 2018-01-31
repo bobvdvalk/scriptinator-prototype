@@ -33,14 +33,14 @@ public class Project extends AbstractEntity {
     @Length(min = 4)
     private String displayName;
     private String description;
-    private boolean actionsEnabled = true;
     @ManyToOne(optional = false)
     private User owner;
-    @OneToMany(mappedBy = "project", orphanRemoval = true)
     @NotNull
-    private List<Script> scripts = new ArrayList<>();
     @OneToMany(mappedBy = "project", orphanRemoval = true)
-    private List<Action> actions = new ArrayList<>();
+    private List<Script> scripts = new ArrayList<>();
+    @NotNull
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    private List<Job> jobs = new ArrayList<>();
 
     public String getDisplayName() {
         return displayName;
@@ -66,28 +66,19 @@ public class Project extends AbstractEntity {
         this.owner = owner;
     }
 
-    public List<Action> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<Action> actions) {
-        this.actions = actions;
-    }
-
-
-    public boolean isActionsEnabled() {
-        return actionsEnabled;
-    }
-
-    public void setActionsEnabled(boolean actionsEnabled) {
-        this.actionsEnabled = actionsEnabled;
-    }
-
     public List<Script> getScripts() {
         return scripts;
     }
 
     public void setScripts(List<Script> scripts) {
         this.scripts = scripts;
+    }
+
+    public List<Job> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 }
