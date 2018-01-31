@@ -18,8 +18,6 @@ package io.chapp.scriptinator.libraries;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +26,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ScriptLibrary {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibrary.class);
     private static final Map<String, Function<ScriptLibrary, ?>> libraries = new HashMap<>();
 
     static {
