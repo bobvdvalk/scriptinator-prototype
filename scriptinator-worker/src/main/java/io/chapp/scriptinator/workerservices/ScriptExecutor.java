@@ -27,10 +27,12 @@ import javax.script.*;
 public class ScriptExecutor {
     private final ObjectFactory<ScriptEngine> scriptEngineFactory;
     private final JobService jobService;
+    private final ObjectConverter objectConverter;
 
-    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService) {
+    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ObjectConverter objectConverter) {
         this.scriptEngineFactory = scriptEngineFactory;
         this.jobService = jobService;
+        this.objectConverter = objectConverter;
     }
 
     @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
@@ -39,7 +41,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
-        bindings.put("Script", new ScriptLibrary(jobService, job));
+        bindings.put("Script", new ScriptLibrary(jobService, job, objectConverter));
 
         CompiledScript script = compile(engine, job);
         if (script == null) {

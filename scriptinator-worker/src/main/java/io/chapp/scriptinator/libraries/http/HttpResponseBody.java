@@ -15,23 +15,13 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.workerservices.ObjectConverter;
-import okhttp3.OkHttpClient;
+import io.chapp.scriptinator.libraries.DataValue;
+import okhttp3.ResponseBody;
 
-public class HttpLibrary extends HttpRequestExecutor {
-    private final ObjectConverter converter;
+public class HttpResponseBody extends DataValue {
+    private final ResponseBody body;
 
-    public HttpLibrary(ObjectConverter converter) {
-        super(converter);
-        this.converter = converter;
-    }
-
-    public HttpClient client() {
-        return new HttpClient(new OkHttpClient(), converter);
-    }
-
-    @Override
-    public HttpResponse request(HttpRequest request) {
-        return client().request(request);
+    public HttpResponseBody(ResponseBody body) {
+        this.body = body;
     }
 }

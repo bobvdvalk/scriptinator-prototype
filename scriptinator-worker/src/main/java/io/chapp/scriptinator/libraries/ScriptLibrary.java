@@ -18,6 +18,7 @@ package io.chapp.scriptinator.libraries;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
+import io.chapp.scriptinator.workerservices.ObjectConverter;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -25,10 +26,12 @@ import java.util.stream.Collectors;
 public class ScriptLibrary {
     private final JobService jobService;
     private final Job job;
+    private final ObjectConverter converter;
 
-    public ScriptLibrary(JobService jobService, Job job) {
+    public ScriptLibrary(JobService jobService, Job job, ObjectConverter converter) {
         this.jobService = jobService;
         this.job = job;
+        this.converter = converter;
     }
 
     public void debug(Object... values) {
@@ -50,7 +53,7 @@ public class ScriptLibrary {
     public Object library(String name) {
         switch (name) {
             case "HTTP":
-                return new HttpLibrary();
+                return new HttpLibrary(converter);
         }
         return null;
     }

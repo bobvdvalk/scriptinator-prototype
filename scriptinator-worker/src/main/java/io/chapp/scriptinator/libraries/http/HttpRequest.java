@@ -15,23 +15,34 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.workerservices.ObjectConverter;
-import okhttp3.OkHttpClient;
+import io.chapp.scriptinator.libraries.DataValue;
 
-public class HttpLibrary extends HttpRequestExecutor {
-    private final ObjectConverter converter;
+import java.util.Map;
 
-    public HttpLibrary(ObjectConverter converter) {
-        super(converter);
-        this.converter = converter;
+public class HttpRequest extends DataValue {
+    private String method;
+    private String url;
+
+    public String getMethod() {
+        return method;
     }
 
-    public HttpClient client() {
-        return new HttpClient(new OkHttpClient(), converter);
+    public void setMethod(String method) {
+        this.method = method;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 
     @Override
-    public HttpResponse request(HttpRequest request) {
-        return client().request(request);
+    protected void inspect(Map<String, Object> target) {
+        target.put("method", method);
+        target.put("url", url);
     }
 }

@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.libraries.http;
+package io.chapp.scriptinator.workerservices;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.Map;
 
-public class Request {
-    private final OkHttpClient client;
-    private final okhttp3.Request.Builder builder;
+@Service
+public class ObjectConverter {
+    private final ObjectMapper mapper;
 
-    public Request(OkHttpClient client, okhttp3.Request.Builder builder) {
-        this.client = client;
-        this.builder = builder;
+
+    public ObjectConverter(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
-    public Response execute() throws IOException {
-        return client.newCall(builder.build()).execute();
+    public <T> T read(Map<String, Object> value, Class<T> targetClass) {
+        return mapper.convertValue(value, targetClass);
     }
 }
