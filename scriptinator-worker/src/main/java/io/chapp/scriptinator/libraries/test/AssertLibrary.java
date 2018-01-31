@@ -13,7 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = Script.library("Assert");
-var HTTP = Script.library("HTTP");
+package io.chapp.scriptinator.libraries.test;
 
-Assert.notNull("HTTP", HTTP);
+public class AssertLibrary {
+    public void fail(String message) {
+        throw new UnmetAssertionException("Assertion not met: " + message);
+    }
+
+    public void notNull(String property, Object value) {
+        if (value == null) {
+            fail("Expected '" + property + "' to be not null.");
+        }
+    }
+}

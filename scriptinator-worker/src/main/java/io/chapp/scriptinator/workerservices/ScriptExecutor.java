@@ -16,8 +16,11 @@
 package io.chapp.scriptinator.workerservices;
 
 import io.chapp.scriptinator.libraries.ScriptLibrary;
+import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,7 @@ import javax.script.*;
 
 @Service
 public class ScriptExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
     private final ObjectFactory<ScriptEngine> scriptEngineFactory;
     private final JobService jobService;
     private final ObjectConverter objectConverter;
@@ -52,7 +56,11 @@ public class ScriptExecutor {
             jobService.changeStatus(job, Job.Status.RUNNING);
             script.eval();
             jobService.changeStatus(job, Job.Status.FINISHED);
+        } catch (ScriptinatorExecutionException e) {
+            job.log("FATAL", e.getMessage());
+            jobService.changeStatus(job, Job.Status.FAILED);
         } catch (Throwable e) {
+            LOGGER.error("Unknown fatal error", e);
             job.log("FATAL", "Oops, something unexpected happened while running your script: " + e.getMessage());
             jobService.changeStatus(job, Job.Status.FAILED);
         }

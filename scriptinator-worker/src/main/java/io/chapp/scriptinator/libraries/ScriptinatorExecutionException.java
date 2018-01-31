@@ -13,7 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = Script.library("Assert");
-var HTTP = Script.library("HTTP");
+package io.chapp.scriptinator.libraries;
 
-Assert.notNull("HTTP", HTTP);
+public class ScriptinatorExecutionException extends RuntimeException {
+    public ScriptinatorExecutionException(String message) {
+        super(message);
+    }
+
+    public ScriptinatorExecutionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

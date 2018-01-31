@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = Script.library("Assert");
-var HTTP = Script.library("HTTP");
+package io.chapp.scriptinator.libraries.test;
 
-Assert.notNull("HTTP", HTTP);
+import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
+
+public class UnmetAssertionException extends ScriptinatorExecutionException {
+    public UnmetAssertionException(String message) {
+        super(message);
+    }
+}
