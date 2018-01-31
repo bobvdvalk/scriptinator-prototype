@@ -24,22 +24,31 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ScriptLibrary {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibrary.class);
-    private static final Map<String, Class<?>> libraries = new HashMap<>();
+    private static final Map<String, Function<ScriptLibrary, ?>> libraries = new HashMap<>();
+
+    static {
+        libraries.put("HTTP", lib -> new HttpLibrary());
+    }
 
     private final JobService jobService;
     private final Job job;
 
-    static {
-        libraries.put("HTTP", HttpLibrary.class);
-    }
-
     public ScriptLibrary(JobService jobService, Job job) {
         this.jobService = jobService;
         this.job = job;
+    }
+
+    public Object library(String name) {
+        Function<ScriptLibrary, ?> builder = libraries.get(name);
+        if (builder == null) {
+            return null;
+        }
+        return builder.apply(this);
     }
 
     public void debug(Object... values) {
@@ -58,18 +67,6 @@ public class ScriptLibrary {
         log("ERROR", values);
     }
 
-    public Object library(String name) {
-        return libraries.containsKey(name) ? instantiateLibrary(libraries.get(name)) : null;
-    }
-
-    private Object instantiateLibrary(Class clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
-            LOGGER.error("Could not instantiate library: " + clazz.getSimpleName());
-        }
-        return null;
-    }
 
     private void log(String level, Object[] values) {
         job.log(
