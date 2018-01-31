@@ -15,14 +15,17 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.chapp.scriptinator.libraries.EncodeUtils.toBase64;
+import static io.chapp.scriptinator.libraries.EncodeUtils.urlEncode;
 
 public class HttpClient extends HttpRequestExecutor {
     private final OkHttpClient client;
@@ -54,11 +57,66 @@ public class HttpClient extends HttpRequestExecutor {
     }
 
     private Headers buildHeaders(HttpRequest request) {
-        return Headers.of();
+        Headers.Builder headers = new Headers.Builder();
+        if (request.getHeaders() != null) {
+            request.getHeaders().forEach(headers::add);
+        }
+
+        if (request.getBasicAuthentication() != null) {
+            headers.add("Authorization", "Basic " + toBase64(
+                    request.getBasicAuthentication().getUsername() + ":" +
+                            request.getBasicAuthentication().getPassword()
+            ));
+        }
+
+        return headers.build();
     }
 
     private RequestBody buildBody(HttpRequest request) {
-        return null;
+        String contentType = request.getContentType();
+        if (contentType == null) {
+            if (request.getBody() == null) {
+                return null;
+            }
+            contentType = "application/json";
+        }
+
+        MediaType mediaType = MediaType.parse(contentType);
+
+        if (mediaType == null) {
+            throw new IllegalArgumentException("Invalid contentType: " + request.getContentType());
+        }
+
+        if (mediaType.toString().contains("json")) {
+            return jsonBody(mediaType, request.getBody());
+        }
+
+        if (mediaType.subtype().equals("x-www-form-urlencoded") && request.getBody() instanceof Map) {
+            Map<String, Object> bodyParts = (Map<String, Object>) request.getBody();
+
+            return RequestBody.create(
+                    mediaType,
+                    bodyParts.entrySet().stream()
+                            .map(entry -> entry.getKey() + "=" + urlEncode(entry.getValue()))
+                            .collect(Collectors.joining("&"))
+            );
+        }
+
+        return RequestBody.create(
+                mediaType,
+                String.valueOf(request.getBody())
+        );
+    }
+
+    private RequestBody jsonBody(MediaType mediaType, Object body) {
+        try {
+            return RequestBody.create(
+                    mediaType,
+                    objectMapper.writeValueAsString(body)
+            );
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public ObjectMapper getMapper() {

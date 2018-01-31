@@ -28,37 +28,34 @@ public abstract class HttpRequestExecutor extends DataValue {
     }
 
     public HttpResponse get(Map<String, Object> request) {
-        return get(converter.read(request, HttpRequest.class));
+        return request("GET", request);
     }
 
-    public HttpResponse get(HttpRequest request) {
-        request.setMethod("GET");
-        return request(request);
+    public HttpResponse head(Map<String, Object> request) {
+        return request("HEAD", request);
     }
 
-    public HttpResponse head(HttpRequest request) {
-        request.setMethod("HEAD");
-        return request(request);
+    public HttpResponse post(Map<String, Object> request) {
+        return request("POST", request);
     }
 
-    public HttpResponse post(HttpRequest request) {
-        request.setMethod("POST");
-        return request(request);
+    public HttpResponse delete(Map<String, Object> request) {
+        return request("DELETE", request);
     }
 
-    public HttpResponse delete(HttpRequest request) {
-        request.setMethod("DELETE");
-        return request(request);
+    public HttpResponse put(Map<String, Object> request) {
+        return request("PUT", request);
     }
 
-    public HttpResponse put(HttpRequest request) {
-        request.setMethod("PUT");
-        return request(request);
+    public HttpResponse patch(Map<String, Object> request) {
+        return request("PATCH", request);
     }
 
-    public HttpResponse patch(HttpRequest request) {
-        request.setMethod("PATCH");
-        return request(request);
+    private HttpResponse request(String method, Map<String, Object> request) {
+        HttpRequest httpRequest = converter.read(request, HttpRequest.class);
+        httpRequest.setMethod(method);
+
+        return request(httpRequest);
     }
 
     public abstract HttpResponse request(HttpRequest request);

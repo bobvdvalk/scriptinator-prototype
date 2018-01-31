@@ -15,13 +15,20 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import io.chapp.scriptinator.libraries.DataValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class HttpRequest extends DataValue {
     private String method;
     private String url;
+    private String contentType;
+    private Object body;
+    private BasicAuthentication basicAuthentication;
+    private List<String> headers;
 
     public String getMethod() {
         return method;
@@ -39,10 +46,45 @@ public class HttpRequest extends DataValue {
         this.url = url;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public Object getBody() {
+        return body;
+    }
+
+    public void setBody(Object body) {
+        this.body = body;
+    }
+
+    public BasicAuthentication getBasicAuthentication() {
+        return basicAuthentication;
+    }
+
+    public void setBasicAuthentication(BasicAuthentication basicAuthentication) {
+        this.basicAuthentication = basicAuthentication;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    @JsonSetter
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = new ArrayList<>(headers.values());
+    }
 
     @Override
     protected void inspect(Map<String, Object> target) {
         target.put("method", method);
         target.put("url", url);
+        if (basicAuthentication != null) {
+            target.put("basicAuthentication", basicAuthentication);
+        }
     }
 }
