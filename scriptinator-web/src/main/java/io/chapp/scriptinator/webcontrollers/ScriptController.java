@@ -23,8 +23,6 @@ import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,7 +38,6 @@ import static java.util.Collections.singletonMap;
 @Controller
 @RequestMapping("/project/{projectId}/script")
 public class ScriptController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptController.class);
     private final ScriptService scriptService;
     private final ProjectService projectService;
     private final ProjectController projectController;

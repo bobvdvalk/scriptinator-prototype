@@ -38,8 +38,6 @@ public class Script extends AbstractEntity {
     @NotNull
     private String description;
 
-    private boolean runnable;
-
     @NotNull
     @Lob
     private String code;
@@ -66,14 +64,6 @@ public class Script extends AbstractEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isRunnable() {
-        return runnable;
-    }
-
-    public void setRunnable(boolean runnable) {
-        this.runnable = runnable;
     }
 
     public String getCode() {

@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+var ASSERT = Script.library("ASSERT");
+var HTTP = Script.library("HTTP");
 
-import io.chapp.scriptinator.model.Job;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-public interface JobRepository extends AbstractEntityRepository<Job> {
-    Page<Job> findByScriptId(long scriptId, Pageable pageable);
-
-    Page<Job> findByStatus(Job.Status status, Pageable pageable);
-}
+ASSERT.error();

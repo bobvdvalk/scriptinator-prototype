@@ -157,6 +157,8 @@
             </tr>
             </tfoot>
         </table>
+    </div>
+
     <div class="ui basic modal">
         <div class="ui icon header">
             <i class="delete icon"></i>
@@ -204,7 +206,7 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(header, token);
             },
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 window.location = /*[[@{'/project/' + ${project.id}}]]*/ "/projects";
             }
         });
@@ -223,7 +225,7 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(header, token);
             },
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 window.location.assign(window.location);
             }
         });
@@ -232,6 +234,17 @@
     $(document).ready(function () {
         refreshTable();
         linkModals();
+
+        // Let Ace handle the save hotkey.
+        editor.commands.addCommand({
+            name: 'saveFile',
+            bindKey: {
+                win: 'Ctrl-S',
+                mac: 'Command-S',
+                sender: 'editor|cli'
+            },
+            exec: saveScript
+        });
     });
 
     function refreshTable() {

@@ -21,9 +21,18 @@ import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ScriptLibrary {
+    private static final Map<String, Function<ScriptLibrary, ?>> libraries = new HashMap<>();
+
+    static {
+        libraries.put("HTTP", lib -> new HttpLibrary(lib.converter));
+    }
+
     private final JobService jobService;
     private final Job job;
     private final ObjectConverter converter;
@@ -32,6 +41,14 @@ public class ScriptLibrary {
         this.jobService = jobService;
         this.job = job;
         this.converter = converter;
+    }
+
+    public Object library(String name) {
+        Function<ScriptLibrary, ?> builder = libraries.get(name);
+        if (builder == null) {
+            return null;
+        }
+        return builder.apply(this);
     }
 
     public void debug(Object... values) {
@@ -50,13 +67,6 @@ public class ScriptLibrary {
         log("ERROR", values);
     }
 
-    public Object library(String name) {
-        switch (name) {
-            case "HTTP":
-                return new HttpLibrary(converter);
-        }
-        return null;
-    }
 
     private void log(String level, Object[] values) {
         job.log(
