@@ -30,7 +30,7 @@ pipeline {
             steps {
                 script {
                     docker.image("rabbitmq:management").withRun() { rabbitMq ->
-                        sh "echo ${rabbitMq.Id} and ${rabbitMq.id}"
+                        sh "echo ${rabbitMq.name}"
                         mvn 'org.jacoco:jacoco-maven-plugin:prepare-agent install'
                     }
                 }
