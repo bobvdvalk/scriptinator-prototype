@@ -119,7 +119,7 @@
     });
 
     // Add code validator rule
-    $.fn.form.settings.rules.validCode = function (value) {
+    $.fn.form.settings.rules.validCode = function () {
         var annotations = editor.getSession().getAnnotations();
         for (var key in annotations) {
             if (annotations.hasOwnProperty(key) && annotations[key].type === "error") {
