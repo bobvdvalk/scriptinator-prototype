@@ -23,7 +23,8 @@
 
 <div layout:fragment="content">
     <h3 class="ui header">New Script</h3>
-    <form th:action="''"
+    <form id="script-create-form"
+          th:action="''"
           th:method="post"
           th:object="${script}"
           class="ui form"
@@ -102,10 +103,23 @@
         editor.getSession().on("change", function () {
             codeField.val(editor.getValue());
         });
+
+        // Let Ace handle the save hotkey.
+        editor.commands.addCommand({
+            name: 'saveFile',
+            bindKey: {
+                win: 'Ctrl-S',
+                mac: 'Command-S',
+                sender: 'editor|cli'
+            },
+            exec: function () {
+                $('#script-create-form').submit()
+            }
+        });
     });
 
     // Add code validator rule
-    $.fn.form.settings.rules.validCode = function (value) {
+    $.fn.form.settings.rules.validCode = function () {
         var annotations = editor.getSession().getAnnotations();
         for (var key in annotations) {
             if (annotations.hasOwnProperty(key) && annotations[key].type === "error") {
