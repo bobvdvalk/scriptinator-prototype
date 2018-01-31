@@ -18,13 +18,24 @@ package io.chapp.scriptinator.libraries;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ScriptLibrary {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibrary.class);
+    private static final Map<String, Class<?>> libraries = new HashMap<>();
+
     private final JobService jobService;
     private final Job job;
+
+    static {
+        libraries.put("HTTP", HttpLibrary.class);
+    }
 
     public ScriptLibrary(JobService jobService, Job job) {
         this.jobService = jobService;
@@ -48,9 +59,14 @@ public class ScriptLibrary {
     }
 
     public Object library(String name) {
-        switch (name) {
-            case "HTTP":
-                return new HttpLibrary();
+        return libraries.containsKey(name) ? instantiateLibrary(libraries.get(name)) : null;
+    }
+
+    private Object instantiateLibrary(Class clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (IllegalAccessException | InstantiationException e) {
+            LOGGER.error("Could not instantiate library: " + clazz.getSimpleName());
         }
         return null;
     }
