@@ -34,6 +34,7 @@ public class AssertLibrary {
         }
     }
 
+    @SuppressWarnings("squid:S1221") // This is an assertion
     public void equal(String message, Object expectedInput, Object actualInput) {
         Object expected = comparisonMapper.convertValue(expectedInput, Object.class);
         Object actual = comparisonMapper.convertValue(actualInput, Object.class);
