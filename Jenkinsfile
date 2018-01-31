@@ -28,7 +28,12 @@ pipeline {
         }
         stage('Build & Test') {
             steps {
-                mvn 'org.jacoco:jacoco-maven-plugin:prepare-agent install'
+                script {
+                    docker.image("rabbitmq:management").withRun() { rabbitMq ->
+                        sh "echo ${rabbitMq.Id} and ${rabbitMq.id}"
+                        mvn 'org.jacoco:jacoco-maven-plugin:prepare-agent install'
+                    }
+                }
             }
         }
         stage('Analyze') {
