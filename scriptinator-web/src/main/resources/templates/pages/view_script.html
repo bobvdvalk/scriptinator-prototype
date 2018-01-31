@@ -206,7 +206,7 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(header, token);
             },
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 window.location = /*[[@{'/project/' + ${project.id}}]]*/ "/projects";
             }
         });
@@ -225,7 +225,7 @@
             beforeSend: function (xhr) {
                 xhr.setRequestHeader(header, token);
             },
-            success: function (data, textStatus, jqXHR) {
+            success: function () {
                 window.location.assign(window.location);
             }
         });
