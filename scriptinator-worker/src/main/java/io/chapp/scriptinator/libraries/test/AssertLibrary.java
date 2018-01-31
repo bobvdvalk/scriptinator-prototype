@@ -15,7 +15,15 @@
  */
 package io.chapp.scriptinator.libraries.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class AssertLibrary {
+    private final ObjectMapper comparisonMapper;
+
+    public AssertLibrary(ObjectMapper comparisonMapper) {
+        this.comparisonMapper = comparisonMapper;
+    }
+
     public void fail(String message) {
         throw new UnmetAssertionException("Assertion not met: " + message);
     }
@@ -23,6 +31,15 @@ public class AssertLibrary {
     public void notNull(String property, Object value) {
         if (value == null) {
             fail("Expected '" + property + "' to be not null.");
+        }
+    }
+
+    public void equal(String message, Object expectedInput, Object actualInput) {
+        Object expected = comparisonMapper.convertValue(expectedInput, Object.class);
+        Object actual = comparisonMapper.convertValue(actualInput, Object.class);
+
+        if (!expected.equals(actual)) {
+            fail(message + "\nExpected '" + expected + "'\nFound: '" + actual + "'");
         }
     }
 }

@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.libraries;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
@@ -32,7 +33,7 @@ public class ScriptLibrary {
 
     static {
         libraries.put("HTTP", lib -> new HttpLibrary(lib.converter));
-        libraries.put("Assert", lib -> new AssertLibrary());
+        libraries.put("Assert", lib -> new AssertLibrary(new ObjectMapper()));
     }
 
     private final JobService jobService;

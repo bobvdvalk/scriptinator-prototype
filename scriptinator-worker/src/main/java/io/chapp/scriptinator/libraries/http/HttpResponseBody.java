@@ -16,19 +16,21 @@
 package io.chapp.scriptinator.libraries.http;
 
 import io.chapp.scriptinator.libraries.DataValue;
+import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class HttpResponseBody extends DataValue {
     private final ResponseBody body;
     private final HttpClient client;
+    private final HttpResponse response;
 
-    public HttpResponseBody(ResponseBody body, HttpClient client) {
+    public HttpResponseBody(ResponseBody body, HttpClient client, HttpResponse response) {
         this.body = body;
         this.client = client;
+        this.response = response;
     }
 
     public String contentType() {
@@ -48,6 +50,10 @@ public class HttpResponseBody extends DataValue {
     }
 
     public Object asObject() {
+        MediaType type = body.contentType();
+        if (type == null) {
+            return null;
+        }
         if (body.contentType().type().contains("json")) {
             return asJson();
         }
@@ -55,10 +61,16 @@ public class HttpResponseBody extends DataValue {
     }
 
     public Object asJson() {
-        try (InputStream data = body.byteStream()) {
-            return client.getMapper().readValue(data, Object.class);
+        try {
+            return client.getMapper().readValue(
+                    body.string(),
+                    Object.class
+            );
         } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+            throw new ScriptinatorExecutionException(
+                    "Could not parse response body from '" + response.request().getMethod() + " " + response.request().getUrl() + "' as json.",
+                    e
+            );
         }
     }
 

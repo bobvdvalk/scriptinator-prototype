@@ -71,7 +71,7 @@ public class HttpResponse extends DataValue {
         if (body == null) {
             return null;
         }
-        return new HttpResponseBody(body, client);
+        return new HttpResponseBody(body, client, this);
     }
 
     @Override

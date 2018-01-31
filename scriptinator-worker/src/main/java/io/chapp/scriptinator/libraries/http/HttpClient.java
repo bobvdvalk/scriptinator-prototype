@@ -19,15 +19,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.*;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.chapp.scriptinator.libraries.EncodeUtils.toBase64;
 import static io.chapp.scriptinator.libraries.EncodeUtils.urlEncode;
 
 public class HttpClient extends HttpRequestExecutor {
+    private static final Set<String> REQUIRE_BODY = Collections.unmodifiableSet(new HashSet<String>() {{
+        add("POST");
+        add("PUT");
+        add("PATCH");
+    }});
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
 
@@ -40,14 +49,28 @@ public class HttpClient extends HttpRequestExecutor {
     @Override
     public HttpResponse request(HttpRequest request) {
         try {
+            Headers headers = buildHeaders(request);
+
+            RequestBody body = buildBody(request);
+            if (body == null && REQUIRE_BODY.contains(request.getMethod())) {
+                MediaType mediaType = MediaType.parse(request.getContentType());
+                if (mediaType == null) {
+                    mediaType = MediaType.parse("application/x-www-form-urlencoded");
+                }
+                body = RequestBody.create(
+                        mediaType,
+                        ""
+                );
+            }
+
             return new HttpResponse(
                     this,
                     request,
                     client.newCall(
                             new Request.Builder()
                                     .url(request.getUrl())
-                                    .headers(buildHeaders(request))
-                                    .method(request.getMethod(), buildBody(request))
+                                    .headers(headers)
+                                    .method(request.getMethod(), body)
                                     .build()
                     ).execute()
             );
@@ -74,8 +97,9 @@ public class HttpClient extends HttpRequestExecutor {
 
     private RequestBody buildBody(HttpRequest request) {
         String contentType = request.getContentType();
-        if (contentType == null) {
-            if (request.getBody() == null) {
+        Object requestBody = request.getBody();
+        if (StringUtils.isEmpty(contentType)) {
+            if (requestBody == null) {
                 return null;
             }
             contentType = "application/json";

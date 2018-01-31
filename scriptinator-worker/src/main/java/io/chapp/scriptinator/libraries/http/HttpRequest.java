@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpRequest extends DataValue {
-    private String method;
+    private String method = "GET";
     private String url;
-    private String contentType;
+    private String contentType = "";
     private Object body;
     private BasicAuthentication basicAuthentication;
-    private List<String> headers;
+    private List<String> headers = new ArrayList<>();
 
     public String getMethod() {
         return method;
