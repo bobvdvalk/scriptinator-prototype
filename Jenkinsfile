@@ -30,8 +30,8 @@ pipeline {
             steps {
                 script {
                     docker.image("rabbitmq:management").withRun() { rabbitMq ->
-                        sh "echo ${rabbitMq.name}"
-                        mvn 'org.jacoco:jacoco-maven-plugin:prepare-agent install'
+                        def rabbitMqIp = sh(returnStdout: true, script: "docker inspect -f '{{ .NetworkSettings.IPAddress }}' ${rabbitMq.id}").trim()
+                        mvn "org.jacoco:jacoco-maven-plugin:prepare-agent install -Dspring.rabbitmq.host=${rabbitMqIp}"
                     }
                 }
             }
