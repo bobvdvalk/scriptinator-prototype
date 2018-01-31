@@ -71,6 +71,7 @@ public class ScriptLibraryIT {
         project = projectRepository.save(project);
     }
 
+    @SuppressWarnings("squid:S2925") // We need to wait until the scripts are done
     @Test
     public void testScriptRunsWithoutErrors() throws IOException {
         Set<String> resources = new Reflections(
