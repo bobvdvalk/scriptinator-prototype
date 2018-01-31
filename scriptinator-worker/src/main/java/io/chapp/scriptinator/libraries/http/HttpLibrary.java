@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.OkHttpClient;
 
@@ -27,7 +28,7 @@ public class HttpLibrary extends HttpRequestExecutor {
     }
 
     public HttpClient client() {
-        return new HttpClient(new OkHttpClient(), converter);
+        return new HttpClient(new OkHttpClient(), converter, new ObjectMapper());
     }
 
     @Override

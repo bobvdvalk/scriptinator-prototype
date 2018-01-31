@@ -62,7 +62,7 @@ public class ScriptLibrary {
         job.log(
                 level,
                 Arrays.stream(values)
-                        .map(Object::toString)
+                        .map(String::valueOf)
                         .collect(Collectors.joining(", "))
         );
         jobService.update(job);

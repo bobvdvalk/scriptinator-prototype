@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpResponse extends DataValue {
+    private final HttpClient client;
     private final HttpRequest request;
     private final Response response;
 
-    public HttpResponse(HttpRequest request, Response response) {
+    public HttpResponse(HttpClient client, HttpRequest request, Response response) {
+        this.client = client;
         this.request = request;
         this.response = response;
     }
@@ -69,7 +71,7 @@ public class HttpResponse extends DataValue {
         if (body == null) {
             return null;
         }
-        return new HttpResponseBody(body);
+        return new HttpResponseBody(body, client);
     }
 
     @Override

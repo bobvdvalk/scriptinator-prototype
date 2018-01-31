@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -25,16 +26,19 @@ import java.io.IOException;
 
 public class HttpClient extends HttpRequestExecutor {
     private final OkHttpClient client;
+    private final ObjectMapper objectMapper;
 
-    public HttpClient(OkHttpClient client, ObjectConverter converter) {
+    public HttpClient(OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper) {
         super(converter);
         this.client = client;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public HttpResponse request(HttpRequest request) {
         try {
             return new HttpResponse(
+                    this,
                     request,
                     client.newCall(
                             new Request.Builder()
@@ -55,5 +59,9 @@ public class HttpClient extends HttpRequestExecutor {
 
     private RequestBody buildBody(HttpRequest request) {
         return null;
+    }
+
+    public ObjectMapper getMapper() {
+        return objectMapper;
     }
 }
