@@ -12,7 +12,7 @@ Perform an `HTTP GET` request. This method is a shortcut for calling `HttpClient
 
 Example
 #######
-.. code-block: javascript
+.. code-block:: javascript
 
    var HTTP = Script.library("HTTP");
 
