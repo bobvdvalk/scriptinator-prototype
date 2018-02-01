@@ -220,6 +220,7 @@
                         <excludes>
                             <exclude>**/node_modules/**</exclude>
                             <exclude>**/node/**</exclude>
+                            <exclude>docs/**</exclude>
                         </excludes>
                     </configuration>
                     <executions>
