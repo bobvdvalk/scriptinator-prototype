@@ -5,9 +5,10 @@ The `HTTP` library allows you to perform HTTP requests. It is equipped with some
 json web APIs.
 
 
-``HttpClient``
---------------
+.. toctree::
+   :maxdepth: 2
+   :caption: Types
 
-The ``HttpClient`` allows you to perform the actual requests. You can create a new client using ``HTTP.client`` or
-automatically create a new client using one of the root level functions.
+   HttpClient
+
 
