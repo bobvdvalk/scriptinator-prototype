@@ -1,18 +1,31 @@
 Scriptinator
 ============
 
-
-This is just a test to see if this works any better.
+Getting Started
+---------------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
+   :caption: Getting Started
 
-   introduction
-   about
+   getting_started/introduction
 
-Indices and tables
-==================
+Libraries
+---------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+   :caption: Libraries
+
+   libraries/overview
+   libraries/http
+
+REST API
+--------
+
+.. toctree::
+   :maxdepth: 2
+   :caption: REST API
+
+   rest_api_documentation/overview
+
