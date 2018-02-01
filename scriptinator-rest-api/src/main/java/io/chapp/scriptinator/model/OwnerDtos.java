@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OwnerDtos {
@@ -24,7 +25,11 @@ public class OwnerDtos {
     private List<ProjectDtos> projectDtos;
 
     public static OwnerDtos convert(User user) {
-        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl(), ProjectDtos.convert(user.getProjects()));
+        List<ProjectDtos> projects = new ArrayList<>();
+        for(Project project : user.getProjects()) {
+            projects.add(ProjectDtos.convert(project));
+        }
+        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl(), projects);
     }
 
     public OwnerDtos(String username, String displayName, String avatarUrl, List<ProjectDtos> projectDtos) {
