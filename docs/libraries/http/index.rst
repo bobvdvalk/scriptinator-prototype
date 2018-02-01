@@ -18,6 +18,10 @@ automatically create a new client using one of the root level functions.
 Perform an `HTTP GET` request. This method is a shortcut for calling `HttpClient.request`_ using ``"GET"`` as the
 `method` parameter.
 
+.. literalinclude:: examples/http_get.js
+   :language: javascript
+   :linenos:
+
 ``HttpClient.head``
 ===================
 
