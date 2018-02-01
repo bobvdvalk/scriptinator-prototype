@@ -67,3 +67,4 @@ logs
 *~
 /config
 /data
+_build/
