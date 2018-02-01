@@ -1,5 +1,6 @@
+############
 Scriptinator
-============
+############
 
 .. toctree::
    :maxdepth: 2
@@ -19,4 +20,11 @@ Scriptinator
    :caption: REST API
 
    rest_api_documentation/index
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contributing
+
+   contributing/index
 
