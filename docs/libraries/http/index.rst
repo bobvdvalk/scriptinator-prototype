@@ -21,7 +21,6 @@ Perform an `HTTP GET` request. This method is a shortcut for calling `HttpClient
 .. literalinclude:: examples/http_get.js
    :language: javascript
    :linenos:
-   :emphasize-lines: 7-9
 
 ``HttpClient.head``
 ===================
