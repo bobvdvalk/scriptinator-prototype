@@ -12,7 +12,7 @@ Scriptinator
    :caption: Libraries
 
    libraries/overview
-   libraries/http
+   libraries/http/index
 
 .. toctree::
    :maxdepth: 2
