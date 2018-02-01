@@ -1,8 +1,0 @@
-site_name: Scriptinator
-theme: readthedocs
-repo_url: https://github.com/ScriptinatorIO/scriptinator
-copyright: test
-strict: true
-pages:
-  - Home: index.md
-  - About: about/index.md
