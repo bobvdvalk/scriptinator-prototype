@@ -28,12 +28,19 @@ pipeline {
         }
         stage('Build & Test') {
             steps {
-                script {
-                    docker.image("rabbitmq:management").withRun() { rabbitMq ->
-                        def rabbitMqIp = sh(returnStdout: true, script: "docker inspect -f '{{ .NetworkSettings.IPAddress }}' ${rabbitMq.id}").trim()
-                        mvn "org.jacoco:jacoco-maven-plugin:prepare-agent install -Dspring.rabbitmq.host=${rabbitMqIp}"
-                    }
+                docker.image("rabbitmq:management").withRun() { rabbitMq ->
+                    def rabbitMqIp = sh(returnStdout: true, script: "docker inspect -f '{{ .NetworkSettings.IPAddress }}' ${rabbitMq.id}").trim()
+                    mvn "org.jacoco:jacoco-maven-plugin:prepare-agent install -Dspring.rabbitmq.host=${rabbitMqIp}"
                 }
+                publishHTML([
+                        allowMissing         : false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll              : false,
+                        reportDir            : 'target/generated-docs',
+                        reportFiles          : 'index.html',
+                        reportName           : 'Documentation',
+                        reportTitles         : ''
+                ])
             }
         }
         stage('Analyze') {

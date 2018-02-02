@@ -98,6 +98,7 @@
         <frontend-plugin.version>1.6</frontend-plugin.version>
         <reflections.version>0.9.11</reflections.version>
         <jacoco-plugin.version>0.8.0</jacoco-plugin.version>
+        <asciidoctor-plugin.version>1.5.6</asciidoctor-plugin.version>
 
         <!-- Build Configuration -->
         <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
@@ -173,6 +174,7 @@
     </dependencies>
 
     <build>
+        <defaultGoal>verify</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -222,7 +224,7 @@
                         <excludes>
                             <exclude>**/node_modules/**</exclude>
                             <exclude>**/node/**</exclude>
-                            <exclude>docs/**</exclude>
+                            <exclude>docs/**/*.js</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -264,6 +266,26 @@
                         <append>true</append>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${asciidoctor-plugin.version}</version>
+                    <configuration>
+                        <sourceDirectory>${project.basedir}/docs</sourceDirectory>
+                        <sourceDocumentName>index.adoc</sourceDocumentName>
+                        <backend>html</backend>
+                        <sourceHighlighter>highlight.js</sourceHighlighter>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>documentation</id>
+                            <goals>
+                                <goal>process-asciidoc</goal>
+                            </goals>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -274,6 +296,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

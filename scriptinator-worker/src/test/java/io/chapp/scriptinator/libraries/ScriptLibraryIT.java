@@ -25,30 +25,27 @@ import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.services.ScriptService;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptinatorWorker.class)
 public class ScriptLibraryIT {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibraryIT.class);
     @Autowired
     private ScriptService scriptService;
     @Autowired
@@ -78,10 +75,36 @@ public class ScriptLibraryIT {
     @SuppressWarnings("squid:S2925") // We need to wait until the scripts are done
     @Test
     public void testScriptRunsWithoutErrors() throws IOException {
-        queueInternalResources();
-        queueDocumentationExamples();
+        queue(Paths.get("src/test/resources"));
+        queue(Paths.get("../docs/libraries"));
+        waitForComplete();
+        checkForErrors();
+    }
 
-        // Wait for all scripts to complete
+    private void queue(Path path) throws IOException {
+        Files.walkFileTree(path.toAbsolutePath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (file.toString().endsWith(".test.js") || file.toString().endsWith(".example.js")) {
+                    String code = Files.lines(file).collect(Collectors.joining("\n"));
+                    queue(code, FilenameUtils.getBaseName(file.toString()).replace('.', '_'));
+                }
+                return super.visitFile(file, attrs);
+            }
+        });
+    }
+
+
+    private void queue(String code, String name) {
+        Script script = new Script();
+        script.setFullyQualifiedName(name);
+        script.setCode(code);
+        script.setProject(project);
+        script = scriptService.create(script);
+        scriptService.run(script);
+    }
+
+    private void waitForComplete() {
         while (
                 jobRepository.findByStatus(Job.Status.QUEUED, new PageRequest(0, 1)).hasContent() ||
                         jobRepository.findByStatus(Job.Status.RUNNING, new PageRequest(0, 1)).hasContent()) {
@@ -91,62 +114,32 @@ public class ScriptLibraryIT {
                 e.printStackTrace();
             }
         }
+    }
 
+
+    private void checkForErrors() {
+        Job failedJob = null;
         for (Job job : jobRepository.findAll()) {
+
+            LOGGER.info(
+                    "Job {} [{} ms]: {}",
+                    job.getStatus(),
+                    StringUtils.leftPad(
+                            Long.toString(job.getFinishedTime().getTime() - job.getStartedTime().getTime()),
+                            6
+                    ),
+                    job.getDisplayName()
+            );
+
             if (job.getStatus() != Job.Status.FINISHED) {
-                Assert.fail(
-                        "Job [" + job.getDisplayName() + "] failed:\n" + job.getOutput()
-                );
+                failedJob = job;
             }
         }
-    }
-
-    private void queueDocumentationExamples() throws IOException {
-        Files.walkFileTree(Paths.get("..").resolve("docs"), new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.toString().endsWith(".example.js")) {
-                    String code = Files.lines(file).collect(Collectors.joining("\n"));
-                    queue(code, FilenameUtils.getBaseName(file.toString()));
-                }
-                return super.visitFile(file, attrs);
-            }
-        });
-    }
-
-    private void queueInternalResources() throws IOException {
-        Set<String> resources = new Reflections(
-                getClass().getPackage().getName(),
-                new ResourcesScanner()
-        )
-                .getResources(name -> name.endsWith(".test.js"));
-        Pattern regex = Pattern.compile(".*/(\\w+)/([\\w]+).*");
-
-        // Queue all scripts
-        for (String resource : resources) {
-            Matcher matcher = regex.matcher(resource);
-            if (matcher.matches()) {
-                String scriptName = matcher.group(1) + "_" + matcher.group(2);
-
-                // Start the script
-                try (InputStream data = getClass().getResourceAsStream("/" + resource)) {
-                    String code = IOUtils.toString(data, "UTF-8");
-
-                    queue(code, scriptName);
-                }
-
-            }
-
+        if (failedJob != null) {
+            Assert.fail(
+                    "Job [" + failedJob.getDisplayName() + "] failed:\n" + failedJob.getOutput()
+            );
         }
-    }
-
-    private void queue(String code, String name) {
-        Script script = new Script();
-        script.setFullyQualifiedName(name);
-        script.setCode(code);
-        script.setProject(project);
-        script = scriptService.create(script);
-        scriptService.run(script);
     }
 
 
