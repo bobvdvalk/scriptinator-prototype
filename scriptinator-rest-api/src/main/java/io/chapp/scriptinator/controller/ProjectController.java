@@ -57,7 +57,7 @@ public class ProjectController {
         return projects;
     }
 
-    @RequestMapping("/")
+    @RequestMapping("/project")
     @ResponseBody
     public ProjectDtos readProject(@RequestParam("project-id") int projectId) {
         logger.info("retrieving project from id"+ projectId);
