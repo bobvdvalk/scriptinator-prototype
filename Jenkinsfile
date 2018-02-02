@@ -38,7 +38,7 @@ pipeline {
             post {
                 always {
                     archiveArtifacts 'target/generated-docs/index.html'
-                    junit '*-reports/*.xml'
+                    junit '**/*-reports/*.xml'
                 }
             }
         }
