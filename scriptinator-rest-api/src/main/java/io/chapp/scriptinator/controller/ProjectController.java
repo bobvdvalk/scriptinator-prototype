@@ -15,14 +15,19 @@
  */
 package io.chapp.scriptinator.controller;
 
+import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.ProjectDtos;
 import io.chapp.scriptinator.services.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ProjectController
@@ -39,6 +44,17 @@ public class ProjectController {
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
+    }
+
+    @RequestMapping("/list")
+    @ResponseBody
+    public List<ProjectDtos> projects(@RequestParam("page-id") int pageId) {
+        logger.info("retrieving all projects");
+        List<ProjectDtos> projects = new ArrayList<>();
+        for(Project project : this.projectService.get(new PageRequest(pageId - 1, 15))) {
+            projects.add(ProjectDtos.convert(project));
+        }
+        return projects;
     }
 
     @RequestMapping("/")
