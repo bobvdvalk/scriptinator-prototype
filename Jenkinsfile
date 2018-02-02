@@ -34,22 +34,11 @@ pipeline {
                         mvn "org.jacoco:jacoco-maven-plugin:prepare-agent install -Dspring.rabbitmq.host=${rabbitMqIp}"
                     }
                 }
-                publishHTML([
-                        allowMissing         : false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll              : false,
-                        reportDir            : 'target/generated-docs',
-                        reportFiles          : 'index.html',
-                        reportName           : 'Documentation',
-                        reportTitles         : ''
-                ])
             }
             post {
                 always {
-                    junit(
-                            allowEmptyResults: true,
-                            testResults: '*-reports/*.xml'
-                    )
+                    archiveArtifacts 'target/generated-docs/index.html'
+                    junit '*-reports/*.xml'
                 }
             }
         }
