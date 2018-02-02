@@ -15,6 +15,15 @@ automatically create a new client using one of the root level functions.
 ``HttpClient.get``
 ==================
 
++------------------------------------------------------------------------------+
+| ``HttpClient.get({ url, contentType, body, basicAuthentication, headers })`` |
++==============================================================================+
+| Test          |
++-----------------------------------------------+
+| More test                                     |
++-----------------------------------------------+
+
+
 Perform an `HTTP GET` request. This method is a shortcut for calling `HttpClient.request`_ using ``"GET"`` as the
 `method` parameter.
 
