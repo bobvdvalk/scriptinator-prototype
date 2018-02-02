@@ -22,6 +22,7 @@ public class OwnerController {
     @RequestMapping("/")
     @ResponseBody
     public OwnerDtos ownerDtos(@RequestParam("username") String username) {
+        logger.info("requested user information of " + username);
         return OwnerDtos.convert(userService.getByUsername(username));
     }
 }
