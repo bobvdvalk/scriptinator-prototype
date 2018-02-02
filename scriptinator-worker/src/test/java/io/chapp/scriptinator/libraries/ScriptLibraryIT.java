@@ -26,25 +26,27 @@ import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.services.ScriptService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptinatorWorker.class)
-public class ScriptLibraryIT {
+public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibraryIT.class);
     @Autowired
     private ScriptService scriptService;
@@ -57,7 +59,29 @@ public class ScriptLibraryIT {
 
     private Project project;
 
-    @Before
+    @DataProvider
+    public static Object[] getAllScripts() throws IOException {
+        List<Path> paths = new ArrayList<>();
+        paths.addAll(scanFolder(Paths.get("src/test/resources")));
+        paths.addAll(scanFolder(Paths.get("../docs/libraries")));
+        return paths.toArray();
+    }
+
+    private static List<Path> scanFolder(Path path) throws IOException {
+        List<Path> result = new ArrayList<>();
+        Files.walkFileTree(path.toAbsolutePath(), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (file.toString().endsWith(".test.js") || file.toString().endsWith(".example.js")) {
+                    result.add(file);
+                }
+                return super.visitFile(file, attrs);
+            }
+        });
+        return result;
+    }
+
+    @BeforeClass
     public void createTestProject() {
         userRepository.deleteAll();
 
@@ -72,30 +96,12 @@ public class ScriptLibraryIT {
         project = projectRepository.save(project);
     }
 
-    @SuppressWarnings("squid:S2925") // We need to wait until the scripts are done
-    @Test
-    public void testScriptRunsWithoutErrors() throws IOException {
-        queue(Paths.get("src/test/resources"));
-        queue(Paths.get("../docs/libraries"));
-        waitForComplete();
-        checkForErrors();
-    }
 
-    private void queue(Path path) throws IOException {
-        Files.walkFileTree(path.toAbsolutePath(), new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.toString().endsWith(".test.js") || file.toString().endsWith(".example.js")) {
-                    String code = Files.lines(file).collect(Collectors.joining("\n"));
-                    queue(code, FilenameUtils.getBaseName(file.toString()).replace('.', '_'));
-                }
-                return super.visitFile(file, attrs);
-            }
-        });
-    }
+    @Test(dataProvider = "getAllScripts")
+    public void testEnqueueJob(Path file) throws IOException {
+        String code = Files.lines(file).collect(Collectors.joining("\n"));
+        String name = FilenameUtils.getBaseName(file.toString()).replace('.', '_');
 
-
-    private void queue(String code, String name) {
         Script script = new Script();
         script.setFullyQualifiedName(name);
         script.setCode(code);
@@ -104,7 +110,8 @@ public class ScriptLibraryIT {
         scriptService.run(script);
     }
 
-    private void waitForComplete() {
+    @AfterClass
+    public void waitForJobsToComplete() {
         while (
                 jobRepository.findByStatus(Job.Status.QUEUED, new PageRequest(0, 1)).hasContent() ||
                         jobRepository.findByStatus(Job.Status.RUNNING, new PageRequest(0, 1)).hasContent()) {
@@ -116,8 +123,8 @@ public class ScriptLibraryIT {
         }
     }
 
-
-    private void checkForErrors() {
+    @AfterClass(dependsOnMethods = "waitForJobsToComplete")
+    public void checkForErrors() {
         Job failedJob = null;
         for (Job job : jobRepository.findAll()) {
 
