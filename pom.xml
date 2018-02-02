@@ -275,6 +275,9 @@
                         <sourceDocumentName>index.adoc</sourceDocumentName>
                         <backend>html</backend>
                         <sourceHighlighter>highlight.js</sourceHighlighter>
+                        <attributes>
+                            <docinfo>shared</docinfo>
+                        </attributes>
                     </configuration>
                     <executions>
                         <execution>
