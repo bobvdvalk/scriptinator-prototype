@@ -44,6 +44,14 @@ pipeline {
                         reportTitles         : ''
                 ])
             }
+            post {
+                always {
+                    junit(
+                            allowEmptyResults: true,
+                            testResults: '*-reports/*.xml'
+                    )
+                }
+            }
         }
         stage('Analyze') {
             steps {
