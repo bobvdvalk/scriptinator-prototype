@@ -13,3 +13,12 @@ var contents = response.body().asJson();
 contents.forEach(function (paragraph) {
     Script.info(paragraph);
 });
+
+
+var Assert = Script.library("Assert");
+
+Assert.equal(
+    "Response is OK",
+    response.code(),
+    200
+);

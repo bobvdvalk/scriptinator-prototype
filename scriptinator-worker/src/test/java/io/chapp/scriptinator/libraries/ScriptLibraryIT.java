@@ -24,6 +24,7 @@ import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.services.ScriptService;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,9 +39,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ScriptinatorWorker.class)
@@ -74,34 +78,8 @@ public class ScriptLibraryIT {
     @SuppressWarnings("squid:S2925") // We need to wait until the scripts are done
     @Test
     public void testScriptRunsWithoutErrors() throws IOException {
-        Set<String> resources = new Reflections(
-                getClass().getPackage().getName(),
-                new ResourcesScanner()
-        )
-                .getResources(name -> name.endsWith(".test.js"));
-        Pattern regex = Pattern.compile(".*/(\\w+)/([\\w]+).*");
-
-        // Queue all scripts
-        for (String resource : resources) {
-            Matcher matcher = regex.matcher(resource);
-            if (matcher.matches()) {
-                String scriptName = matcher.group(1) + "_" + matcher.group(2);
-
-                // Start the script
-                try (InputStream data = getClass().getResourceAsStream("/" + resource)) {
-                    String code = IOUtils.toString(data, "UTF-8");
-
-                    Script script = new Script();
-                    script.setFullyQualifiedName(scriptName);
-                    script.setCode(code);
-                    script.setProject(project);
-                    script = scriptService.create(script);
-                    scriptService.run(script);
-                }
-
-            }
-
-        }
+        queueInternalResources();
+        queueDocumentationExamples();
 
         // Wait for all scripts to complete
         while (
@@ -122,5 +100,54 @@ public class ScriptLibraryIT {
             }
         }
     }
+
+    private void queueDocumentationExamples() throws IOException {
+        Files.walkFileTree(Paths.get("..").resolve("docs"), new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (file.toString().endsWith(".example.js")) {
+                    String code = Files.lines(file).collect(Collectors.joining("\n"));
+                    queue(code, FilenameUtils.getBaseName(file.toString()));
+                }
+                return super.visitFile(file, attrs);
+            }
+        });
+    }
+
+    private void queueInternalResources() throws IOException {
+        Set<String> resources = new Reflections(
+                getClass().getPackage().getName(),
+                new ResourcesScanner()
+        )
+                .getResources(name -> name.endsWith(".test.js"));
+        Pattern regex = Pattern.compile(".*/(\\w+)/([\\w]+).*");
+
+        // Queue all scripts
+        for (String resource : resources) {
+            Matcher matcher = regex.matcher(resource);
+            if (matcher.matches()) {
+                String scriptName = matcher.group(1) + "_" + matcher.group(2);
+
+                // Start the script
+                try (InputStream data = getClass().getResourceAsStream("/" + resource)) {
+                    String code = IOUtils.toString(data, "UTF-8");
+
+                    queue(code, scriptName);
+                }
+
+            }
+
+        }
+    }
+
+    private void queue(String code, String name) {
+        Script script = new Script();
+        script.setFullyQualifiedName(name);
+        script.setCode(code);
+        script.setProject(project);
+        script = scriptService.create(script);
+        scriptService.run(script);
+    }
+
 
 }
