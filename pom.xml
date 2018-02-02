@@ -97,8 +97,10 @@
         <license.plugin.version>3.0</license.plugin.version>
         <frontend-plugin.version>1.6</frontend-plugin.version>
         <reflections.version>0.9.11</reflections.version>
+        <jacoco-plugin.version>0.8.0</jacoco-plugin.version>
 
         <!-- Build Configuration -->
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
     </properties>
 
     <dependencyManagement>
@@ -252,6 +254,15 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-plugin.version}</version>
+                    <configuration>
+                        <destFile>${sonar.jacoco.reportPaths}</destFile>
+                        <append>true</append>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
