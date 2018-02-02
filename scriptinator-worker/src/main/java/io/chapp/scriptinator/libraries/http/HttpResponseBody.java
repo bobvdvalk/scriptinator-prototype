@@ -49,21 +49,10 @@ public class HttpResponseBody extends DataValue {
         }
     }
 
-    public Object asObject() {
-        MediaType type = body.contentType();
-        if (type == null) {
-            return null;
-        }
-        if (body.contentType().type().contains("json")) {
-            return asJson();
-        }
-        return null;
-    }
-
     public Object asJson() {
         try {
             return client.getMapper().readValue(
-                    body.string(),
+                    asString(),
                     Object.class
             );
         } catch (IOException e) {

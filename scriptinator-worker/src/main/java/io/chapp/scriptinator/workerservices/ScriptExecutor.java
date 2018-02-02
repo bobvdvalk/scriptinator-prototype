@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.workerservices;
 
+import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.libraries.ScriptLibrary;
 import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
@@ -39,14 +40,21 @@ public class ScriptExecutor {
         this.objectConverter = objectConverter;
     }
 
-    @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
     public void execute(Job job) {
         // Create engine
         ScriptEngine engine = scriptEngineFactory.getObject();
 
-        Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
-        bindings.put("Script", new ScriptLibrary(jobService, job, objectConverter));
+        try (ClosableContext context = new ClosableContext()) {
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, objectConverter, context);
+            Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+            bindings.put("Script", scriptLibrary);
 
+            execute(engine, job);
+        }
+    }
+
+    @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
+    private void execute(ScriptEngine engine, Job job) {
         CompiledScript script = compile(engine, job);
         if (script == null) {
             return;

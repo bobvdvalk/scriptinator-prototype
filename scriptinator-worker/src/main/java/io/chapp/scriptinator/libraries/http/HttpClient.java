@@ -17,6 +17,7 @@ package io.chapp.scriptinator.libraries.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.*;
 import org.springframework.util.StringUtils;
@@ -44,15 +45,17 @@ public class HttpClient extends HttpRequestExecutor {
 
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
+    private final ClosableContext closableContext;
 
-    public HttpClient(OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper) {
+    public HttpClient(OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper, ClosableContext closableContext) {
         super(converter);
         this.client = client;
         this.objectMapper = objectMapper;
+        this.closableContext = closableContext;
     }
 
     @Override
-    public HttpResponse request(HttpRequest request) {
+    protected HttpResponse request(HttpRequest request) {
         try {
             Headers headers = buildHeaders(request);
 
@@ -68,16 +71,22 @@ public class HttpClient extends HttpRequestExecutor {
                 );
             }
 
+            Response response = client.newCall(
+                    new Request.Builder()
+                            .url(request.getUrl())
+                            .headers(headers)
+                            .method(request.getMethod(), body)
+                            .build()
+            ).execute();
+
+            if(response.body() != null) {
+                closableContext.register(response);
+            }
+
             return new HttpResponse(
                     this,
                     request,
-                    client.newCall(
-                            new Request.Builder()
-                                    .url(request.getUrl())
-                                    .headers(headers)
-                                    .method(request.getMethod(), body)
-                                    .build()
-                    ).execute()
+                    response
             );
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
@@ -148,7 +157,7 @@ public class HttpClient extends HttpRequestExecutor {
         }
     }
 
-    public ObjectMapper getMapper() {
+    ObjectMapper getMapper() {
         return objectMapper;
     }
 }

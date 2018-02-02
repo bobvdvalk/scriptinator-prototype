@@ -16,23 +16,26 @@
 package io.chapp.scriptinator.libraries.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.OkHttpClient;
 
 public class HttpLibrary extends HttpRequestExecutor {
     private final ObjectConverter converter;
+    private final ClosableContext closableContext;
 
-    public HttpLibrary(ObjectConverter converter) {
+    public HttpLibrary(ObjectConverter converter, ClosableContext closableContext) {
         super(converter);
         this.converter = converter;
+        this.closableContext = closableContext;
     }
 
     public HttpClient client() {
-        return new HttpClient(new OkHttpClient(), converter, new ObjectMapper());
+        return new HttpClient(new OkHttpClient(), converter, new ObjectMapper(), closableContext);
     }
 
     @Override
-    public HttpResponse request(HttpRequest request) {
+    protected HttpResponse request(HttpRequest request) {
         return client().request(request);
     }
 }

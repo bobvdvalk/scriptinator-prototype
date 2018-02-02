@@ -56,11 +56,14 @@ public abstract class HttpRequestExecutor extends DataValue {
     }
 
     private HttpResponse request(String method, Map<String, Object> request) {
-        HttpRequest httpRequest = converter.read(request, HttpRequest.class);
-        httpRequest.setMethod(method);
+        request.put("method", method);
+        return request(request);
+    }
 
+    public HttpResponse request(Map<String, Object> request) {
+        HttpRequest httpRequest = converter.read(request, HttpRequest.class);
         return request(httpRequest);
     }
 
-    public abstract HttpResponse request(HttpRequest request);
+    protected abstract HttpResponse request(HttpRequest request);
 }

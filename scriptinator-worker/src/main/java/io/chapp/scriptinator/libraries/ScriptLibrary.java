@@ -16,6 +16,7 @@
 package io.chapp.scriptinator.libraries;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
@@ -32,18 +33,20 @@ public class ScriptLibrary {
     private static final Map<String, Function<ScriptLibrary, ?>> libraries = new HashMap<>();
 
     static {
-        libraries.put("HTTP", lib -> new HttpLibrary(lib.converter));
+        libraries.put("HTTP", lib -> new HttpLibrary(lib.converter, lib.closableContext));
         libraries.put("Assert", lib -> new AssertLibrary(new ObjectMapper()));
     }
 
     private final JobService jobService;
     private final Job job;
     private final ObjectConverter converter;
+    private final ClosableContext closableContext;
 
-    public ScriptLibrary(JobService jobService, Job job, ObjectConverter converter) {
+    public ScriptLibrary(JobService jobService, Job job, ObjectConverter converter, ClosableContext closableContext) {
         this.jobService = jobService;
         this.job = job;
         this.converter = converter;
+        this.closableContext = closableContext;
     }
 
     public Object library(String name) {
