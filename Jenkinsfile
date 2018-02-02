@@ -36,7 +36,7 @@ pipeline {
                 }
                 publishHTML([
                         allowMissing         : false,
-                        alwaysLinkToLastBuild: false,
+                        alwaysLinkToLastBuild: true,
                         keepAll              : false,
                         reportDir            : 'target/generated-docs',
                         reportFiles          : 'index.html',
