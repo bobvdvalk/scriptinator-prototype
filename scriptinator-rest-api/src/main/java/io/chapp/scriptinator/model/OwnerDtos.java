@@ -22,21 +22,15 @@ public class OwnerDtos {
     private String username;
     private String displayName;
     private String avatarUrl;
-    private List<ProjectDtos> projectDtos;
 
     public static OwnerDtos convert(User user) {
-        List<ProjectDtos> projects = new ArrayList<>();
-        for(Project project : user.getProjects()) {
-            projects.add(ProjectDtos.convert(project));
-        }
-        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl(), projects);
+        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl());
     }
 
-    public OwnerDtos(String username, String displayName, String avatarUrl, List<ProjectDtos> projectDtos) {
+    public OwnerDtos(String username, String displayName, String avatarUrl) {
         this.username = username;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
-        this.projectDtos = projectDtos;
     }
 
     public String getUsername() {
@@ -62,13 +56,4 @@ public class OwnerDtos {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
-
-    public List<ProjectDtos> getProjectDtos() {
-        return projectDtos;
-    }
-
-    public void setProjectDtos(List<ProjectDtos> projectDtos) {
-        this.projectDtos = projectDtos;
-    }
-
 }
