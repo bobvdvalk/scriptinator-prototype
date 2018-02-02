@@ -1,3 +1,4 @@
+// tag::docs[]
 var HTTP = Script.library("HTTP");
 
 /**
@@ -13,7 +14,7 @@ var contents = response.body().asJson();
 contents.forEach(function (paragraph) {
     Script.info(paragraph);
 });
-
+// end::docs[]
 
 var Assert = Script.library("Assert");
 
