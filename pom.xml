@@ -182,7 +182,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>verify</defaultGoal>
+        <defaultGoal>compile</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
