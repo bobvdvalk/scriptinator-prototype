@@ -23,8 +23,8 @@ public class JobDtos {
     private Date queuedTime;
     private Date startedTime;
     private Date finishedTime;
-    private ScriptDtos scriptDtos;
-    private ProjectDtos projectDtos;
+    private ScriptDtos script;
+    private ProjectDtos project;
 
     public static JobDtos convert(Job job) {
         Status status = JobDtos.Status.valueOf(job.getStatus().toString());
@@ -32,15 +32,15 @@ public class JobDtos {
                 job.getFinishedTime(), ScriptDtos.convert(job.getScript()) ,ProjectDtos.convert(job.getProject()));
     }
 
-    public JobDtos(String displayName, Status status, Date queuedTime, Date startedTime, Date finishedTime, ScriptDtos scriptDtos,
-                   ProjectDtos projectDtos) {
+    public JobDtos(String displayName, Status status, Date queuedTime, Date startedTime, Date finishedTime, ScriptDtos script,
+                   ProjectDtos project) {
         this.displayName = displayName;
         this.status = status;
         this.queuedTime = queuedTime;
         this.startedTime = startedTime;
         this.finishedTime = finishedTime;
-        this.scriptDtos = scriptDtos;
-        this.projectDtos = projectDtos;
+        this.script = script;
+        this.project = project;
     }
 
     public String getDisplayName() {
@@ -83,20 +83,20 @@ public class JobDtos {
         this.finishedTime = finishedTime;
     }
 
-    public ScriptDtos getScriptDtos() {
-        return scriptDtos;
+    public ScriptDtos getScript() {
+        return script;
     }
 
-    public void setScriptDtos(ScriptDtos scriptDtos) {
-        this.scriptDtos = scriptDtos;
+    public void setScript(ScriptDtos script) {
+        this.script = script;
     }
 
-    public ProjectDtos getProjectDtos() {
-        return projectDtos;
+    public ProjectDtos getProject() {
+        return project;
     }
 
-    public void setProjectDtos(ProjectDtos projectDtos) {
-        this.projectDtos = projectDtos;
+    public void setProject(ProjectDtos project) {
+        this.project = project;
     }
 
     public enum Status {

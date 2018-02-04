@@ -21,19 +21,19 @@ public class ScriptDtos {
     private String filename;
     private String description;
     private String code;
-    private ProjectDtos projectDtos;
-    private List<JobDtos> jobDtos;
+    private ProjectDtos project;
+    private List<JobDtos> job;
 
     public static ScriptDtos convert(Script script) {
         return null;
     }
 
-    public ScriptDtos(String filename, String description, String code, ProjectDtos projectDtos, List<JobDtos> jobDtos) {
+    public ScriptDtos(String filename, String description, String code, ProjectDtos project, List<JobDtos> job) {
         this.filename = filename;
         this.description = description;
         this.code = code;
-        this.projectDtos = projectDtos;
-        this.jobDtos = jobDtos;
+        this.project = project;
+        this.job = job;
     }
 
     public String getFilename() {
@@ -60,19 +60,19 @@ public class ScriptDtos {
         this.code = code;
     }
 
-    public ProjectDtos getProjectDtos() {
-        return projectDtos;
+    public ProjectDtos getProject() {
+        return project;
     }
 
-    public void setProjectDtos(ProjectDtos projectDtos) {
-        this.projectDtos = projectDtos;
+    public void setProject(ProjectDtos project) {
+        this.project = project;
     }
 
-    public List<JobDtos> getJobDtos() {
-        return jobDtos;
+    public List<JobDtos> getJob() {
+        return job;
     }
 
-    public void setJobDtos(List<JobDtos> jobDtos) {
-        this.jobDtos = jobDtos;
+    public void setJob(List<JobDtos> job) {
+        this.job = job;
     }
 }

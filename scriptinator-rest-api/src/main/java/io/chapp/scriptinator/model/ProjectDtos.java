@@ -22,8 +22,8 @@ public class ProjectDtos {
     private String projectName;
     private String description;
     private OwnerDtos ownerDtos;
-    private List<ScriptDtos> scriptDtos;
-    private List<JobDtos> jobDtos;
+    private List<ScriptDtos> scripts;
+    private List<JobDtos> jobs;
 
     public static ProjectDtos convert(Project project) {
         List<JobDtos> jobDtos = new ArrayList<>();
@@ -38,12 +38,12 @@ public class ProjectDtos {
         return new ProjectDtos(project.getDisplayName(), project.getDescription(), OwnerDtos.convert(project.getOwner()), scriptDtos, jobDtos);
     }
 
-    public ProjectDtos(String projectName, String description, OwnerDtos ownerDtos, List<ScriptDtos> scriptDtos, List<JobDtos> jobDtos) {
+    public ProjectDtos(String projectName, String description, OwnerDtos ownerDtos, List<ScriptDtos> scripts, List<JobDtos> jobs) {
         this.projectName = projectName;
         this.description = description;
         this.ownerDtos = ownerDtos;
-        this.scriptDtos = scriptDtos;
-        this.jobDtos = jobDtos;
+        this.scripts = scripts;
+        this.jobs = jobs;
     }
 
     public String getProjectName() {
@@ -58,11 +58,11 @@ public class ProjectDtos {
         return ownerDtos;
     }
 
-    public List<ScriptDtos> getScriptDtos() {
-        return scriptDtos;
+    public List<ScriptDtos> getScripts() {
+        return scripts;
     }
 
-    public List<JobDtos> getJobDtos() {
-        return jobDtos;
+    public List<JobDtos> getJobs() {
+        return jobs;
     }
 }
