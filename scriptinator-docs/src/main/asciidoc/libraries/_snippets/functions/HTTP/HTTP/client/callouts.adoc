@@ -14,10 +14,6 @@
 // limitations under the License.
 //
 
-= Libraries
-
-:leveloffset: +1
-
-include::http.adoc[]
-
-:leveloffset: -1
+<1> Import the HTTP library
+<2> Call `HTTP.client()` to create a new client
+<3> Use the client to perform a request

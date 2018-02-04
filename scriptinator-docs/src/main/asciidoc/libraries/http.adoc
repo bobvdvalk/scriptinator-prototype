@@ -14,51 +14,24 @@
 // limitations under the License.
 //
 
+:library_name: HTTP
+
 = HTTP
+:type_name: HTTP
 
 The `HTTP` library allows you to perform HTTP requests. It is equipped with some utilities to allow for simple use of
-json web APIs.
+json web APIs. You can perform HTTP requests by calling the `HTTP` functions directly, or by creating a reusable
+<<HttpClient>> with which you can perform multiple requests.
 
-====
+:function_id: client
+include::_snippets/function.adoc[]
 
-|===
-3.1+h| `HTTP.client()`
-
-h| Description:
-2.1+| Create a new <<HttpClient>>. You can use this instead of the request functions on the `HTTP` library directly to
-slightly increase performance by sharing resources between related requests.
-
-|===
-
-```javascript
-include::examples/http_client.example.js[tags=docs]
-```
-
-<1> Create a new client
-<2> Use the client to perform a get request
-<3> Parse the result of the request to json
-<4> Log the response body
-
-====
 
 == HttpClient
-
-The `HttpClient` allows you to perform the actual requests. You can create a new client using `HTTP.client` or
-automatically create a new client using one of the root level functions.
-
-
+:type_name: HttpClient
 
 
 === HttpClient.get
-
-
-Perform an `HTTP GET` request. This method is a shortcut for calling <<HttpClient.request>> using `"GET"` as the
-`method` parameter.
-
-```javascript
-include::examples/http_get.example.js[tags=docs]
-```
-
 
 === HttpClient.head
 
