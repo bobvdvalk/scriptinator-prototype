@@ -37,7 +37,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts 'target/generated-docs/index.html'
+                    archiveArtifacts 'scriptinator-docs/target/generated-docs/index.html'
                     junit '**/*-reports/*.xml'
                 }
             }

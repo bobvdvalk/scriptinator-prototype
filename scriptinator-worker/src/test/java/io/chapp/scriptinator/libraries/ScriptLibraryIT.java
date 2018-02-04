@@ -63,7 +63,7 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
     public static Object[] getAllScripts() throws IOException {
         List<Path> paths = new ArrayList<>();
         paths.addAll(scanFolder(Paths.get("src/test/resources")));
-        paths.addAll(scanFolder(Paths.get("../docs/libraries")));
+        paths.addAll(scanFolder(Paths.get("../scriptinator-docs/src/main/asciidoc")));
         return paths.toArray();
     }
 

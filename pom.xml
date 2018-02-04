@@ -33,6 +33,7 @@
     </parent>
 
     <modules>
+        <module>scriptinator-docs</module>
         <module>scriptinator-data</module>
         <module>scriptinator-rest-api</module>
         <module>scriptinator-web</module>
@@ -232,7 +233,7 @@
                         <excludes>
                             <exclude>**/node_modules/**</exclude>
                             <exclude>**/node/**</exclude>
-                            <exclude>docs/**/*.js</exclude>
+                            <exclude>**/asciidoc/**/*.js</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -279,7 +280,6 @@
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${asciidoctor-plugin.version}</version>
                     <configuration>
-                        <sourceDirectory>${project.basedir}/docs</sourceDirectory>
                         <sourceDocumentName>index.adoc</sourceDocumentName>
                         <backend>html</backend>
                         <sourceHighlighter>highlight.js</sourceHighlighter>
@@ -307,10 +307,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctor-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
