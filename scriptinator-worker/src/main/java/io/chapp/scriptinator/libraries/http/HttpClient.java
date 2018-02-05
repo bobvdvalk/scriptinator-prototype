@@ -47,8 +47,8 @@ public class HttpClient extends HttpRequestExecutor {
     private final ObjectMapper objectMapper;
     private final ClosableContext closableContext;
 
-    public HttpClient(OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper, ClosableContext closableContext) {
-        super(converter);
+    public HttpClient(ClientOptions clientOptions, OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper, ClosableContext closableContext) {
+        super(converter, clientOptions);
         this.client = client;
         this.objectMapper = objectMapper;
         this.closableContext = closableContext;
@@ -79,7 +79,7 @@ public class HttpClient extends HttpRequestExecutor {
                             .build()
             ).execute();
 
-            if(response.body() != null) {
+            if (response.body() != null) {
                 closableContext.register(response);
             }
 
@@ -99,11 +99,13 @@ public class HttpClient extends HttpRequestExecutor {
             request.getHeaders().forEach(headers::add);
         }
 
-        if (request.getBasicAuthentication() != null) {
+        if (request.getBasicAuth() != null) {
             headers.add("Authorization", "Basic " + toBase64(
-                    request.getBasicAuthentication().getUsername() + ":" +
-                            request.getBasicAuthentication().getPassword()
+                    request.getBasicAuth().getUsername() + ":" +
+                            request.getBasicAuth().getPassword()
             ));
+        } else if (request.getBearerAuth() != null) {
+            headers.add("Authorization", "Bearer " + request.getBearerAuth().getToken());
         }
 
         return headers.build();

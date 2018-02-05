@@ -20,18 +20,32 @@ import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.workerservices.ObjectConverter;
 import okhttp3.OkHttpClient;
 
+import java.util.Map;
+
 public class HttpLibrary extends HttpRequestExecutor {
     private final ObjectConverter converter;
     private final ClosableContext closableContext;
 
     public HttpLibrary(ObjectConverter converter, ClosableContext closableContext) {
-        super(converter);
+        super(converter, new ClientOptions());
         this.converter = converter;
         this.closableContext = closableContext;
     }
 
     public HttpClient client() {
-        return new HttpClient(new OkHttpClient(), converter, new ObjectMapper(), closableContext);
+        return client(null);
+    }
+
+    public HttpClient client(Map<String, Object> options) {
+        ClientOptions clientOptions = converter.read(options, ClientOptions.class);
+
+        return new HttpClient(
+                clientOptions,
+                new OkHttpClient(),
+                converter, new
+                ObjectMapper(),
+                closableContext
+        );
     }
 
     @Override

@@ -15,21 +15,34 @@
  */
 package io.chapp.scriptinator.workerservices;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
+
+import static java.util.Collections.emptyMap;
 
 @Service
 public class ObjectConverter {
     private final ObjectMapper mapper;
 
-
     public ObjectConverter(ObjectMapper mapper) {
-        this.mapper = mapper;
+        this.mapper = mapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public <T> T read(Map<String, Object> value, Class<T> targetClass) {
-        return mapper.convertValue(value, targetClass);
+        return mapper.convertValue(value == null ? emptyMap() : value, targetClass);
+    }
+
+    public <T> T readInto(Map<String, Object> request, T target) {
+        try {
+            return mapper.readerForUpdating(target).readValue(
+                    mapper.writeValueAsBytes(request)
+            );
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

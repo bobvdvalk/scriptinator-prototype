@@ -18,7 +18,7 @@ var Assert = Script.library("Assert");
 
 var authenticatedResponse = HTTP.get({
     url: "https://httpbin.org/basic-auth/someuser/secret123",
-    basicAuthentication: {
+    basicAuth: {
         username: "someuser",
         password: "secret123"
     }
