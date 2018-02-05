@@ -19,10 +19,14 @@ import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.services.ProjectService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import static java.util.Collections.singletonMap;
 
 @Controller
 @RequestMapping("/project")
@@ -55,12 +59,14 @@ public class ProjectController {
 
     @GetMapping("{projectId}/settings")
     public String editProject(@PathVariable long projectId, Model model) {
-        model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
+        if (!model.containsAttribute(Project.ATTRIBUTE)) {
+            model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
+        }
         model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
         return "pages/edit_project";
     }
 
-    @GetMapping("")
+    @GetMapping
     public String showCreateProjectForm(Model model) {
         if (!model.containsAttribute(Project.ATTRIBUTE)) {
             model.addAttribute(Project.ATTRIBUTE, new Project());
@@ -68,11 +74,16 @@ public class ProjectController {
         return "pages/new_project";
     }
 
-    @PostMapping("")
-    public String createNewProject(@ModelAttribute(Project.ATTRIBUTE) Project project) {
-        // Set the owner, save the project.
+    @PostMapping
+    public String createNewProject(@ModelAttribute(Project.ATTRIBUTE) Project project, Model model) {
         project.setOwner(currentUserFactory.getObject());
-        project = projectService.create(project);
+
+        try {
+            project = projectService.create(project);
+        } catch (DataIntegrityViolationException e) {
+            addDbErrorsToModel(e, model, project);
+            return showCreateProjectForm(model);
+        }
 
         return "redirect:/project/" + project.getId();
     }
@@ -81,9 +92,15 @@ public class ProjectController {
     public String updateProject(@PathVariable long projectId, @ModelAttribute(Project.ATTRIBUTE) Project projectChanges, Model model) {
         // Update the current project with the project changes.
         Project currentProject = projectService.get(projectId);
-        currentProject.setDisplayName(projectChanges.getDisplayName());
+        currentProject.setName(projectChanges.getName());
         currentProject.setDescription(projectChanges.getDescription());
-        projectService.update(currentProject);
+
+        try {
+            projectService.update(currentProject);
+        } catch (DataIntegrityViolationException e) {
+            addDbErrorsToModel(e, model, currentProject);
+            return editProject(currentProject.getId(), model);
+        }
 
         return viewScripts(projectId, model);
     }
@@ -92,5 +109,21 @@ public class ProjectController {
     public String deleteProject(@PathVariable long projectId, Model model) {
         projectService.delete(projectId);
         return projectsController.projectList(model);
+    }
+
+    private void addDbErrorsToModel(DataIntegrityViolationException e, Model model, Project project) {
+        Throwable cause = e.getCause();
+
+        // Check for a duplicate project name constraint error.
+        if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals("project_name")) {
+            model.addAttribute(Project.ATTRIBUTE, project);
+            model.addAttribute(
+                    "errors",
+                    singletonMap(
+                            "name",
+                            "There already seems to be a project with that name, please choose a different one."
+                    )
+            );
+        }
     }
 }

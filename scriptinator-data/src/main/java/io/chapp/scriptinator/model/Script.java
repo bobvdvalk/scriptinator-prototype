@@ -24,16 +24,15 @@ import java.util.List;
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(
         name = "script_name",
-        columnNames = {"project_id", "fully_qualified_name"}
+        columnNames = {"project_id", "name"}
 ))
 public class Script extends AbstractEntity {
     public static final String ATTRIBUTE = "script";
     public static final String LIST_ATTRIBUTE = "scripts";
 
     @NotNull
-    @Pattern(regexp = "[\\w]+")
-    @Column(name = "fully_qualified_name")
-    private String fullyQualifiedName;
+    @Pattern(regexp = "[a-z][\\w-]*", flags = {Pattern.Flag.CASE_INSENSITIVE})
+    private String name;
 
     @NotNull
     private String description;
@@ -47,15 +46,25 @@ public class Script extends AbstractEntity {
     private Project project;
 
     @NotNull
-    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @OneToMany(mappedBy = "script", orphanRemoval = true)
     private List<Job> jobs = new ArrayList<>();
 
-    public String getFullyQualifiedName() {
-        return fullyQualifiedName;
+    /**
+     * Get the full script name constructed from the project and script name, i.e.: "project/script".
+     *
+     * @return The full script name.
+     */
+    @Override
+    public String toString() {
+        return project.getName() + '/' + name;
     }
 
-    public void setFullyQualifiedName(String fullyQualifiedName) {
-        this.fullyQualifiedName = fullyQualifiedName;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

@@ -18,6 +18,10 @@ package io.chapp.scriptinator.workerservices;
 import io.chapp.scriptinator.libraries.ScriptLibrary;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
+import io.chapp.scriptinator.services.ProjectService;
+import io.chapp.scriptinator.services.ScriptService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +29,18 @@ import javax.script.*;
 
 @Service
 public class ScriptExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptExecutor.class);
+
     private final ObjectFactory<ScriptEngine> scriptEngineFactory;
     private final JobService jobService;
+    private final ScriptService scriptService;
+    private final ProjectService projectService;
 
-    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService) {
+    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, ProjectService projectService) {
         this.scriptEngineFactory = scriptEngineFactory;
         this.jobService = jobService;
+        this.scriptService = scriptService;
+        this.projectService = projectService;
     }
 
     @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
@@ -39,7 +49,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
-        bindings.put("Script", new ScriptLibrary(jobService, job));
+        bindings.put("Script", new ScriptLibrary(jobService, job, scriptService, projectService));
 
         CompiledScript script = compile(engine, job);
         if (script == null) {
@@ -53,6 +63,7 @@ public class ScriptExecutor {
         } catch (Throwable e) {
             job.log("FATAL", "Oops, something unexpected happened while running your script: " + e.getMessage());
             jobService.changeStatus(job, Job.Status.FAILED);
+            LOGGER.error("An unexpected exception occurred while running a script.", e);
         }
     }
 

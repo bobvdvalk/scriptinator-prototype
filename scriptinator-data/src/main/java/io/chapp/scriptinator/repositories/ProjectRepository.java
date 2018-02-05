@@ -17,5 +17,8 @@ package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.Project;
 
+import java.util.Optional;
+
 public interface ProjectRepository extends AbstractEntityRepository<Project> {
+    Optional<Project> findOneByName(String name);
 }

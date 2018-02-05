@@ -19,7 +19,11 @@ import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ProjectService extends AbstractEntityService<Project, ProjectRepository> {
-
+    public Optional<Project> find(String name) {
+        return getRepository().findOneByName(name);
+    }
 }

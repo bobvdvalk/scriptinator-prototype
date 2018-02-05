@@ -24,7 +24,7 @@
 <div layout:fragment="content">
     <h3 class="ui header">
         <div class="content">
-            Script: <span th:text="${script.fullyQualifiedName}"></span>
+            Script: <span th:text="${script.name}"></span>
             <div class="sub header" th:text="${script.description}"></div>
         </div>
     </h3>
@@ -95,6 +95,10 @@
                     Job
                 </th>
                 <th class="collapsing">
+                    Trigger
+                </th>
+                <th class="collapsing">
+                    Output
                 </th>
                 <th class="collapsing">
                     Status
@@ -103,13 +107,31 @@
             </thead>
             <tr th:if="${!jobs.hasContent()}">
                 <td colspan="2">
-                    This action has not been executed before.
+                    This script has not been executed yet.
                 </td>
             </tr>
             <tr th:each="job : ${jobs}"
                 class="job"
                 th:classappend="${job.status.name().toLowerCase()}">
                 <td th:text="${job.displayName}"></td>
+                <td>
+                    <th:block th:if="${job.triggeredByJobId}">
+                        <th:block th:if="${jobTriggers.containsKey(job.id)}">
+                            <a th:href="${'/project/' + script.project.id + '/script/' + jobTriggers.get(job.id).script.id}">
+                                <button class="ui circular button"
+                                        th:data-tooltip="${'Triggered by script: ' + jobTriggers.get(job.id).script.toString()}"
+                                        th:text="${'#' + job.triggeredByJobId}">
+                                </button>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${jobTriggers.containsKey(job.id)}">
+                            <button class="ui circular button"
+                                    data-tooltip="Triggered by an unknown script."
+                                    th:text="${'#' + job.triggeredByJobId}">
+                            </button>
+                        </th:block>
+                    </th:block>
+                </td>
                 <td>
                     <th:block th:if="${!job.output.isEmpty()}">
                         <div class="ui fullscreen modal">
@@ -120,7 +142,7 @@
                         </div>
                         <button th:data-job="${job.id}"
                                 class="ui circular icon button output-btn"
-                                data-tooltip="Show Log">
+                                data-tooltip="Show log">
                             <i class="ellipsis horizontal icon"></i>
                         </button>
                     </th:block>
@@ -152,8 +174,7 @@
             </tr>
             <tfoot>
             <tr>
-                <th colspan="3">
-                </th>
+                <th colspan="4"></th>
             </tr>
             </tfoot>
         </table>
@@ -162,7 +183,7 @@
     <div class="ui basic modal">
         <div class="ui icon header">
             <i class="delete icon"></i>
-            Delete <span th:text="${script.fullyQualifiedName}"></span>?
+            Delete <span th:text="${script.name}"></span>?
         </div>
         <div class="content">
             <p>Should you decide to delete this script, we will not be able to recover it for you.</p>
