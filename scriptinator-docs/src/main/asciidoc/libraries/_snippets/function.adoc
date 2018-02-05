@@ -30,6 +30,8 @@ include::{function_dir}/variables.adoc[]
 h| Description:
 2.1+| {description}
 
+include::{function_dir}/parameters.adoc[]
+
 |===
 
 ```javascript

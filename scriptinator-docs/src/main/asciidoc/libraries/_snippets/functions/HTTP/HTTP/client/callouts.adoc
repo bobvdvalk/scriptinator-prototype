@@ -15,5 +15,10 @@
 //
 
 <1> Import the HTTP library
-<2> Call `HTTP.client()` to create a new client
-<3> Use the client to perform a request
+<2> Create an <<HttpClient>> with default settings
+<3> Create an <<HttpClient>> with basic authentication enabled. This applies
+    basic authentication on all requests made by this client
+<4> Create an <<HttpClient>> with bearer (or token) authentication enabled.
+    This allows you to make requests using token authentication, which is
+    commonly used by OAuth secured web APIs.
+

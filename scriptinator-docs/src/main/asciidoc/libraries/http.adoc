@@ -30,21 +30,68 @@ include::_snippets/function.adoc[]
 == HttpClient
 :type_name: HttpClient
 
+The `HttpClient` is used to perform HTTP requests. To make requests you have two options:
+
+1. Call the `get`, `head`, `post`, `delete`, `put`, `patch` and `request` functions directly on the `HTTP` library.
+   This will create a new client for every request which causes some overhead, but requires less boilerplate.
+
+2. Use `HTTP.client()` to create a client and reuse that for your requests. This method introduces less overhead.
+   Creating a client also allows you to specify options such as authentication methods. This causes those options
+   to be applied to all requests you make using this client.
 
 === HttpClient.get
 
+:function_id: get_url
+include::_snippets/function.adoc[]
+
+:function_id: get_options
+include::_snippets/function.adoc[]
+
 === HttpClient.head
+
+:function_id: head_url
+include::_snippets/function.adoc[]
+
+:function_id: head_options
+include::_snippets/function.adoc[]
 
 === HttpClient.post
 
+:function_id: post_url
+include::_snippets/function.adoc[]
+
+:function_id: post_options
+include::_snippets/function.adoc[]
+
 === HttpClient.delete
+
+:function_id: delete_url
+include::_snippets/function.adoc[]
+
+:function_id: delete_options
+include::_snippets/function.adoc[]
 
 === HttpClient.put
 
+:function_id: put_url
+include::_snippets/function.adoc[]
+
+:function_id: put_options
+include::_snippets/function.adoc[]
+
 === HttpClient.patch
+
+:function_id: patch_url
+include::_snippets/function.adoc[]
+
+:function_id: patch_options
+include::_snippets/function.adoc[]
 
 === HttpClient.request
 
+:function_id: request_url
+include::_snippets/function.adoc[]
 
-
+:function_id: request_options
+include::_snippets/function.adoc[]
 

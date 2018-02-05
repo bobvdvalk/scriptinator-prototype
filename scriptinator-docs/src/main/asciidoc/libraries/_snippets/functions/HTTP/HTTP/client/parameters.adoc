@@ -1,0 +1,15 @@
+| `Object{username, password} basicAuth`
+2.1+| Set this object to enable basic authentication for all requests
+
+| `String basicAuth.username`
+2.1+| The username to use for basic authentication
+
+| `String basicAuth.password`
+2.1+| The password to use for basic authentication
+
+| `Object{token} bearerAuth`
+2.1+| Set this object to enable bearer authentication for all requests
+
+| `String bearerAuth.token`
+2.1+ | The token to use for bearer authentication
+
