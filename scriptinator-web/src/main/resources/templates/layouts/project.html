@@ -22,7 +22,7 @@
     <meta charset="UTF-8">
     <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
     <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title th:text="${project.displayName} + ' - Scriptinator'"></title>
+    <title th:text="${project.name} + ' - Scriptinator'"></title>
 
 
     <script th:src="@{/assets/jquery/dist/jquery.min.js}"></script>
@@ -49,7 +49,7 @@
         <h1 id="title" class="ui header">
             <i class="book icon"></i>
             <div class="content">
-                <span th:text="${project.displayName}"></span>
+                <span th:text="${project.name}"></span>
                 <div class="sub header" th:text="${project.description}"></div>
             </div>
         </h1>
@@ -77,7 +77,7 @@
 <script>
 
     function setReadOnly(editor, readOnly) {
-        if(readOnly) {
+        if (readOnly) {
             editor.setOptions({
                 readOnly: true,
                 highlightActiveLine: false,

@@ -94,7 +94,7 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         user = userRepository.save(user);
 
         project = new Project();
-        project.setDisplayName("IntegrationTests");
+        project.setName("IntegrationTests");
         project.setOwner(user);
         project = projectRepository.save(project);
     }
@@ -106,7 +106,7 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         String name = FilenameUtils.getBaseName(file.toString()).replace('.', '_');
 
         Script script = new Script();
-        script.setFullyQualifiedName(name);
+        script.setName(name);
         script.setCode(code);
         script.setProject(project);
         script = scriptService.create(script);

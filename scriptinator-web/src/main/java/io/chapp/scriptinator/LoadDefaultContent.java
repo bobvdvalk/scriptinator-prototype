@@ -50,7 +50,7 @@ public class LoadDefaultContent implements CommandLineRunner {
             defaultUser = userRepository.save(defaultUser);
 
             Project project = new Project();
-            project.setDisplayName("My First Project");
+            project.setName("my-first-project");
             project.setDescription("A simple project to help you get started");
             project.setOwner(defaultUser);
             project = projectRepository.save(project);
@@ -59,7 +59,7 @@ public class LoadDefaultContent implements CommandLineRunner {
             script.setProject(project);
             script.setCode("Script.info('Hello World');");
             script.setDescription("Hello World");
-            script.setFullyQualifiedName("greet");
+            script.setName("greet");
             scriptRepository.save(script);
         }
     }

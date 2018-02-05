@@ -46,7 +46,7 @@
         <tr th:each="script : ${scripts}">
             <td class="clickable">
                 <a th:href="@{'/project/' + ${project.id} + '/script/' + ${script.id}}">
-                    <span th:text="${script.fullyQualifiedName}"></span>
+                    <span th:text="${script.name}"></span>
                     <span th:text="${script.description}"
                           class="ui right floated sub header">
                     </span>

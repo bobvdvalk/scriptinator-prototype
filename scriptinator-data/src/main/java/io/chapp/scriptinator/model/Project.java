@@ -15,39 +15,40 @@
  */
 package io.chapp.scriptinator.model;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(
+        name = "project_name",
+        columnNames = {"name"}
+))
 public class Project extends AbstractEntity {
     public static final String ATTRIBUTE = "project";
     public static final String LIST_ATTRIBUTE = "projects";
-    @NotEmpty
-    @Length(min = 4)
-    private String displayName;
+
+    @NotNull
+    @Pattern(regexp = "[a-z][\\w-]*", flags = {Pattern.Flag.CASE_INSENSITIVE})
+    private String name;
+
     private String description;
+
     @ManyToOne(optional = false)
     private User owner;
+
     @NotNull
     @OneToMany(mappedBy = "project", orphanRemoval = true)
     private List<Script> scripts = new ArrayList<>();
-    @NotNull
-    @OneToMany(mappedBy = "project", orphanRemoval = true)
-    private List<Job> jobs = new ArrayList<>();
 
-    public String getDisplayName() {
-        return displayName;
+    public String getName() {
+        return name;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -72,13 +73,5 @@ public class Project extends AbstractEntity {
 
     public void setScripts(List<Script> scripts) {
         this.scripts = scripts;
-    }
-
-    public List<Job> getJobs() {
-        return jobs;
-    }
-
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
     }
 }

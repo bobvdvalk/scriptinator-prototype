@@ -63,7 +63,7 @@ tr td.clickable:hover, tr.clickable:hover td {
     width: 100%;
 }
 
-.editor.read-only *{
+.editor.read-only * {
     cursor: default;
 }
 

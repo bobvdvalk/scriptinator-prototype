@@ -36,11 +36,12 @@
               th:object="${project}"
               class="ui form">
             <div class="fields">
-                <div class="four wide field" th:classappend="${errors?.displayName} ? 'error': ''">
+                <div class="four wide field"
+                     th:classappend="${errors?.get('name') == null ? '' : 'error'}">
                     <label>Name</label>
                     <input type="text"
-                           name="displayName"
-                           th:field="*{displayName}"
+                           name="name"
+                           th:field="*{name}"
                            placeholder="ProjectName"
                     >
                 </div>
@@ -56,8 +57,10 @@
 
             <div class="ui grid">
                 <div class="twelve wide column">
-
-                    <div class="ui error message">
+                    <div class="ui error message" th:classappend="${errors != null ? 'visible': ''}">
+                        <ul class="list" th:if="${errors != null}">
+                            <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                        </ul>
                     </div>
                 </div>
                 <div class="four wide column">
@@ -75,16 +78,20 @@
     $('.ui.form')
         .form({
             fields: {
-                displayName: {
-                    identifier: 'displayName',
+                name: {
+                    identifier: 'name',
                     rules: [
                         {
                             type: 'empty',
                             prompt: 'What would you like to call this project?'
                         },
                         {
-                            type: 'minLength[4]',
-                            prompt: 'Please use a name with at least 4 characters.'
+                            type: 'regExp[/^[a-z0-9_-]*$/i]',
+                            prompt: 'Please rename your project to only use alphanumeric characters, underscores and dashes.'
+                        },
+                        {
+                            type: 'regExp[/^[a-z]/i]',
+                            prompt: 'Please rename your project to start with a letter.'
                         }
                     ]
                 }
