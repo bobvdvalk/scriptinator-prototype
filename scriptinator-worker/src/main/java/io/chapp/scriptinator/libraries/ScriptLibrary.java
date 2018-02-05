@@ -17,31 +17,43 @@ package io.chapp.scriptinator.libraries;
 
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.model.Job;
+import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
+import io.chapp.scriptinator.services.ProjectService;
+import io.chapp.scriptinator.services.ScriptService;
+import jdk.nashorn.internal.objects.NativeJSON;
+import jdk.nashorn.internal.runtime.JSONFunctions;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ScriptLibrary {
-    private static final Map<String, Function<ScriptLibrary, ?>> libraries = new HashMap<>();
+    private static final Map<String, Function<ScriptLibrary, ?>> LIBRARIES = new HashMap<>();
 
     static {
-        libraries.put("HTTP", lib -> new HttpLibrary());
+        LIBRARIES.put("HTTP", lib -> new HttpLibrary());
     }
 
     private final JobService jobService;
     private final Job job;
+    private final ScriptService scriptService;
+    private final ProjectService projectService;
 
-    public ScriptLibrary(JobService jobService, Job job) {
+    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ProjectService projectService) {
         this.jobService = jobService;
         this.job = job;
+        this.scriptService = scriptService;
+        this.projectService = projectService;
     }
 
     public Object library(String name) {
-        Function<ScriptLibrary, ?> builder = libraries.get(name);
+        Function<ScriptLibrary, ?> builder = LIBRARIES.get(name);
         if (builder == null) {
             return null;
         }
@@ -64,7 +76,6 @@ public class ScriptLibrary {
         log("ERROR", values);
     }
 
-
     private void log(String level, Object[] values) {
         job.log(
                 level,
@@ -73,5 +84,58 @@ public class ScriptLibrary {
                         .collect(Collectors.joining(", "))
         );
         jobService.update(job);
+    }
+
+    public Long run(String fullName) {
+        return run(fullName, null);
+    }
+
+    public Long run(String fullName, Object argument) {
+        String projectName = null;
+        String scriptName = fullName;
+
+        // Parse the name parts: (project/)?(script)
+        String[] parts = StringUtils.split(fullName, "/");
+        if (parts != null) {
+            if (parts.length == 2) {
+                projectName = parts[0];
+                scriptName = parts[1];
+            } else if (parts.length > 2) {
+                return null;
+            }
+        }
+
+        // Get the project.
+        Project project = job.getScript().getProject();
+        if (projectName != null) {
+            project = projectService.find(projectName).orElse(null);
+        }
+        if (project == null) {
+            return null;
+        }
+
+        // Get the script.
+        Optional<Script> script = scriptService.get(project.getId(), scriptName);
+        if (!script.isPresent()) {
+            return null;
+        }
+
+        return scriptService.run(script.get(), job, argToString(argument)).getId();
+    }
+
+    private String argToString(Object argument) {
+        if (argument == null) {
+            return null;
+        }
+
+        return NativeJSON.stringify(null, argument, null, null).toString();
+    }
+
+    public Object argument() {
+        if (job.getArgument() == null) {
+            return null;
+        }
+
+        return JSONFunctions.parse(job.getArgument(), null);
     }
 }

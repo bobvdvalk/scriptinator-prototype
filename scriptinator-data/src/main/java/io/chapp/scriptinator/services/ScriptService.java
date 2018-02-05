@@ -20,7 +20,7 @@ import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class ScriptService extends AbstractEntityService<Script, ScriptRepository> {
@@ -30,19 +30,41 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         this.jobService = jobService;
     }
 
-    public Script get(long projectId, String fullyQualifiedName) {
-        Script result = getRepository().findOneByProjectIdAndFullyQualifiedName(projectId, fullyQualifiedName);
-        if (result == null) {
-            throw new NoSuchElementException();
-        }
-        return result;
+    public Optional<Script> get(long projectId, String name) {
+        return getRepository().findOneByProjectIdAndName(projectId, name);
     }
 
+    /**
+     * Run a script.
+     *
+     * @param script The script to run.
+     * @return The created job.
+     */
     public Job run(Script script) {
-        Job job = new Job();
-        job.setDisplayName(script.getFullyQualifiedName());
-        job.setProject(script.getProject());
-        job.setScript(script);
+        return jobService.create(createJob(script, null));
+    }
+
+    /**
+     * Run a script triggered by a job.
+     *
+     * @param script   The script to run.
+     * @param trigger  The job that triggered the execution.
+     * @param argument The argument passed to the script.
+     * @return The created job.
+     */
+    public Job run(Script script, Job trigger, String argument) {
+        Job job = createJob(script, argument);
+        if (trigger != null) {
+            job.setTriggeredByJobId(trigger.getId());
+        }
         return jobService.create(job);
+    }
+
+    private Job createJob(Script script, String argument) {
+        Job job = new Job();
+        job.setDisplayName(script.getName());
+        job.setScript(script);
+        job.setArgument(argument);
+        return job;
     }
 }

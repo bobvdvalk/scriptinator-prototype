@@ -31,6 +31,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static java.util.Collections.singletonMap;
@@ -68,29 +70,29 @@ public class ScriptController {
 
     @PostMapping
     public String createNewScript(@PathVariable long projectId, @ModelAttribute("script") Script script, Model model) {
-        // Set the project, save the script.
         Project project = projectService.get(projectId);
         script.setProject(project);
+
         try {
-            scriptService.create(script);
+            script = scriptService.create(script);
         } catch (DataIntegrityViolationException e) {
             Throwable cause = e.getCause();
 
+            // Check for a duplicate script name constraint error.
             if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals("script_name")) {
                 model.addAttribute(Script.ATTRIBUTE, script);
                 model.addAttribute(
                         "errors",
                         singletonMap(
-                                "fullyQualifiedName",
-                                "There already seems to be a script with that name. Please consider a different name."
+                                "name",
+                                "There already seems to be a script with that name, please choose a different one."
                         )
                 );
             }
             return showCreateScriptForm(projectId, model);
         }
 
-
-        return "redirect:/project/" + projectId;
+        return "redirect:/project/" + projectId + "/script/" + script.getId();
     }
 
     @GetMapping("{scriptId}")
@@ -110,6 +112,16 @@ public class ScriptController {
                         )
                 )
         );
+
+        // Add all job triggers to the model.
+        Map<Long, Job> jobTriggers = new HashMap<>(jobs.getSize());
+        for (Job job : jobs) {
+            if (job.getTriggeredByJobId() != null) {
+                jobService.findOne(job.getTriggeredByJobId())
+                        .ifPresent(trigger -> jobTriggers.put(job.getId(), trigger));
+            }
+        }
+        model.addAttribute("jobTriggers", jobTriggers);
 
         model.addAttribute(Job.LIST_ATTRIBUTE, jobs);
         model.addAttribute(

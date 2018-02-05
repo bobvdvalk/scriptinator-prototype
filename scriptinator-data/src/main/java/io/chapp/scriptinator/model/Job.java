@@ -28,19 +28,28 @@ public class Job extends AbstractEntity {
     public static final String EXECUTE_JOB_QUEUE = "execute_job";
 
     private String displayName;
+
     @NotNull
     private Status status;
+
     @NotNull
     private Date queuedTime;
+
     private Date startedTime;
+
     private Date finishedTime;
+
     @ManyToOne(optional = false)
     private Script script;
-    @ManyToOne(optional = false)
-    private Project project;
+
     @NotNull
     @Lob
     private String output = "";
+
+    private Long triggeredByJobId;
+
+    @Lob
+    private String argument;
 
     public String getDisplayName() {
         return displayName;
@@ -90,14 +99,6 @@ public class Job extends AbstractEntity {
         this.script = script;
     }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
     public String getOutput() {
         return output;
     }
@@ -108,6 +109,22 @@ public class Job extends AbstractEntity {
 
     public void log(String level, String message) {
         output += String.format("%s - [%s]: %s%n", new Date(), level, message);
+    }
+
+    public Long getTriggeredByJobId() {
+        return triggeredByJobId;
+    }
+
+    public void setTriggeredByJobId(Long triggeredByJobId) {
+        this.triggeredByJobId = triggeredByJobId;
+    }
+
+    public String getArgument() {
+        return argument;
+    }
+
+    public void setArgument(String argument) {
+        this.argument = argument;
     }
 
     public enum Status {

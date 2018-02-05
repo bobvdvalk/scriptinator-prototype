@@ -29,17 +29,17 @@
         <div class="ui green clearing segment">
             <h3>Project settings</h3>
 
-            <div class="field" th:classappend="${errors?.displayName} ? 'error': ''">
-                Name
+            <div class="field" th:classappend="${errors?.name} ? 'error': ''">
+                <label>Name</label>
                 <input type="text"
-                       th:field="*{displayName}"
-                       name="displayName"
+                       th:field="*{name}"
+                       name="name"
                        placeholder="ProjectName"
                 >
             </div>
 
             <div class="field">
-                Description
+                <label>Description</label>
                 <input type="text"
                        th:field="*{description}"
                        name="description"
@@ -47,10 +47,20 @@
                 >
             </div>
 
-            <div class="ui error message"></div>
-            <button class="ui primary right floated button" type="submit">
-                Save
-            </button>
+            <div class="ui grid">
+                <div class="twelve wide column">
+                    <div class="ui error message active" th:classappend="${errors != null ? 'visible': ''}">
+                        <ul class="list" th:if="${errors != null}">
+                            <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="four wide column">
+                    <button class="ui primary right floated button" type="submit">
+                        Save
+                    </button>
+                </div>
+            </div>
         </div>
     </form>
 
@@ -65,7 +75,7 @@
     <div class="ui basic modal">
         <div class="ui icon header">
             <i class="delete icon"></i>
-            Delete <span th:text="${project.displayName}"></span>?
+            Delete <span th:text="${project.name}"></span>?
         </div>
         <div class="content">
             <p>Should you decide to delete this project, we will not be able to recover it for you.</p>
@@ -88,16 +98,20 @@
     $('.ui.form')
         .form({
             fields: {
-                displayName: {
-                    identifier: 'displayName',
+                name: {
+                    identifier: 'name',
                     rules: [
                         {
                             type: 'empty',
                             prompt: 'What would you like to call this project?'
                         },
                         {
-                            type: 'minLength[4]',
-                            prompt: 'Please use a name with at least 4 characters.'
+                            type: 'regExp[/^[a-z0-9_-]*$/i]',
+                            prompt: 'Please rename your project to only use alphanumeric characters, underscores and dashes.'
+                        },
+                        {
+                            type: 'regExp[/^[a-z]/i]',
+                            prompt: 'Please rename your project to start with a letter.'
                         }
                     ]
                 }

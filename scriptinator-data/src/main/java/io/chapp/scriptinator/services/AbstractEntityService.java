@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class AbstractEntityService<E extends AbstractEntity, R extends AbstractEntityRepository<E>> {
     private R repository;
@@ -83,6 +84,16 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
      */
     public void delete(long id) {
         repository.delete(id);
+    }
+
+    /**
+     * Find an entity.
+     *
+     * @param id the id
+     * @return an optional containing the entity
+     */
+    public Optional<E> findOne(long id) {
+        return Optional.ofNullable(repository.findOne(id));
     }
 
     protected R getRepository() {

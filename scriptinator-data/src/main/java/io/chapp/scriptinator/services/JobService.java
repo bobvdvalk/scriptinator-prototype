@@ -32,7 +32,6 @@ public class JobService extends AbstractEntityService<Job, JobRepository> {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-
     public Page<Job> get(long scriptId, PageRequest pageRequest) {
         return getRepository().findByScriptId(scriptId, pageRequest);
     }

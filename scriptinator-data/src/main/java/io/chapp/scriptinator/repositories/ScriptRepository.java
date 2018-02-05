@@ -17,6 +17,8 @@ package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.Script;
 
+import java.util.Optional;
+
 public interface ScriptRepository extends AbstractEntityRepository<Script> {
-    Script findOneByProjectIdAndFullyQualifiedName(long projectId, String fullyQualifiedName);
+    Optional<Script> findOneByProjectIdAndName(long projectId, String name);
 }
