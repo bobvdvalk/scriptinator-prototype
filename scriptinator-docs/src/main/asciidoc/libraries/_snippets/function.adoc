@@ -27,8 +27,7 @@ include::{function_dir}/variables.adoc[]
 |===
 3.1+h| `{type_name}.{signature}`
 
-h| Description:
-2.1+| {description}
+3.1+h| {description}
 
 include::{function_dir}/parameters.adoc[]
 
