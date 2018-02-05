@@ -20,8 +20,6 @@ import io.chapp.scriptinator.libraries.ScriptLibrary;
 import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.slf4j.Logger;
@@ -54,7 +52,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         try (ClosableContext context = new ClosableContext()) {
-            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, objectConverter, context);
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, projectService, objectConverter, context);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             bindings.put("Script", scriptLibrary);
 
