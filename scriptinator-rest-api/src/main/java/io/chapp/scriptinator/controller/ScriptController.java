@@ -4,10 +4,7 @@ import io.chapp.scriptinator.model.ScriptDtos;
 import io.chapp.scriptinator.services.ScriptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/scripts")
@@ -19,17 +16,17 @@ public class ScriptController {
         this.scriptService = scriptService;
     }
 
-    @RequestMapping("/script")
+    @RequestMapping("/script/{id}/")
     @ResponseBody
-    public ScriptDtos getScript(@RequestParam("script-id") int scriptId) {
+    public ScriptDtos getScript(@PathVariable("script-id") int scriptId) {
         logger.info("retrieving script with id: "+ scriptId);
         return ScriptDtos.convert(scriptService.get(scriptId));
     }
 
-    @RequestMapping("/script")
+    @RequestMapping("/script/{project-id}/{script-name}")
     @ResponseBody
-    public ScriptDtos getScriptByProjectIdAndFullyQualifiedName(@RequestParam("project-id") int projectId,
-                                                                @RequestParam("script-name") String qualifiedName) {
+    public ScriptDtos getScriptByProjectIdAndFullyQualifiedName(@PathVariable("project-id") int projectId,
+                                                                @PathVariable("script-name") String qualifiedName) {
         logger.info("retrieving script with project-id: " + projectId + " and name: "+ qualifiedName);
         return ScriptDtos.convert(scriptService.get(projectId, qualifiedName));
     }
