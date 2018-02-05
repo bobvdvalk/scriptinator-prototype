@@ -43,7 +43,10 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static org.awaitility.Awaitility.await;
 
 @ContextConfiguration(classes = ScriptinatorWorker.class)
 public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
@@ -111,20 +114,14 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
     }
 
     @AfterClass
-    public void waitForJobsToComplete() {
-        while (
-                jobRepository.findByStatus(Job.Status.QUEUED, new PageRequest(0, 1)).hasContent() ||
-                        jobRepository.findByStatus(Job.Status.RUNNING, new PageRequest(0, 1)).hasContent()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @AfterClass(dependsOnMethods = "waitForJobsToComplete")
     public void checkForErrors() {
+        await("Wait for all jobs to complete")
+                .atMost(1, TimeUnit.MINUTES)
+                .until(
+                        () -> !jobRepository.findByStatus(Job.Status.QUEUED, new PageRequest(0, 1)).hasContent() &&
+                                !jobRepository.findByStatus(Job.Status.RUNNING, new PageRequest(0, 1)).hasContent()
+                );
+
         Job failedJob = null;
         for (Job job : jobRepository.findAll()) {
 

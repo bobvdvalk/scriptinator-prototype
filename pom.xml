@@ -101,6 +101,7 @@
         <jacoco-plugin.version>0.8.0</jacoco-plugin.version>
         <asciidoctor-plugin.version>1.5.6</asciidoctor-plugin.version>
         <testng.version>6.13.1</testng.version>
+        <awaitility.version>3.0.0</awaitility.version>
 
         <!-- Build Configuration -->
         <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
@@ -157,9 +158,12 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
-                <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
