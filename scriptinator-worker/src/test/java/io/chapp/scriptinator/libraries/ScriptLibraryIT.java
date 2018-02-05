@@ -29,11 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -62,7 +60,7 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
 
     private Project project;
 
-    @DataProvider
+    @DataProvider(parallel = true)
     public static Object[] getAllScripts() throws IOException {
         List<Path> paths = new ArrayList<>();
         paths.addAll(scanFolder(Paths.get("src/test/resources")));
@@ -110,41 +108,28 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         script.setCode(code);
         script.setProject(project);
         script = scriptService.create(script);
-        scriptService.run(script);
-    }
+        long jobId = scriptService.run(script).getId();
 
-    @AfterClass
-    public void checkForErrors() {
-        await("Wait for all jobs to complete")
+        await("Wait for test to complete: " + file)
                 .atMost(1, TimeUnit.MINUTES)
-                .until(
-                        () -> !jobRepository.findByStatus(Job.Status.QUEUED, new PageRequest(0, 1)).hasContent() &&
-                                !jobRepository.findByStatus(Job.Status.RUNNING, new PageRequest(0, 1)).hasContent()
-                );
+                .until(() -> jobRepository.findOne(jobId).getFinishedTime() != null);
 
-        Job failedJob = null;
-        for (Job job : jobRepository.findAll()) {
+        Job finishedJob = jobRepository.findOne(jobId);
 
-            LOGGER.info(
-                    "Job {} [{} ms]: {}",
-                    job.getStatus(),
-                    StringUtils.leftPad(
-                            Long.toString(job.getFinishedTime().getTime() - job.getStartedTime().getTime()),
-                            6
-                    ),
-                    job.getDisplayName()
-            );
+        LOGGER.info(
+                "Job {} [{} ms]: {}",
+                finishedJob.getStatus(),
+                StringUtils.leftPad(
+                        Long.toString(finishedJob.getFinishedTime().getTime() - finishedJob.getStartedTime().getTime()),
+                        6
+                ),
+                finishedJob.getDisplayName()
+        );
 
-            if (job.getStatus() != Job.Status.FINISHED) {
-                failedJob = job;
-            }
-        }
-        if (failedJob != null) {
+        if (finishedJob.getStatus() == Job.Status.FAILED) {
             Assert.fail(
-                    "Job [" + failedJob.getDisplayName() + "] failed:\n" + failedJob.getOutput()
+                    "Job [" + finishedJob.getDisplayName() + "] failed:\n" + finishedJob.getOutput()
             );
         }
     }
-
-
 }
