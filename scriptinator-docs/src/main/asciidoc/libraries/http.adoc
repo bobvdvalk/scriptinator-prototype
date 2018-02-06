@@ -89,10 +89,7 @@ include::_snippets/function.adoc[]
 
 === HttpClient.request
 
-:function_id: request_url
-include::_snippets/function.adoc[]
-
-:function_id: request_options
+:function_id: request
 include::_snippets/function.adoc[]
 
 == HttpResponse

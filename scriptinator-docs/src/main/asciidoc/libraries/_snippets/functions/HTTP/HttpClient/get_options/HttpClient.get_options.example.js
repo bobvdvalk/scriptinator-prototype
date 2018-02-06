@@ -2,7 +2,7 @@
 var HTTP = Script.library("HTTP");      // <1>
 
 var response = HTTP.get({               // <2>
-    url: "https://httpbin.org/basic-auth/user/passwd",
+    url: "https://httpbin.org/basic-auth/user/p455w0rd",
     basicAuth: {
         username: "user",
         password: "p455w0rd"
