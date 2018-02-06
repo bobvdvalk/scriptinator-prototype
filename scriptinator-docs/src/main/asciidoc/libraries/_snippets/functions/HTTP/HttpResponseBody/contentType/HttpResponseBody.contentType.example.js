@@ -2,7 +2,7 @@
 var HTTP = Script.library("HTTP");      // <1>
 
 var body = HTTP.get(                    // <2>
-    "https://httpbin.org/response-headers?Server=httpbin&Content-Type=text%2Fplain"
+    "https://httpbin.org/response-headers?Content-Type=text%2Fplain"
 ).body();
 
 Script.info(body.contentType());        // <3>

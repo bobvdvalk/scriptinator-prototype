@@ -14,6 +14,6 @@ Script.info(text);                       // <4>
 var Assert = Script.library("Assert");
 
 Assert.notNullOrEmpty(
-    "Body is not empty",
+    "body",
     text
 );
