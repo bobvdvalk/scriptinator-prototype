@@ -12,7 +12,6 @@ Script.info(post.title);
 
 var Assert = Script.library("Assert");
 
-Assert.notNull("HTTP library exists", HTTP);
 Assert.equal(
     "Post 5 is retrieved",
     5,

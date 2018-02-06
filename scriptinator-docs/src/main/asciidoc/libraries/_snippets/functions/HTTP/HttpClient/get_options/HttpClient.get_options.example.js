@@ -5,7 +5,7 @@ var response = HTTP.get({               // <2>
     url: "https://httpbin.org/basic-auth/user/passwd",
     basicAuth: {
         username: "user",
-        password: "passwd"
+        password: "p455w0rd"
     }
 });
 
@@ -13,7 +13,6 @@ var response = HTTP.get({               // <2>
 
 var Assert = Script.library("Assert");
 
-Assert.notNull("HTTP library exists", HTTP);
 Assert.equal(
     "The request is authenticated",
     true,

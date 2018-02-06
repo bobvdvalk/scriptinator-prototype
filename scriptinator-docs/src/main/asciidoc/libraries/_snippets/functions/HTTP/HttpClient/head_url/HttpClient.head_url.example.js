@@ -12,7 +12,6 @@ Script.info(contentLength);             // <3>
 
 var Assert = Script.library("Assert");
 
-Assert.notNull("HTTP library exists", HTTP);
 Assert.equal(
     "A length was present",
     "1754",

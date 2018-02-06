@@ -17,7 +17,6 @@ Script.info(server);
 
 var Assert = Script.library("Assert");
 
-Assert.notNull("HTTP library exists", HTTP);
 Assert.equal(
     "The server is described",
     "meinheld/0.6.1",

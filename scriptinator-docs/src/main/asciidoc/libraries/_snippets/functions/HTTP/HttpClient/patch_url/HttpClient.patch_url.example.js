@@ -1,8 +1,8 @@
 // tag::docs[]
 var HTTP = Script.library("HTTP");      // <1>
 
-var response = HTTP.delete(             // <2>
-    "https://jsonplaceholder.typicode.com/posts/4"
+var response = HTTP.patch(              // <2>
+    "http://jsonplaceholder.typicode.com/users/2"
 );
 
 // end::docs[]
