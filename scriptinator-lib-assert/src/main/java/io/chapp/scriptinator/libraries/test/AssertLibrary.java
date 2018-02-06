@@ -34,6 +34,12 @@ public class AssertLibrary {
         }
     }
 
+    public void notNullOrEmpty(String property, Object value) {
+        if (value == null || "".equals(String.valueOf(value))) {
+            fail("Expected '" + property + "' to not be null or empty.");
+        }
+    }
+
     @SuppressWarnings("squid:S1221") // This is an assertion
     public void equal(String message, Object expectedInput, Object actualInput) {
         Object expected = comparisonMapper.convertValue(expectedInput, Object.class);
