@@ -16,4 +16,4 @@
 
 <1> Import the HTTP library
 <2> Perform a request
-<3> Read the http protocol version from the response (for example: `"http/1.1"`)
+<3> Read the content type of the response body from the headers (for example: `"text/plain"`)
