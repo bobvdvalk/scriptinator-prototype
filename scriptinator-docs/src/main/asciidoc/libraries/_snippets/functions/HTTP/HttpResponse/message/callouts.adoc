@@ -15,7 +15,5 @@
 //
 
 <1> Import the HTTP library
-<2> Perform the `HEAD` request using the `HTTP` library directly
-<3> Only inspect the `Content-Length` header without having to download the body. (As specified by
-    the https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD[HEAD^] request method.)
-
+<2> Perform a request
+<3> Read the http status code message from the response and log it
