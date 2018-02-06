@@ -20,5 +20,5 @@ Assert.equal(
 Assert.equal(
     "Content-Length header was sent",
     "0",
-    response.header("Content-Length")
+    body.headers['Content-Length']
 );
