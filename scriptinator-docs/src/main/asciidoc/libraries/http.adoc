@@ -144,7 +144,7 @@ include::_snippets/function.adoc[]
 
 The `HttpResponseBode` allows you to easily parse HTTP response bodies into a useable form.
 
-=== HttpResonseBody.contentType
+=== HttpResponseBody.contentType
 
 :function_id: contentType
 include::_snippets/function.adoc[]

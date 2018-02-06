@@ -14,31 +14,5 @@
 // limitations under the License.
 //
 
-= Scriptinator
-Thomas Biesaart; Luca Scalzotto; Bob van der Valk
-Version 1.0
-:doctype: book
-:toc: left
-:sectnums:
-:sectlinks:
-:highlightjs-theme: magula
-:icons: font
-
-
-include::getting_started/index.adoc[]
-
-<<<
-
-include::writing_scripts/index.adoc[]
-
-<<<
-
-include::libraries/index.adoc[]
-
-<<<
-
-include::rest_api/index.adoc[]
-
-<<<
-
-include::contributing/index.adoc[]
+:signature: post(url)
+:description: Send an empty `POST` request to the server
