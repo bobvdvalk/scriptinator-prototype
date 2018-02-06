@@ -14,7 +14,5 @@
 // limitations under the License.
 //
 
-<1> Import the HTTP library
-<2> Perform the `HEAD` request to request everything except the response body
-<3> Log the content length
-
+:signature: post({url, contentType, body, headers, basicAuth, bearerAuth})
+:description: Send data to the server using a `POST` request.

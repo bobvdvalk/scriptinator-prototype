@@ -15,6 +15,5 @@
 //
 
 <1> Import the HTTP library
-<2> Perform the `HEAD` request to request everything except the response body
-<3> Log the content length
+<2> Perform the `POST` request to create a new entry in the target API
 

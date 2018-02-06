@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-:signature: head({url, contentType, body, headers})
+:signature: head({url, headers, basicAuth, bearerAuth})
 :description: Load only the headers from the server using a `HEAD` request.

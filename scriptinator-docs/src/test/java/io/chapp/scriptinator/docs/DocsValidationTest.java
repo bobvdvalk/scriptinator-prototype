@@ -16,18 +16,21 @@
 package io.chapp.scriptinator.docs;
 
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class DocsValidationTest {
     private static final Path GENERATED_DOCS = Paths.get("target/generated-docs").toAbsolutePath();
     private static final Path INDEX = GENERATED_DOCS.resolve("index.html");
+    private static final Pattern UNRESOLVED_DIRECTIVE = Pattern.compile(".*Unresolved directive in .* include::([^\\[]*)\\[].*");
 
     @Test
     public void testDocsAreGenerated() {
@@ -39,12 +42,18 @@ public class DocsValidationTest {
 
     @Test
     public void testAllDirectivesAreResolved() throws IOException {
+
+        SoftAssert softAssert = new SoftAssert();
+
         for (String line : Files.readAllLines(INDEX)) {
-            assertFalse(
-                    line.contains("Unresolved directive in"),
-                    "All directives are resolved: " + line
-            );
+            Matcher matcher = UNRESOLVED_DIRECTIVE.matcher(line);
+            if (matcher.matches()) {
+                String path = matcher.group(1);
+                softAssert.fail("Missing included snippet: " + path);
+            }
         }
+
+        softAssert.assertAll();
     }
 
 }
