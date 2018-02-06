@@ -16,4 +16,4 @@
 
 <1> Import the HTTP library
 <2> Perform a request
-<3> Read the http status code from the response and log it
+<3> Read the HTTP status code from the response and log it
