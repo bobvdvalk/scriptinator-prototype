@@ -16,7 +16,7 @@
 
 1.3+| *basicAuth* +
 Type: <<Object>>
-2.1+| Set this object to enable basic authentication for all requests
+2.1+| Set this object to enable basic authentication
 
 | *username* +
 Type: <<String>>
@@ -28,7 +28,7 @@ Type: <<String>>
 
 1.2+| *bearerAuth* +
 Type: <<Object>>
-2.1+| Set this object to enable bearer authentication for all requests
+2.1+| Set this object to enable bearer authentication
 
 | *token* +
 Type: <<String>>

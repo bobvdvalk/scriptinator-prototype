@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-:signature: request({method, url, contentType, body, headers, basicAuth, bearerAuth})
+:signature: request({url, method, contentType, body, headers, basicAuth, bearerAuth})
 :description: Send a request to the server
