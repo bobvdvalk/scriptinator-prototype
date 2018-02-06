@@ -98,6 +98,9 @@ include::_snippets/function.adoc[]
 == HttpResponse
 :type_name: HttpResponse
 
+An `HttpResponse` is the result of one of the request methods. It contains various headers and types of <<HttpResponseBody, response bodies>>
+which are exposed by convenient methods.
+
 === HttpResponse.code
 
 :function_id: code
@@ -138,6 +141,8 @@ include::_snippets/function.adoc[]
 
 == HttpResponseBody
 :type_name: HttpResponseBody
+
+The `HttpResponseBode` allows you to easily parse HTTP response bodies into a useable form.
 
 === HttpResonseBody.contentType
 
