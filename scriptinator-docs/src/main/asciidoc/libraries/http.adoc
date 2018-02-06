@@ -98,5 +98,60 @@ include::_snippets/function.adoc[]
 == HttpResponse
 :type_name: HttpResponse
 
+=== HttpResponse.code
+
+:function_id: code
+include::_snippets/function.adoc[]
+
+=== HttpResponse.message
+
+:function_id: message
+include::_snippets/function.adoc[]
+
+=== HttpResponse.protocol
+
+:function_id: protocol
+include::_snippets/function.adoc[]
+
+=== HttpResponse.headerNames
+
+:function_id: headerNames
+include::_snippets/function.adoc[]
+
+=== HttpResponse.headers
+
+:function_id: headers
+include::_snippets/function.adoc[]
+
+:function_id: headers_name
+include::_snippets/function.adoc[]
+
+=== HttpResponse.header
+
+:function_id: header
+include::_snippets/function.adoc[]
+
+=== HttpResponse.body
+
+:function_id: body
+include::_snippets/function.adoc[]
+
 == HttpResponseBody
 :type_name: HttpResponseBody
+
+=== HttpResonseBody.contentType
+
+:function_id: contentType
+include::_snippets/function.adoc[]
+
+=== HttpResponseBody.asString
+
+:function_id: asString
+include::_snippets/function.adoc[]
+
+=== HttpResponseBody.asJson
+
+:function_id: asJson
+include::_snippets/function.adoc[]
+
+
