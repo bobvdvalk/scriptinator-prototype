@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.libraries.test;
+package io.chapp.scriptinator.libraries.core;
 
-import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
-
-public class UnmetAssertionException extends ScriptinatorExecutionException {
-    public UnmetAssertionException(String message) {
+public class ScriptinatorExecutionException extends RuntimeException {
+    public ScriptinatorExecutionException(String message) {
         super(message);
+    }
+
+    public ScriptinatorExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

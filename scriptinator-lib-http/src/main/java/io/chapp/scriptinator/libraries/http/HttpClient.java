@@ -17,10 +17,11 @@ package io.chapp.scriptinator.libraries.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.chapp.scriptinator.ClosableContext;
-import io.chapp.scriptinator.workerservices.ObjectConverter;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.EncodeUtils;
+import io.chapp.scriptinator.libraries.core.ObjectConverter;
 import okhttp3.*;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,9 +29,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static io.chapp.scriptinator.libraries.EncodeUtils.toBase64;
-import static io.chapp.scriptinator.libraries.EncodeUtils.urlEncode;
 
 public class HttpClient extends HttpRequestExecutor {
     private static final Set<String> REQUIRE_BODY;
@@ -100,7 +98,7 @@ public class HttpClient extends HttpRequestExecutor {
         }
 
         if (request.getBasicAuth() != null) {
-            headers.add("Authorization", "Basic " + toBase64(
+            headers.add("Authorization", "Basic " + EncodeUtils.toBase64(
                     request.getBasicAuth().getUsername() + ":" +
                             request.getBasicAuth().getPassword()
             ));
@@ -137,7 +135,7 @@ public class HttpClient extends HttpRequestExecutor {
             return RequestBody.create(
                     mediaType,
                     bodyParts.entrySet().stream()
-                            .map(entry -> entry.getKey() + "=" + urlEncode(entry.getValue()))
+                            .map(entry -> entry.getKey() + "=" + EncodeUtils.urlEncode(entry.getValue()))
                             .collect(Collectors.joining("&"))
             );
         }

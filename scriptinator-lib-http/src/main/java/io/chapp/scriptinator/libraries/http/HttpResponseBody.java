@@ -15,8 +15,8 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.libraries.DataValue;
-import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
+import io.chapp.scriptinator.libraries.core.DataValue;
+import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 

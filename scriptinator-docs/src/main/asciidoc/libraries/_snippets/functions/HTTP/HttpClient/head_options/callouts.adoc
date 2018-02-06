@@ -14,5 +14,6 @@
 // limitations under the License.
 //
 
-:signature: get({url, contentType, body, headers})
-:description: Get data from the server using a `GET` request.
+<1> Import the HTTP library
+<2> Perform the `GET` request using the `HTTP` library directly
+

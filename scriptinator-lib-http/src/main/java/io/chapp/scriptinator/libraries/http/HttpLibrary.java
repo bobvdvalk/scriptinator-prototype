@@ -16,8 +16,8 @@
 package io.chapp.scriptinator.libraries.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.chapp.scriptinator.ClosableContext;
-import io.chapp.scriptinator.workerservices.ObjectConverter;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ObjectConverter;
 import okhttp3.OkHttpClient;
 
 import java.util.Map;

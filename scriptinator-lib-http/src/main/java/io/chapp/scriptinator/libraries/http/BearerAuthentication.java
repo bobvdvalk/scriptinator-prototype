@@ -15,33 +15,23 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.libraries.DataValue;
+import io.chapp.scriptinator.libraries.core.DataValue;
 
 import java.util.Map;
 
-public class BasicAuthentication extends DataValue {
-    private String username;
-    private String password;
+public class BearerAuthentication extends DataValue {
+    private String token;
 
-    public String getUsername() {
-        return username;
+    public String getToken() {
+        return token;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override
     protected void inspect(Map<String, Object> target) {
-        target.put("username", username);
-        target.put("password", password == null ? "<missing>" : "****");
+        target.put("token", token == null ? "<missing>" : "****");
     }
 }

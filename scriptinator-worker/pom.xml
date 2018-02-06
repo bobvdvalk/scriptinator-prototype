@@ -32,8 +32,12 @@
     <dependencies>
         <!-- Libraries -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <groupId>io.chapp.scriptinator</groupId>
+            <artifactId>scriptinator-lib-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.chapp.scriptinator</groupId>
+            <artifactId>scriptinator-lib-assert</artifactId>
         </dependency>
 
         <dependency>
@@ -69,6 +73,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

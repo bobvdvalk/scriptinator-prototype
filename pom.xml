@@ -33,11 +33,19 @@
     </parent>
 
     <modules>
-        <module>scriptinator-docs</module>
-        <module>scriptinator-data</module>
+        <!-- Applications -->
         <module>scriptinator-rest-api</module>
         <module>scriptinator-web</module>
         <module>scriptinator-worker</module>
+
+        <!-- Artifacts -->
+        <module>scriptinator-docs</module>
+        <module>scriptinator-data</module>
+
+        <!-- Libraries -->
+        <module>scriptinator-lib-http</module>
+        <module>scriptinator-lib-core</module>
+        <module>scriptinator-lib-assert</module>
     </modules>
 
     <name>Scriptinator</name>
@@ -102,6 +110,7 @@
         <asciidoctor-plugin.version>1.5.6</asciidoctor-plugin.version>
         <testng.version>6.13.1</testng.version>
         <awaitility.version>3.0.0</awaitility.version>
+        <dockerfile-plugin.version>1.3.7</dockerfile-plugin.version>
 
         <!-- Build Configuration -->
         <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
@@ -128,6 +137,21 @@
             <dependency>
                 <groupId>io.chapp.scriptinator</groupId>
                 <artifactId>scriptinator-worker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-assert</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -298,6 +322,24 @@
                                 <goal>process-asciidoc</goal>
                             </goals>
                             <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile-plugin.version}</version>
+                    <configuration>
+                        <repository>scriptinator/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default</id>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>push</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>

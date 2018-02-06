@@ -15,9 +15,9 @@
  */
 package io.chapp.scriptinator.workerservices;
 
-import io.chapp.scriptinator.ClosableContext;
 import io.chapp.scriptinator.libraries.ScriptLibrary;
-import io.chapp.scriptinator.libraries.ScriptinatorExecutionException;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
@@ -37,14 +37,12 @@ public class ScriptExecutor {
     private final JobService jobService;
     private final ScriptService scriptService;
     private final ProjectService projectService;
-    private final ObjectConverter objectConverter;
 
-    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, ProjectService projectService, ObjectConverter objectConverter) {
+    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, ProjectService projectService) {
         this.scriptEngineFactory = scriptEngineFactory;
         this.jobService = jobService;
         this.scriptService = scriptService;
         this.projectService = projectService;
-        this.objectConverter = objectConverter;
     }
 
     public void execute(Job job) {
@@ -52,7 +50,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         try (ClosableContext context = new ClosableContext()) {
-            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, projectService, objectConverter, context);
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, projectService, context);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             bindings.put("Script", scriptLibrary);
 

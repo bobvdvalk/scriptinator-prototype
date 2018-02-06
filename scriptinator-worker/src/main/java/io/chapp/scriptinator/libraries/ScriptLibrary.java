@@ -16,7 +16,8 @@
 package io.chapp.scriptinator.libraries;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.chapp.scriptinator.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ObjectConverter;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
@@ -28,7 +29,6 @@ import io.chapp.scriptinator.services.ScriptService;
 import jdk.nashorn.internal.objects.NativeJSON;
 import jdk.nashorn.internal.runtime.JSONFunctions;
 import org.springframework.util.StringUtils;
-import io.chapp.scriptinator.workerservices.ObjectConverter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,10 +52,10 @@ public class ScriptLibrary {
     private final ObjectConverter converter;
     private final ClosableContext closableContext;
 
-    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ProjectService projectService, ObjectConverter converter, ClosableContext closableContext) {
+    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ProjectService projectService, ClosableContext closableContext) {
         this.jobService = jobService;
         this.job = job;
-        this.converter = converter;
+        this.converter = new ObjectConverter(new ObjectMapper());
         this.closableContext = closableContext;
         this.scriptService = scriptService;
         this.projectService = projectService;

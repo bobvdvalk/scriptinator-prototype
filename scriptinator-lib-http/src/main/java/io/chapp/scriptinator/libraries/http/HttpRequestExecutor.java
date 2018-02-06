@@ -15,8 +15,9 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.libraries.DataValue;
-import io.chapp.scriptinator.workerservices.ObjectConverter;
+
+import io.chapp.scriptinator.libraries.core.DataValue;
+import io.chapp.scriptinator.libraries.core.ObjectConverter;
 
 import java.util.Collections;
 import java.util.HashMap;

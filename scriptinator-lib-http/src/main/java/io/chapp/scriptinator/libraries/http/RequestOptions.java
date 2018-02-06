@@ -15,7 +15,8 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import io.chapp.scriptinator.libraries.DataValue;
+
+import io.chapp.scriptinator.libraries.core.DataValue;
 
 import java.util.Map;
 

@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-:signature: get({url, contentType, body, headers})
-:description: Get data from the server using a `GET` request.
+:signature: head({url, contentType, body, headers})
+:description: Load only the headers from the server using a `HEAD` request.

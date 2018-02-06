@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.workerservices;
+package io.chapp.scriptinator.libraries.core;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
 
-@Service
 public class ObjectConverter {
     private final ObjectMapper mapper;
 
