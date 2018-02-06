@@ -15,4 +15,4 @@
 //
 
 :signature: get(url)
-:description: A convenience function for calling `HttpClient.get({url: "...")` with just the `url` parameter.
+:description: A convenience function for calling `HttpClient.get({url: "..."})` with just the `url` parameter.

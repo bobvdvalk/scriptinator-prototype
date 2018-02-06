@@ -14,5 +14,3 @@
 // limitations under the License.
 //
 
-:signature: head(url)
-:description: A convenience function for calling `HttpClient.head({url: "..."})` with just the `url` parameter.

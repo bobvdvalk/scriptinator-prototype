@@ -14,5 +14,6 @@
 // limitations under the License.
 //
 
-:signature: head(url)
-:description: A convenience function for calling `HttpClient.head({url: "..."})` with just the `url` parameter.
+<1> Import the HTTP library
+<2> Perform a request
+<3> Get the body from the response
