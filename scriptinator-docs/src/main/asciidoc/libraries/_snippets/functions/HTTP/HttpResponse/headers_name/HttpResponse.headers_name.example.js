@@ -12,7 +12,7 @@ Script.info(response.headers("Multi-Header"));  // <3>
 var Assert = Script.library("Assert");
 
 Assert.equal(
-    "Custom headers are set",
+    "Multiple values are set for header",
     ["FooBar", "FizzBuzz"],
     response.headers("Multi-Header")
 );

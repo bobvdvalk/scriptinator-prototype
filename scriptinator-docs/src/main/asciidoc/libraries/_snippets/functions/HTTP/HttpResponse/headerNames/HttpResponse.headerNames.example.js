@@ -12,5 +12,5 @@ Script.info(response.headerNames());    // <3>
 var Assert = Script.library("Assert");
 
 if (response.headerNames().indexOf("Custom-Header") === -1) {
-    Assert.fail("Header names contain custom header.");
+    Assert.fail("Header names contain custom header");
 }
