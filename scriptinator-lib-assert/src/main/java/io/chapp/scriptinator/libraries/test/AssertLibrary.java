@@ -17,6 +17,11 @@ package io.chapp.scriptinator.libraries.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 public class AssertLibrary {
     private final ObjectMapper comparisonMapper;
 
@@ -45,8 +50,40 @@ public class AssertLibrary {
         Object expected = comparisonMapper.convertValue(expectedInput, Object.class);
         Object actual = comparisonMapper.convertValue(actualInput, Object.class);
 
-        if (!expected.equals(actual)) {
+        // Convert lists to linked hashmaps, because that is what a list from the script get converted to.
+        if (expected instanceof List) {
+            expected = listToMap((List) expected);
+        }
+        if (actual instanceof List) {
+            actual = listToMap((List) actual);
+        }
+
+        if (!deepEquals(expected, actual)) {
             fail(message + "\nExpected '" + expected + "'\nFound: '" + actual + "'");
         }
+    }
+
+    private boolean deepEquals(Object expected, Object actual) {
+        if (expected instanceof Map && actual instanceof Map) {
+            Map<Object, Object> expectedMap = (Map<Object, Object>) expected;
+            Map<Object, Object> actualMap = (Map<Object, Object>) actual;
+
+            if (expectedMap.size() != actualMap.size()) {
+                return false;
+            }
+
+            return expectedMap.entrySet().stream()
+                    .allMatch(entry -> deepEquals(entry.getValue(), actualMap.get(entry.getKey())));
+        } else {
+            return Objects.equals(expected, actual);
+        }
+    }
+
+    private Map<String, Object> listToMap(List list) {
+        Map<String, Object> map = new LinkedHashMap<>(list.size());
+        for (int i = 0; i < list.size(); i++) {
+            map.put(Integer.toString(i), list.get(i));
+        }
+        return map;
     }
 }
