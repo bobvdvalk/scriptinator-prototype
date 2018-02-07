@@ -89,7 +89,7 @@ public class User extends AbstractEntity {
 
     public String getAvatarUrl() {
         if (StringUtils.isEmpty(avatarUrl) && !StringUtils.isEmpty(email)) {
-            return "https://www.gravatar.com/avatar/" + DigestUtils.md2Hex(
+            return "https://www.gravatar.com/avatar/" + DigestUtils.md5Hex(
                     email.toLowerCase().trim()
             );
         }
