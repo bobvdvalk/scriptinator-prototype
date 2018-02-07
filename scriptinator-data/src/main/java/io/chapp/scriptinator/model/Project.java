@@ -80,6 +80,6 @@ public class Project extends AbstractEntity {
 
     @Override
     public Link getUrl() {
-        return new Link("/projects/"+ name);
+        return new Link("/projects/" + name);
     }
 }

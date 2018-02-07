@@ -15,12 +15,17 @@
  */
 package io.chapp.scriptinator.controller;
 
+import io.chapp.scriptinator.model.Link;
+import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.services.ProjectService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * ProjectController
@@ -41,5 +46,17 @@ public class ProjectController {
     @GetMapping("{projectName}")
     public Project getProjectByName(@PathVariable String projectName) {
         return projectService.get(projectName);
+    }
+
+    @GetMapping
+    public PageResult<Project> projectList(HttpServletRequest request) {
+        Page<Project> result = projectService.get(
+                PageResult.request(request)
+        );
+
+        return PageResult.of(
+                new Link("/projects"),
+                result
+        );
     }
 }

@@ -15,29 +15,42 @@
  */
 package io.chapp.scriptinator.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import org.apache.http.client.utils.URIBuilder;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Link {
     private final String href;
+    private final Map<String, String> parameters;
 
     public Link(String href) {
-        this.href = href;
+        this(href, Collections.emptyMap());
     }
 
-    @JsonValue
-    public String getAbsoluteLink() throws URISyntaxException {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    public Link(String href, Map<String, String> parameters) {
+        this.href = href;
+        this.parameters = parameters;
+    }
 
-        return new URIBuilder(request.getRequestURL().toString())
-                .removeQuery()
-                .clearParameters()
-                .setPath(href)
-                .toString();
+    public String getHref() {
+        return href;
+    }
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public Link withParameter(String name, String value) {
+        Link result = copy();
+        result.parameters.put(name, value);
+        return result;
+    }
+
+    public Link withParameter(String name, int value) {
+        return withParameter(name, Integer.toString(value));
+    }
+
+    private Link copy() {
+        return new Link(href, new HashMap<>(parameters));
     }
 }
