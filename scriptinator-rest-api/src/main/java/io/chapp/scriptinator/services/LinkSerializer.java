@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import io.chapp.scriptinator.model.Link;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,20 +26,20 @@ public class LinkSerializer extends StdSerializer<Link> {
 
     @Override
     public void serialize(Link link, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        String resourceUrl = getRequestUrl()
+        URIBuilder resourceUrl = getRequestUrl()
                 .removeQuery()
                 .clearParameters()
-                .setPath(link.getHref())
-                .setParameters(
-                        link.getParameters().entrySet()
-                                .stream()
-                                .map(
-                                        entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
-                                .collect(Collectors.toList())
-                )
-                .toString();
+                .setPath(link.getHref());
 
-        jsonGenerator.writeString(resourceUrl);
+        List<NameValuePair> parameters = link.getParameters().entrySet().stream().map(
+                entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())
+        ).collect(Collectors.toList());
+
+        if(!parameters.isEmpty()) {
+            resourceUrl.setParameters(parameters);
+        }
+
+        jsonGenerator.writeString(resourceUrl.toString());
     }
 
     private URIBuilder getRequestUrl() {
