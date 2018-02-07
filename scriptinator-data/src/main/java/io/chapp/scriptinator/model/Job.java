@@ -127,6 +127,11 @@ public class Job extends AbstractEntity {
         this.argument = argument;
     }
 
+    @Override
+    public Link getUrl() {
+        return new Link("/jobs/"+ this.getId());
+    }
+
     public enum Status {
         QUEUED,
         RUNNING,

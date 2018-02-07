@@ -15,26 +15,24 @@
  */
 package io.chapp.scriptinator.controller;
 
-import io.chapp.scriptinator.model.OwnerDtos;
+import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
-public class OwnerController {
-    private final Logger logger = LoggerFactory.getLogger(OwnerController.class);
+@RequestMapping("users")
+public class UserController {
     private final UserService userService;
 
-    public OwnerController(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @RequestMapping("/{username}")
-    @ResponseBody
-    public OwnerDtos ownerDtos(@PathVariable("username") String username) {
-        logger.info("requested user information of " + username);
-        return OwnerDtos.convert(userService.getByUsername(username));
+    @GetMapping("{username}")
+    public User getUserByUsername(@PathVariable String username) {
+        return userService.getByUsername(username);
     }
 }

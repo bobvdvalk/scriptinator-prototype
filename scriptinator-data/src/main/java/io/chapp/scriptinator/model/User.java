@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -47,6 +48,7 @@ public class User extends AbstractEntity {
 
     @OneToMany(mappedBy = "owner", orphanRemoval = true)
     @NotNull
+    @JsonIgnore
     private List<Project> projects = new ArrayList<>();
 
     public String getUsername() {
@@ -57,6 +59,7 @@ public class User extends AbstractEntity {
         this.username = username;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -103,5 +106,14 @@ public class User extends AbstractEntity {
 
     public void setProjects(List<Project> projects) {
         this.projects = projects;
+    }
+
+    public Link getProjectUrl() {
+        return new Link("/users/" + username + "/projects");
+    }
+
+    @Override
+    public Link getUrl() {
+        return new Link("/users/" + username);
     }
 }

@@ -74,4 +74,9 @@ public class Project extends AbstractEntity {
     public void setScripts(List<Script> scripts) {
         this.scripts = scripts;
     }
+
+    @Override
+    public Link getUrl() {
+        return new Link("/projects/"+ name);
+    }
 }

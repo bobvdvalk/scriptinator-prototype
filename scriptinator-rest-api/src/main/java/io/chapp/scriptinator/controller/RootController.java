@@ -28,8 +28,10 @@ public class RootController {
     @GetMapping("/")
     public Map<String, Link> getApiLinks() {
         Map<String, Link> links = new HashMap<>();
-        links.put("usersUrl", new Link("/users"));
+        links.put("jobsUrl", new Link("/jobs"));
         links.put("projectsUrl", new Link("/projects"));
+        links.put("scriptsUrl", new Link("/scripts"));
+        links.put("usersUrl", new Link("/users"));
         return links;
     }
 }

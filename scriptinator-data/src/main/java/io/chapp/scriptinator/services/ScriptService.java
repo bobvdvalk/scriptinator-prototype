@@ -20,6 +20,7 @@ import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -28,6 +29,11 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
 
     public ScriptService(JobService jobService) {
         this.jobService = jobService;
+    }
+
+    public Script get(String projectName, String scriptName) {
+        return getRepository().findOneByProjectNameAndName(projectName, scriptName)
+                .orElseThrow(() -> new NoSuchElementException());
     }
 
     public Optional<Script> get(long projectId, String name) {

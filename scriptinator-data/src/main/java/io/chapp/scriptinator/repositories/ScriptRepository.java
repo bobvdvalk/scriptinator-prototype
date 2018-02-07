@@ -21,4 +21,6 @@ import java.util.Optional;
 
 public interface ScriptRepository extends AbstractEntityRepository<Script> {
     Optional<Script> findOneByProjectIdAndName(long projectId, String name);
+
+    Optional<Script> findOneByProjectNameAndName(String projectName, String scriptName);
 }
