@@ -34,7 +34,7 @@ public class Link {
     public String getAbsoluteLink() throws URISyntaxException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        return new URIBuilder(request.getRequestURI())
+        return new URIBuilder(request.getRequestURL().toString())
                 .removeQuery()
                 .clearParameters()
                 .setPath(href)

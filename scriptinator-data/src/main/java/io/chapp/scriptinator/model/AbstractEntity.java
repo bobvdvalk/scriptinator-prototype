@@ -15,13 +15,16 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @MappedSuperclass
-public class AbstractEntity implements Serializable {
+@JsonPropertyOrder({"id", "url"})
+public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
@@ -33,4 +36,6 @@ public class AbstractEntity implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public abstract Link getUrl();
 }

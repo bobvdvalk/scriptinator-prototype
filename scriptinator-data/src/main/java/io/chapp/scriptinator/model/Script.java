@@ -98,4 +98,9 @@ public class Script extends AbstractEntity {
     public void setJobs(List<Job> jobs) {
         this.jobs = jobs;
     }
+
+    @Override
+    public Link getUrl() {
+        return new Link("/scripts/" + name);
+    }
 }
