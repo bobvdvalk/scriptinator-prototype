@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -41,6 +43,7 @@ public class Project extends AbstractEntity {
 
     @NotNull
     @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @JsonIgnore
     private List<Script> scripts = new ArrayList<>();
 
     public String getName() {

@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -47,6 +49,7 @@ public class Script extends AbstractEntity {
 
     @NotNull
     @OneToMany(mappedBy = "script", orphanRemoval = true)
+    @JsonIgnore
     private List<Job> jobs = new ArrayList<>();
 
     /**
