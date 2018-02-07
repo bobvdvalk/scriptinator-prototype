@@ -133,7 +133,7 @@ public class PageResult<T> {
     }
 
     public boolean isHasItems() {
-        return items.size() > 0;
+        return !items.isEmpty();
     }
 
     public boolean isHasPrevious() {

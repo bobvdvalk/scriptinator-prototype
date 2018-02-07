@@ -35,7 +35,7 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
 
     public Script get(String projectName, String scriptName) {
         return getRepository().findOneByProjectNameAndName(projectName, scriptName)
-                .orElseThrow(() -> new NoSuchElementException());
+                .orElseThrow(NoSuchElementException::new);
     }
 
     public Optional<Script> get(long projectId, String name) {

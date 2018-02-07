@@ -31,7 +31,7 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
     }
 
     public Project get(String projectName) {
-        return this.find(projectName).orElseThrow(() -> new NoSuchElementException());
+        return this.find(projectName).orElseThrow(NoSuchElementException::new);
     }
 
     public Page<Project> get(String username, PageRequest pageRequest) {
