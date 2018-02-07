@@ -85,7 +85,7 @@ public class Job extends AbstractEntity {
     public void setStartedTime(Date startedTime) {
         this.startedTime = startedTime;
     }
-clea
+
     public Date getFinishedTime() {
         return finishedTime;
     }
