@@ -102,8 +102,12 @@ public class Script extends AbstractEntity {
         this.jobs = jobs;
     }
 
+    public Link getJobsUrl() {
+        return new Link("/scripts/" + getId() + "/jobs");
+    }
+
     @Override
     public Link getUrl() {
-        return new Link("/scripts/" + name);
+        return new Link("/scripts/" + getId());
     }
 }

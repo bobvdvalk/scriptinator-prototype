@@ -108,7 +108,7 @@ public class User extends AbstractEntity {
         this.projects = projects;
     }
 
-    public Link getProjectUrl() {
+    public Link getProjectsUrl() {
         return new Link("/users/" + username + "/projects");
     }
 

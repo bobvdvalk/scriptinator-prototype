@@ -15,27 +15,53 @@
  */
 package io.chapp.scriptinator.controller;
 
+import io.chapp.scriptinator.model.Job;
+import io.chapp.scriptinator.model.Link;
+import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Script;
+import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
+@RequestMapping("scripts")
 public class ScriptController {
     private final ScriptService scriptService;
+    private final JobService jobService;
 
-    public ScriptController(ScriptService scriptService) {
+    public ScriptController(ScriptService scriptService, JobService jobService) {
         this.scriptService = scriptService;
+        this.jobService = jobService;
     }
 
-    @GetMapping("/scripts/{scriptId}")
+    @GetMapping("")
+    public PageResult<Script> getScripts(HttpServletRequest request) {
+        return PageResult.of(
+                new Link("/scripts"),
+                scriptService.get(
+                        PageResult.request(request)
+                )
+        );
+    }
+
+    @GetMapping("{scriptId}")
     public Script getScriptById(@PathVariable int scriptId) {
         return scriptService.get(scriptId);
     }
 
-    @GetMapping("/projects/{projectName}/scripts/{scriptName}")
-    public Script getScriptByName(@PathVariable String projectName, @PathVariable String scriptName) {
-        return scriptService.get(projectName, scriptName);
+    @GetMapping("{scriptId}/jobs")
+    public PageResult<Job> getJobs(@PathVariable int scriptId, HttpServletRequest request) {
+        return PageResult.of(
+                new Link("/scripts/" + scriptId + "/jobs"),
+                jobService.get(
+                        scriptId,
+                        PageResult.request(request)
+                )
+        );
     }
 }
