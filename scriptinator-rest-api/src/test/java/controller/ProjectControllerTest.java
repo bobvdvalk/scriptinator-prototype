@@ -15,35 +15,99 @@
  */
 package controller;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
+import io.chapp.scriptinator.ScriptinatorRestApi;
+import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.repositories.ProjectRepository;
+import io.chapp.scriptinator.repositories.UserRepository;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.testng.annotations.*;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+
+import static org.testng.Assert.assertEquals;
 
 public class ProjectControllerTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectControllerTest.class);
+    private final OkHttpClient client = new OkHttpClient();
 
-    @Before
-    public void setupMockStuff() {
-        LOGGER.info("Starting ProjectControllerTest");
-        //todo: create mock database and then retrieve data
-    }
-
-    @Test
-    public void testRetrieveProjectByProjectId() {
-        int projectId = 1;
-    }
+    ApplicationContext context;
+    UserRepository userRepository;
+    ProjectRepository projectRepository;
+    User user;
 
     @Test
-    public void testProjectListByPageId() {
-        int projectId = 1;
+    public void testWhenProjectIsRequestedItIsReturned() throws IOException {
+        // Precondition
+        Project project = new Project();
+        project.setOwner(user);
+        project.setName("hoiBobDitIsEenTest");
+        project.setDescription("We can enter a nice description");
+        projectRepository.save(project);
 
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/projects/hoiBobDitIsEenTest")
+                        .build()
+        ).execute();
+
+        // Validation
+        String body = response.body().string();
+        ReadContext json = JsonPath.parse(body);
+
+        assertEquals(
+                json.read("$.name"),
+                "hoiBobDitIsEenTest"
+        );
+        assertEquals(
+                json.read("$.description"),
+                "We can enter a nice description"
+        );
+        assertEquals(
+                json.read("$.id"),
+                (Integer) project.getId().intValue()
+        );
+        assertEquals(
+                json.read("$.url"),
+                "http://localhost:8080/projects/hoiBobDitIsEenTest"
+        );
+        assertEquals(
+                json.read("$.scriptsUrl"),
+                "http://localhost:8080/projects/hoiBobDitIsEenTest/scripts"
+        );
     }
 
-    @After
-    public void afterTest() {
-        LOGGER.info("Stopping ProjectControllerTest");
-        //todo: do stuff after the test.
+    @BeforeClass
+    public void startServer() {
+        context = SpringApplication.run(ScriptinatorRestApi.class);
+        userRepository = context.getBean(UserRepository.class);
+        projectRepository = context.getBean(ProjectRepository.class);
+    }
+
+    @AfterClass
+    public void stopServer() {
+        SpringApplication.exit(context);
+    }
+
+    @BeforeMethod
+    public void createUser(Method method) {
+        user = new User();
+        user.setDisplayName("Test User: " + method.getName());
+        user.setUsername(method.getName());
+        user.setPassword("thisistest");
+        user = userRepository.save(user);
+    }
+
+    @AfterMethod
+    public void cleanUp() {
+        userRepository.deleteAll();
     }
 }
