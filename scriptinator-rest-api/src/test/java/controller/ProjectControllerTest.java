@@ -17,36 +17,35 @@ package controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
-import io.chapp.scriptinator.ScriptinatorRestApi;
 import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
-import org.testng.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
+import static controller.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.Assert.assertEquals;
 
+@Listeners(ScriptinatorTestCase.class)
 public class ProjectControllerTest {
     private final OkHttpClient client = new OkHttpClient();
 
-    ApplicationContext context;
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     ProjectRepository projectRepository;
-    User user;
 
     @Test
     public void testWhenProjectIsRequestedItIsReturned() throws IOException {
         // Precondition
         Project project = new Project();
-        project.setOwner(user);
+        project.setOwner(userRepository.findByUsername(DEFAULT_USERNAME));
         project.setName("hoiBobDitIsEenTest");
         project.setDescription("We can enter a nice description");
         projectRepository.save(project);
@@ -83,31 +82,5 @@ public class ProjectControllerTest {
                 json.read("$.scriptsUrl"),
                 "http://localhost:8080/projects/hoiBobDitIsEenTest/scripts"
         );
-    }
-
-    @BeforeClass
-    public void startServer() {
-        context = SpringApplication.run(ScriptinatorRestApi.class);
-        userRepository = context.getBean(UserRepository.class);
-        projectRepository = context.getBean(ProjectRepository.class);
-    }
-
-    @AfterClass
-    public void stopServer() {
-        SpringApplication.exit(context);
-    }
-
-    @BeforeMethod
-    public void createUser(Method method) {
-        user = new User();
-        user.setDisplayName("Test User: " + method.getName());
-        user.setUsername(method.getName());
-        user.setPassword("thisistest");
-        user = userRepository.save(user);
-    }
-
-    @AfterMethod
-    public void cleanUp() {
-        userRepository.deleteAll();
     }
 }
