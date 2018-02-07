@@ -62,7 +62,7 @@ public class PageResult<T> {
 
         return new PageResult<>(
                 pageNumber < maxPageNumber ? self.withParameter("page", pageNumber + 1) : null,
-                pageNumber > 0 ? self.withParameter("page", pageNumber - 1) : null,
+                pageNumber > 1 ? self.withParameter("page", pageNumber - 1) : null,
                 totalItemCount,
                 items,
                 self,
