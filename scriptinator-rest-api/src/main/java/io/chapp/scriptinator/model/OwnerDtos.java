@@ -15,22 +15,19 @@
  */
 package io.chapp.scriptinator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class OwnerDtos {
     private String username;
     private String displayName;
     private String avatarUrl;
 
-    public static OwnerDtos convert(User user) {
-        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl());
-    }
-
     public OwnerDtos(String username, String displayName, String avatarUrl) {
         this.username = username;
         this.displayName = displayName;
         this.avatarUrl = avatarUrl;
+    }
+
+    public static OwnerDtos convert(User user) {
+        return new OwnerDtos(user.getUsername(), user.getDisplayName(), user.getAvatarUrl());
     }
 
     public String getUsername() {

@@ -38,6 +38,7 @@ public class JobController {
     @RequestMapping("/")
     @ResponseBody
     public JobDtos getJobById(@RequestParam("job-id") int jobId) {
+        logger.info("requested job by id: "+ jobId);
         return JobDtos.convert(jobService.get(jobId));
     }
 }
