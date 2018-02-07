@@ -59,8 +59,7 @@ public class ProjectControllerTest {
         ).execute();
 
         // Validation
-        String body = response.body().string();
-        ReadContext json = JsonPath.parse(body);
+        ReadContext json = JsonPath.parse(response.body().string());
 
         assertEquals(
                 json.read("$.name"),
