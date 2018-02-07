@@ -78,6 +78,10 @@ public class Project extends AbstractEntity {
         this.scripts = scripts;
     }
 
+    public Link getScriptsUrl() {
+        return new Link("/projects/" + name + "/scripts");
+    }
+
     @Override
     public Link getUrl() {
         return new Link("/projects/" + name);

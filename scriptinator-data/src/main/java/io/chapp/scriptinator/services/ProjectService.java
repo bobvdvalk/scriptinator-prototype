@@ -17,6 +17,8 @@ package io.chapp.scriptinator.services;
 
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.repositories.ProjectRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -30,5 +32,9 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
 
     public Project get(String projectName) {
         return this.find(projectName).orElseThrow(() -> new NoSuchElementException());
+    }
+
+    public Page<Project> get(String username, PageRequest pageRequest) {
+        return getRepository().findByOwnerUsername(username, pageRequest);
     }
 }

@@ -18,7 +18,9 @@ package io.chapp.scriptinator.controller;
 import io.chapp.scriptinator.model.Link;
 import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.ProjectService;
+import io.chapp.scriptinator.services.ScriptService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,14 +40,11 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("projects")
 public class ProjectController {
     private final ProjectService projectService;
+    private final ScriptService scriptService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService, ScriptService scriptService) {
         this.projectService = projectService;
-    }
-
-    @GetMapping("{projectName}")
-    public Project getProjectByName(@PathVariable String projectName) {
-        return projectService.get(projectName);
+        this.scriptService = scriptService;
     }
 
     @GetMapping
@@ -58,5 +57,26 @@ public class ProjectController {
                 new Link("/projects"),
                 result
         );
+    }
+
+    @GetMapping("{projectName}")
+    public Project getProjectByName(@PathVariable String projectName) {
+        return projectService.get(projectName);
+    }
+
+    @GetMapping("{projectName}/scripts")
+    public PageResult<Script> getProjectScripts(@PathVariable String projectName, HttpServletRequest request) {
+        return PageResult.of(
+                new Link("/projects/" + projectName + "/scripts"),
+                scriptService.get(
+                        projectName,
+                        PageResult.request(request)
+                )
+        );
+    }
+
+    @GetMapping("{projectName}/scripts/{scriptName}")
+    public Script getScriptByName(@PathVariable String projectName, @PathVariable String scriptName) {
+        return scriptService.get(projectName, scriptName);
     }
 }

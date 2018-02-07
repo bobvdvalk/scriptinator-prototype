@@ -28,6 +28,9 @@ public class Link {
     }
 
     public Link(String href, Map<String, String> parameters) {
+        if (!href.startsWith("/")) {
+            throw new IllegalArgumentException("Links must start with a '/'");
+        }
         this.href = href;
         this.parameters = parameters;
     }
