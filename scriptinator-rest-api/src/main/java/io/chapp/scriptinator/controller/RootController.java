@@ -13,16 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.junit.Assert;
-import org.junit.Test;
+package io.chapp.scriptinator.controller;
 
-public class MainTest {
+import io.chapp.scriptinator.model.Link;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-    @Test
-    public void simpleTest() {
-        String var = "I am stupid!";
-        String var2 = "I am stupid!";
+import java.util.HashMap;
+import java.util.Map;
 
-        Assert.assertEquals(var, var2);
+@RestController
+public class RootController {
+
+    @GetMapping("/")
+    public Map<String, Link> getApiLinks() {
+        Map<String, Link> links = new HashMap<>();
+        links.put("usersUrl", new Link("/users"));
+        links.put("projectsUrl", new Link("/projects"));
+        return links;
     }
 }
