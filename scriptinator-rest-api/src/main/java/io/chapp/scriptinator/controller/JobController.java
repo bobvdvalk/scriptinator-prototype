@@ -17,14 +17,14 @@ package io.chapp.scriptinator.controller;
 
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("jobs")
 public class JobController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 
     private final JobService jobService;
 
