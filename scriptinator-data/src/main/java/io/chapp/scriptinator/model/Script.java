@@ -37,11 +37,11 @@ public class Script extends AbstractEntity {
     private String name;
 
     @NotNull
-    private String description;
+    private String description = "";
 
     @NotNull
     @Lob
-    private String code;
+    private String code = "";
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")

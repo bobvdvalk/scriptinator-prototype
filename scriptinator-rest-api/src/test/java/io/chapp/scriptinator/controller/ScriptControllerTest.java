@@ -17,9 +17,11 @@ package io.chapp.scriptinator.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
+import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
@@ -27,11 +29,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 
+import static io.chapp.scriptinator.controller.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.AssertJUnit.assertEquals;
 
 @Listeners(ScriptinatorTestCase.class)
@@ -44,6 +51,8 @@ public class ScriptControllerTest {
     UserRepository userRepository;
     @Autowired
     ProjectRepository projectRepository;
+    @Autowired
+    JobRepository jobRepository;
 
     @Test
     public void testWhenScriptIsRequestedItReturned() throws IOException {
@@ -214,5 +223,53 @@ public class ScriptControllerTest {
                 Boolean.valueOf("false")
         );
 
+    }
+
+    @Test
+    public void testGettingJobsFromScriptListsAllJobs() throws IOException {
+        // Precondition
+        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME);
+
+        Project project = new Project();
+        project.setName("testJobListing");
+        project.setOwner(defaultUser);
+        project = projectRepository.save(project);
+
+        Script script = new Script();
+        script.setName("testScript");
+        script.setProject(project);
+        script = scriptRepository.save(script);
+
+        Job jobOne = new Job();
+        jobOne.setScript(script);
+        jobOne.setStatus(Job.Status.QUEUED);
+        jobOne.setQueuedTime(new Date());
+        jobOne = jobRepository.save(jobOne);
+
+        Job jobTwo = new Job();
+        jobTwo.setScript(script);
+        jobTwo.setStatus(Job.Status.RUNNING);
+        jobTwo.setQueuedTime(new Date());
+        jobTwo.setStartedTime(new Date());
+        jobTwo = jobRepository.save(jobTwo);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .build()
+        ).execute();
+
+        // Validation
+        ReadContext json = JsonPath.parse(response.body().string());
+
+        Assert.assertEquals(
+                new HashSet<>(json.read("$.items[*].id")),
+                new HashSet<>(Arrays.asList(
+                        jobOne.getId().intValue(),
+                        jobTwo.getId().intValue()
+                ))
+        );
     }
 }

@@ -29,7 +29,10 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 
+import static io.chapp.scriptinator.controller.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.AssertJUnit.assertEquals;
 
 @Listeners(ScriptinatorTestCase.class)
@@ -161,6 +164,49 @@ public class UserControllerTest {
         assertEquals(
                 json.read("$.totalItemCount"),
                 (Integer) 1
+        );
+    }
+
+    @Test
+    public void testListingUsersReturnsAllUsers() throws IOException {
+        // Precondition
+        User user = new User();
+        user.setUsername("superSecretSpecialSir");
+        user.setPassword("sssssss");
+        userRepository.save(user);
+        user = new User();
+        user.setUsername("megaMasterMagicalMisses");
+        user.setPassword("mmmmmm");
+        userRepository.save(user);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/users")
+                        .build()
+        ).execute();
+
+        //Validation
+        ReadContext json = JsonPath.parse(response.body().string());
+
+        assertEquals(
+                new HashSet<>(json.read("$.items[*].username")),
+                new HashSet<>(Arrays.asList(
+                        DEFAULT_USERNAME,
+                        "superSecretSpecialSir",
+                        "megaMasterMagicalMisses"
+                ))
+        );
+
+        assertEquals(
+                json.read("$.hasNext"),
+                Boolean.valueOf("false")
+        );
+
+        assertEquals(
+                json.read("$.totalItemCount"),
+                (Integer) 3
         );
     }
 }

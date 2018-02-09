@@ -18,8 +18,10 @@ package io.chapp.scriptinator.controller;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.ProjectRepository;
+import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -30,6 +32,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static java.util.Collections.emptyList;
 import static org.testng.Assert.assertEquals;
@@ -42,6 +45,8 @@ public class ProjectControllerTest {
     UserRepository userRepository;
     @Autowired
     ProjectRepository projectRepository;
+    @Autowired
+    ScriptRepository scriptRepository;
 
     @Test
     public void testWhenProjectIsRequestedItIsReturned() throws IOException {
@@ -157,5 +162,43 @@ public class ProjectControllerTest {
         );
     }
 
+    @Test
+    public void testListProjectScriptReturnsAllScripts() throws IOException {
+        // Precondition
+        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME);
+        Project project = new Project();
+        project.setOwner(defaultUser);
+        project.setName("aNiceProjectWithScripts");
+        project = projectRepository.save(project);
+
+        Script script = new Script();
+        script.setProject(project);
+        script.setName("testScript");
+        scriptRepository.save(script);
+        script = new Script();
+        script.setProject(project);
+        script.setName("someOtherScript");
+        scriptRepository.save(script);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/projects/aNiceProjectWithScripts/scripts")
+                        .build()
+        ).execute();
+
+        // Validation
+        String body = response.body().string();
+        ReadContext json = JsonPath.parse(body);
+
+        assertEquals(
+                new HashSet<>(json.read("$.items[*].name")),
+                new HashSet<>(Arrays.asList(
+                        "testScript",
+                        "someOtherScript"
+                ))
+        );
+    }
 
 }
