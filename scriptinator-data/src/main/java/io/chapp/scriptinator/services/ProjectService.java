@@ -21,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -31,7 +30,7 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
     }
 
     public Project get(String projectName) {
-        return this.find(projectName).orElseThrow(NoSuchElementException::new);
+        return this.find(projectName).orElseThrow(() -> noSuchElement(projectName));
     }
 
     public Page<Project> get(String username, PageRequest pageRequest) {

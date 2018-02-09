@@ -37,9 +37,25 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
     public E get(long id) {
         E entity = repository.findOne(id);
         if (entity == null) {
-            throw new NoSuchElementException(Long.toString(id));
+            throw noSuchElement(id);
         }
         return entity;
+    }
+
+    protected NoSuchElementException noSuchElement(String name) {
+        return new NoSuchElementException("We could not find a " + getEntityName() + " with name: " + name);
+    }
+
+    protected NoSuchElementException noSuchElement(long id) {
+        return new NoSuchElementException("We could not find a " + getEntityName() + " with id: " + id);
+    }
+
+    private String getEntityName() {
+        String name = getClass().getSimpleName();
+        if (name.endsWith("Service")) {
+            name = name.substring(0, name.length() - "Service".length());
+        }
+        return name.toLowerCase();
     }
 
     /**
