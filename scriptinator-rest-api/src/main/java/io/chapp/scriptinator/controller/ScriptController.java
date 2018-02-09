@@ -22,6 +22,7 @@ import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +72,7 @@ public class ScriptController {
     }
 
     @PostMapping("{scriptId}/jobs")
+    @ResponseStatus(HttpStatus.CREATED)
     public Job runScript(@PathVariable long scriptId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try (InputStream data = request.getInputStream()) {
             Job result = scriptService.run(
@@ -78,8 +80,9 @@ public class ScriptController {
                     null,
                     StreamUtils.copyToString(data, Charset.defaultCharset())
             );
-            response.setHeader("Location", objectMapper.writeValueAsString(
-                    result.getUrl()
+            response.setHeader("Location", objectMapper.convertValue(
+                    result.getUrl(),
+                    String.class
             ));
             return result;
         }

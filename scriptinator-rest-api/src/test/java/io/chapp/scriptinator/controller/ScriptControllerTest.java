@@ -25,9 +25,7 @@ import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
 import org.testng.annotations.Listeners;
@@ -270,6 +268,61 @@ public class ScriptControllerTest {
                         jobOne.getId().intValue(),
                         jobTwo.getId().intValue()
                 ))
+        );
+    }
+
+    @Test
+    public void testRunScriptCreatesNewJobWithLocationHeader() throws IOException {
+        // Precondition
+        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME);
+
+        Project project = new Project();
+        project.setName("testRunScriptJob");
+        project.setOwner(defaultUser);
+        project = projectRepository.save(project);
+
+        Script script = new Script();
+        script.setName("greetingScript");
+        script.setProject(project);
+        script.setCode("Script.info('Hello!');");
+        script = scriptRepository.save(script);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .post(RequestBody.create(MediaType.parse("application/octet-stream"), "{\"Hello\": \"World\"}"))
+                        .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .build()
+        ).execute();
+
+        // Validation
+        Assert.assertEquals(
+                response.code(),
+                201
+        );
+
+        ReadContext json = JsonPath.parse(response.body().string());
+        String location = response.header("Location");
+        Assert.assertNotNull(location, "Location header is present");
+
+        // Pull the id from the location header
+        int jobId = Integer.parseInt(location.substring(location.lastIndexOf('/') + 1));
+
+        Assert.assertEquals(
+                (int) json.read("$.id"),
+                jobId
+        );
+        Assert.assertEquals(
+                json.read("$.scriptUrl"),
+                "http://localhost:8080/scripts/" + script.getId()
+        );
+        Assert.assertEquals(
+                json.read("$.status"),
+                "QUEUED"
+        );
+        Assert.assertEquals(
+                json.read("$.argument"),
+                "{\"Hello\": \"World\"}"
         );
     }
 }
