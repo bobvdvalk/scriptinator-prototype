@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ * Copyright © 2018 Scriptinator (support@scriptinator.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
