@@ -14,8 +14,10 @@
 # limitations under the License.
 #
 
-# This compose file
-version: '3'
+# This compose file starts all services on which scriptinator depends.
+# Run `docker-compose up -d` to start it. After this, you can start
+# your scriptinator services
+version: '3.3'
 
 services:
   # Management Interface: http://localhost:15672
