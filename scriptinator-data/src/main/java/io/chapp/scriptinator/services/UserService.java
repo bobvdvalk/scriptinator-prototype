@@ -19,14 +19,12 @@ import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 @Service
 public class UserService extends AbstractEntityService<User, UserRepository> {
     public User getByUsername(String username) {
         User user = getRepository().findByUsername(username);
         if (user == null) {
-            throw new NoSuchElementException(username);
+            throw noSuchElement(username);
         }
         return user;
     }

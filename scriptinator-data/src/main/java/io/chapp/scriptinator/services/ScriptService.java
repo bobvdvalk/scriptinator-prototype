@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -35,7 +34,7 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
 
     public Script get(String projectName, String scriptName) {
         return getRepository().findOneByProjectNameAndName(projectName, scriptName)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
     }
 
     public Optional<Script> get(long projectId, String name) {
