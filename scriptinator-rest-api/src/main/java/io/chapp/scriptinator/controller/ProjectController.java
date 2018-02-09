@@ -74,9 +74,4 @@ public class ProjectController {
                 )
         );
     }
-
-    @GetMapping("{projectName}/scripts/{scriptName}")
-    public Script getScriptByName(@PathVariable String projectName, @PathVariable String scriptName) {
-        return scriptService.get(projectName, scriptName);
-    }
 }
