@@ -15,28 +15,33 @@
  */
 package io.chapp.scriptinator.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Link;
 import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 @RestController
 @RequestMapping("scripts")
 public class ScriptController {
     private final ScriptService scriptService;
     private final JobService jobService;
+    private final ObjectMapper objectMapper;
 
-    public ScriptController(ScriptService scriptService, JobService jobService) {
+    public ScriptController(ScriptService scriptService, JobService jobService, ObjectMapper objectMapper) {
         this.scriptService = scriptService;
         this.jobService = jobService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("")
@@ -50,12 +55,12 @@ public class ScriptController {
     }
 
     @GetMapping("{scriptId}")
-    public Script getScriptById(@PathVariable int scriptId) {
+    public Script getScriptById(@PathVariable long scriptId) {
         return scriptService.get(scriptId);
     }
 
     @GetMapping("{scriptId}/jobs")
-    public PageResult<Job> getJobs(@PathVariable int scriptId, HttpServletRequest request) {
+    public PageResult<Job> getJobs(@PathVariable long scriptId, HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts/" + scriptId + "/jobs"),
                 jobService.get(
@@ -63,5 +68,20 @@ public class ScriptController {
                         PageResult.request(request)
                 )
         );
+    }
+
+    @PostMapping("{scriptId}/jobs")
+    public Job runScript(@PathVariable long scriptId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try (InputStream data = request.getInputStream()) {
+            Job result = scriptService.run(
+                    scriptService.get(scriptId),
+                    null,
+                    StreamUtils.copyToString(data, Charset.defaultCharset())
+            );
+            response.setHeader("Location", objectMapper.writeValueAsString(
+                    result.getUrl()
+            ));
+            return result;
+        }
     }
 }
