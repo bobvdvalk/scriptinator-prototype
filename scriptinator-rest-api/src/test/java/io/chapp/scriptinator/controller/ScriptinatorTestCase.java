@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package controller;
+package io.chapp.scriptinator.controller;
 
 import io.chapp.scriptinator.ScriptinatorRestApi;
 import io.chapp.scriptinator.model.User;
