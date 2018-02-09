@@ -16,11 +16,15 @@
 package io.chapp.scriptinator.controller;
 
 import io.chapp.scriptinator.model.Job;
+import io.chapp.scriptinator.model.Link;
+import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.services.JobService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("jobs")
@@ -32,8 +36,18 @@ public class JobController {
         this.jobService = jobService;
     }
 
+    @GetMapping("")
+    public PageResult<Job> listJobs(HttpServletRequest request) {
+        return PageResult.of(
+                new Link("/jobs"),
+                jobService.get(
+                        PageResult.request(request)
+                )
+        );
+    }
+
     @GetMapping("{jobId}")
-    public Job getJobById(@RequestParam long jobId) {
+    public Job getJobById(@PathVariable long jobId) {
         return jobService.get(jobId);
     }
 }
