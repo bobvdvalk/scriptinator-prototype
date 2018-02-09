@@ -22,6 +22,7 @@ import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +51,7 @@ public class UserController {
         Page<Project> result = projectService.get(username, PageResult.request(request));
 
         return PageResult.of(
-                new Link("/users/" + username + "/projects"),
+                new Link("/users/"+ username +"/projects"),
                 result
         );
     }
