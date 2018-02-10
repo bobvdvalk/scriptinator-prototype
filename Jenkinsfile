@@ -1,5 +1,5 @@
 /**
- * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ * Copyright © 2018 Scriptinator (support@scriptinator.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 pipeline {
     agent {
-        docker {
-            image 'maven:3'
+        dockerfile {
+            dir 'buildagent'
         }
     }
 
@@ -28,7 +28,18 @@ pipeline {
         }
         stage('Build & Test') {
             steps {
-                mvn 'org.jacoco:jacoco-maven-plugin:prepare-agent install'
+                script {
+                    docker.image("rabbitmq:management").withRun() { rabbitMq ->
+                        def rabbitMqIp = sh(returnStdout: true, script: "docker inspect -f '{{ .NetworkSettings.IPAddress }}' ${rabbitMq.id}").trim()
+                        mvn "org.jacoco:jacoco-maven-plugin:prepare-agent install -Dspring.rabbitmq.host=${rabbitMqIp}"
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts 'scriptinator-docs/target/generated-docs/index.html'
+                    junit '**/*-reports/*.xml'
+                }
             }
         }
         stage('Analyze') {

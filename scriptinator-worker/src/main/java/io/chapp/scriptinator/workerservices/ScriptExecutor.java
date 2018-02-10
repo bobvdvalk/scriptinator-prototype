@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ * Copyright © 2018 Scriptinator (support@scriptinator.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package io.chapp.scriptinator.workerservices;
 
 import io.chapp.scriptinator.libraries.ScriptLibrary;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
@@ -43,14 +45,21 @@ public class ScriptExecutor {
         this.projectService = projectService;
     }
 
-    @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
     public void execute(Job job) {
         // Create engine
         ScriptEngine engine = scriptEngineFactory.getObject();
 
-        Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
-        bindings.put("Script", new ScriptLibrary(jobService, job, scriptService, projectService));
+        try (ClosableContext context = new ClosableContext()) {
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, projectService, context);
+            Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
+            bindings.put("Script", scriptLibrary);
 
+            execute(engine, job);
+        }
+    }
+
+    @SuppressWarnings("squid:S1181") // This is a third party script. We should catch everything.
+    private void execute(ScriptEngine engine, Job job) {
         CompiledScript script = compile(engine, job);
         if (script == null) {
             return;
@@ -60,7 +69,11 @@ public class ScriptExecutor {
             jobService.changeStatus(job, Job.Status.RUNNING);
             script.eval();
             jobService.changeStatus(job, Job.Status.FINISHED);
+        } catch (ScriptinatorExecutionException e) {
+            job.log("FATAL", e.getMessage());
+            jobService.changeStatus(job, Job.Status.FAILED);
         } catch (Throwable e) {
+            LOGGER.error("Unknown fatal error", e);
             job.log("FATAL", "Oops, something unexpected happened while running your script: " + e.getMessage());
             jobService.changeStatus(job, Job.Status.FAILED);
             LOGGER.error("An unexpected exception occurred while running a script.", e);

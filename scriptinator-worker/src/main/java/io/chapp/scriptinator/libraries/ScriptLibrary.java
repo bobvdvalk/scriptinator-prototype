@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ * Copyright © 2018 Scriptinator (support@scriptinator.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 package io.chapp.scriptinator.libraries;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.libraries.core.ClosableContext;
+import io.chapp.scriptinator.libraries.core.ObjectConverter;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
+import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
@@ -37,17 +41,22 @@ public class ScriptLibrary {
     private static final Map<String, Function<ScriptLibrary, ?>> LIBRARIES = new HashMap<>();
 
     static {
-        LIBRARIES.put("HTTP", lib -> new HttpLibrary());
+        LIBRARIES.put("HTTP", lib -> new HttpLibrary(lib.converter, lib.closableContext));
+        LIBRARIES.put("Assert", lib -> new AssertLibrary(new ObjectMapper()));
     }
 
     private final JobService jobService;
     private final Job job;
     private final ScriptService scriptService;
     private final ProjectService projectService;
+    private final ObjectConverter converter;
+    private final ClosableContext closableContext;
 
-    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ProjectService projectService) {
+    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ProjectService projectService, ClosableContext closableContext) {
         this.jobService = jobService;
         this.job = job;
+        this.converter = new ObjectConverter(new ObjectMapper());
+        this.closableContext = closableContext;
         this.scriptService = scriptService;
         this.projectService = projectService;
     }
@@ -80,7 +89,7 @@ public class ScriptLibrary {
         job.log(
                 level,
                 Arrays.stream(values)
-                        .map(Object::toString)
+                        .map(String::valueOf)
                         .collect(Collectors.joining(", "))
         );
         jobService.update(job);

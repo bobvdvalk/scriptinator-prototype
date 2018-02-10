@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+    Copyright © 2018 Scriptinator (support@scriptinator.io)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,16 +33,30 @@
     </parent>
 
     <modules>
-        <module>scriptinator-data</module>
+        <!-- Applications -->
         <module>scriptinator-rest-api</module>
         <module>scriptinator-web</module>
         <module>scriptinator-worker</module>
+
+        <!-- Artifacts -->
+        <module>scriptinator-docs</module>
+        <module>scriptinator-data</module>
+
+        <!-- Libraries -->
+        <module>scriptinator-lib-http</module>
+        <module>scriptinator-lib-core</module>
+        <module>scriptinator-lib-assert</module>
     </modules>
 
     <name>Scriptinator</name>
     <description>An open easy-to-use and easy-to-scale serverless scripting platform</description>
     <inceptionYear>2018</inceptionYear>
     <url>https://github.com/ChappIO/scriptinator</url>
+
+    <organization>
+        <name>Scriptinator</name>
+        <url>https://github.com/ScriptinatorIO</url>
+    </organization>
 
     <scm>
         <connection>scm:git:git://github.com/ChappIO/scriptinator.git</connection>
@@ -78,7 +92,7 @@
         <developer>
             <id>LucaScorpion</id>
             <name>Luca Scalzotto</name>
-            <email>lucascalzotto@gmail.com</email>
+            <email>luca@scorpiac.com</email>
         </developer>
     </developers>
 
@@ -88,14 +102,23 @@
         <thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
         <okhttp.version>3.9.1</okhttp.version>
+        <apache-commons-lang.version>3.7</apache-commons-lang.version>
+        <apache-commons-io.version>2.6</apache-commons-io.version>
 
         <!-- Build Dependencies -->
         <node.version>9.3.0</node.version>
         <failsafe.plugin.version>2.20.1</failsafe.plugin.version>
         <license.plugin.version>3.0</license.plugin.version>
         <frontend-plugin.version>1.6</frontend-plugin.version>
+        <reflections.version>0.9.11</reflections.version>
+        <jacoco-plugin.version>0.8.0</jacoco-plugin.version>
+        <asciidoctor-plugin.version>1.5.6</asciidoctor-plugin.version>
+        <testng.version>6.13.1</testng.version>
+        <awaitility.version>3.0.0</awaitility.version>
+        <dockerfile-plugin.version>1.3.7</dockerfile-plugin.version>
 
         <!-- Build Configuration -->
+        <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +144,21 @@
                 <artifactId>scriptinator-worker</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.chapp.scriptinator</groupId>
+                <artifactId>scriptinator-lib-assert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Third Party Dependencies -->
             <dependency>
@@ -128,12 +166,57 @@
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${apache-commons-lang.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${apache-commons-io.version}</version>
+            </dependency>
 
             <!-- Test Dependencies -->
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
+        <defaultGoal>compile</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -170,8 +253,8 @@
                     <configuration>
                         <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
                         <properties>
-                            <owner>${project.developers[0].name}</owner>
-                            <email>${project.developers[0].email}</email>
+                            <owner>${project.organization.name}</owner>
+                            <email>support@scriptinator.io</email>
                         </properties>
                         <useDefaultExcludes>true</useDefaultExcludes>
                         <strictCheck>true</strictCheck>
@@ -183,6 +266,7 @@
                         <excludes>
                             <exclude>**/node_modules/**</exclude>
                             <exclude>**/node/**</exclude>
+                            <exclude>**/asciidoc/**/*.js</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -211,6 +295,55 @@
                             <id>npm install</id>
                             <goals>
                                 <goal>npm</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-plugin.version}</version>
+                    <configuration>
+                        <destFile>${sonar.jacoco.reportPaths}</destFile>
+                        <append>true</append>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>${asciidoctor-plugin.version}</version>
+                    <configuration>
+                        <sourceDocumentName>index.adoc</sourceDocumentName>
+                        <backend>html</backend>
+                        <sourceHighlighter>highlight.js</sourceHighlighter>
+                        <attributes>
+                            <docinfo>shared</docinfo>
+                        </attributes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>documentation</id>
+                            <goals>
+                                <goal>process-asciidoc</goal>
+                            </goals>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile-plugin.version}</version>
+                    <configuration>
+                        <repository>scriptinator/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default</id>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>push</goal>
                             </goals>
                         </execution>
                     </executions>

@@ -1,0 +1,159 @@
+//
+// Copyright © 2018 Scriptinator (support@scriptinator.io)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+:library_name: HTTP
+
+= HTTP
+:type_name: HTTP
+
+The `HTTP` library allows you to perform HTTP requests. It is equipped with some utilities to allow for simple use of
+json web APIs. You can perform HTTP requests by calling the `HTTP` functions directly, or by creating a reusable
+<<HttpClient>> with which you can perform multiple requests.
+
+:function_id: client
+include::_snippets/function.adoc[]
+
+
+== HttpClient
+:type_name: HttpClient
+
+The `HttpClient` is used to perform HTTP requests. To make requests you have two options:
+
+1. Call the `get`, `head`, `post`, `delete`, `put`, `patch` and `request` functions directly on the `HTTP` library.
+   This will create a new client for every request which causes some overhead, but requires less boilerplate.
+
+2. Use `HTTP.client()` to create a client and reuse that for your requests. This method introduces less overhead.
+   Creating a client also allows you to specify options such as authentication methods. This causes those options
+   to be applied to all requests you make using this client.
+
+=== HttpClient.get
+
+:function_id: get_url
+include::_snippets/function.adoc[]
+
+:function_id: get_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.head
+
+:function_id: head_url
+include::_snippets/function.adoc[]
+
+:function_id: head_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.post
+
+:function_id: post_url
+include::_snippets/function.adoc[]
+
+:function_id: post_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.delete
+
+:function_id: delete_url
+include::_snippets/function.adoc[]
+
+:function_id: delete_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.put
+
+:function_id: put_url
+include::_snippets/function.adoc[]
+
+:function_id: put_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.patch
+
+:function_id: patch_url
+include::_snippets/function.adoc[]
+
+:function_id: patch_options
+include::_snippets/function.adoc[]
+
+=== HttpClient.request
+
+:function_id: request
+include::_snippets/function.adoc[]
+
+== HttpResponse
+:type_name: HttpResponse
+
+An `HttpResponse` is the result of one of the request methods. It contains various headers and types of <<HttpResponseBody, response bodies>>
+which are exposed by convenient methods.
+
+=== HttpResponse.code
+
+:function_id: code
+include::_snippets/function.adoc[]
+
+=== HttpResponse.message
+
+:function_id: message
+include::_snippets/function.adoc[]
+
+=== HttpResponse.protocol
+
+:function_id: protocol
+include::_snippets/function.adoc[]
+
+=== HttpResponse.headerNames
+
+:function_id: headerNames
+include::_snippets/function.adoc[]
+
+=== HttpResponse.headers
+
+:function_id: headers
+include::_snippets/function.adoc[]
+
+:function_id: headers_name
+include::_snippets/function.adoc[]
+
+=== HttpResponse.header
+
+:function_id: header
+include::_snippets/function.adoc[]
+
+=== HttpResponse.body
+
+:function_id: body
+include::_snippets/function.adoc[]
+
+== HttpResponseBody
+:type_name: HttpResponseBody
+
+The `HttpResponseBody` allows you to easily parse HTTP response bodies into a usable form.
+
+=== HttpResponseBody.contentType
+
+:function_id: contentType
+include::_snippets/function.adoc[]
+
+=== HttpResponseBody.asString
+
+:function_id: asString
+include::_snippets/function.adoc[]
+
+=== HttpResponseBody.asJson
+
+:function_id: asJson
+include::_snippets/function.adoc[]
+
+

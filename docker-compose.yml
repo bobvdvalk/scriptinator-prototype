@@ -1,5 +1,5 @@
 #
-# Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+# Copyright © 2018 Scriptinator (support@scriptinator.io)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 # limitations under the License.
 #
 
-version: '3'
+# This compose file starts all services on which scriptinator depends.
+# Run `docker-compose up -d` to start it. After this, you can start
+# your scriptinator services
+version: '3.3'
 
 services:
   # Management Interface: http://localhost:15672
