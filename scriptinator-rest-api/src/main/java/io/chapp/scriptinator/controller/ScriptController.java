@@ -55,7 +55,7 @@ public class ScriptController {
         );
     }
 
-    /**
+    /*
      * Get script by ID
      *
      * The reason you request a script by id is because a script id is always unique and a script name is only unique
