@@ -34,6 +34,6 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
     }
 
     public Page<Project> get(String username, PageRequest pageRequest) {
-        return getRepository().findByOwnerUsername(username, pageRequest);
+        return getRepository().findAllByOwnerUsername(username, pageRequest);
     }
 }

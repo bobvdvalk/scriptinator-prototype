@@ -42,7 +42,7 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
     }
 
     public Page<Script> get(String projectName, PageRequest request) {
-        return getRepository().findByProjectName(projectName, request);
+        return getRepository().findAllByProjectName(projectName, request);
     }
 
     /**

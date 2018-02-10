@@ -55,6 +55,15 @@ public class ScriptController {
         );
     }
 
+    /**
+     * Get script by ID
+     *
+     * The reason you request a script by id is because a script id is always unique and a script name is only unique
+     * within the project.
+     *
+     * @param scriptId long value
+     * @return PageResult of a script id.
+     */
     @GetMapping("{scriptId}")
     public Script getScriptById(@PathVariable long scriptId) {
         return scriptService.get(scriptId);

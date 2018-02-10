@@ -26,5 +26,5 @@ public interface ScriptRepository extends AbstractEntityRepository<Script> {
 
     Optional<Script> findOneByProjectNameAndName(String projectName, String scriptName);
 
-    Page<Script> findByProjectName(String projectName, Pageable pageable);
+    Page<Script> findAllByProjectName(String projectName, Pageable pageable);
 }
