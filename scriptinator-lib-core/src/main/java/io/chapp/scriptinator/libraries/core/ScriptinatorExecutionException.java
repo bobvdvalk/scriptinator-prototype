@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Thomas Biesaart (thomas.biesaart@gmail.com)
+ * Copyright © 2018 Scriptinator (support@scriptinator.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.libraries.http;
+package io.chapp.scriptinator.libraries.core;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-
-import java.io.IOException;
-
-public class Request {
-    private final OkHttpClient client;
-    private final okhttp3.Request.Builder builder;
-
-    public Request(OkHttpClient client, okhttp3.Request.Builder builder) {
-        this.client = client;
-        this.builder = builder;
+public class ScriptinatorExecutionException extends RuntimeException {
+    public ScriptinatorExecutionException(String message) {
+        super(message);
     }
 
-    public Response execute() throws IOException {
-        return client.newCall(builder.build()).execute();
+    public ScriptinatorExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
