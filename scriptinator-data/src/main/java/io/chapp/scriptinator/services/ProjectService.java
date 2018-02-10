@@ -17,6 +17,8 @@ package io.chapp.scriptinator.services;
 
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.repositories.ProjectRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,5 +27,13 @@ import java.util.Optional;
 public class ProjectService extends AbstractEntityService<Project, ProjectRepository> {
     public Optional<Project> find(String name) {
         return getRepository().findOneByName(name);
+    }
+
+    public Project get(String projectName) {
+        return this.find(projectName).orElseThrow(() -> noSuchElement(projectName));
+    }
+
+    public Page<Project> get(String username, PageRequest pageRequest) {
+        return getRepository().findAllByOwnerUsername(username, pageRequest);
     }
 }

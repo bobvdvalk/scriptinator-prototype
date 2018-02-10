@@ -18,6 +18,8 @@ package io.chapp.scriptinator.services;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.repositories.ScriptRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -30,8 +32,17 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         this.jobService = jobService;
     }
 
+    public Script get(String projectName, String scriptName) {
+        return getRepository().findOneByProjectNameAndName(projectName, scriptName)
+                .orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
+    }
+
     public Optional<Script> get(long projectId, String name) {
         return getRepository().findOneByProjectIdAndName(projectId, name);
+    }
+
+    public Page<Script> get(String projectName, PageRequest request) {
+        return getRepository().findAllByProjectName(projectName, request);
     }
 
     /**

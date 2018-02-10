@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator.services;
 
-import io.chapp.scriptinator.model.Project;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+@Service
+public class CustomSerializers extends SimpleModule {
 
-public interface ProjectRepository extends AbstractEntityRepository<Project> {
-    Optional<Project> findOneByName(String name);
-
-    Page<Project> findAllByOwnerUsername(String username, Pageable pageable);
+    public CustomSerializers(LinkSerializer linkSerializer) {
+        addSerializer(linkSerializer);
+    }
 }

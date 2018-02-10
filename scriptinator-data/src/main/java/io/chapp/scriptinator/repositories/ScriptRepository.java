@@ -16,9 +16,15 @@
 package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.Script;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
 public interface ScriptRepository extends AbstractEntityRepository<Script> {
     Optional<Script> findOneByProjectIdAndName(long projectId, String name);
+
+    Optional<Script> findOneByProjectNameAndName(String projectName, String scriptName);
+
+    Page<Script> findAllByProjectName(String projectName, Pageable pageable);
 }

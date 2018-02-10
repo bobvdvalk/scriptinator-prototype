@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -40,6 +42,7 @@ public class Job extends AbstractEntity {
     private Date finishedTime;
 
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Script script;
 
     @NotNull
@@ -99,6 +102,10 @@ public class Job extends AbstractEntity {
         this.script = script;
     }
 
+    public Link getScriptUrl() {
+        return getScript().getUrl();
+    }
+
     public String getOutput() {
         return output;
     }
@@ -125,6 +132,11 @@ public class Job extends AbstractEntity {
 
     public void setArgument(String argument) {
         this.argument = argument;
+    }
+
+    @Override
+    public Link getUrl() {
+        return new Link("/jobs/" + this.getId());
     }
 
     public enum Status {

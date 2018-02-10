@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.repositories;
+package io.chapp.scriptinator;
 
-import io.chapp.scriptinator.model.Project;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Optional;
+@SpringBootApplication
+public class ScriptinatorRestApi {
 
-public interface ProjectRepository extends AbstractEntityRepository<Project> {
-    Optional<Project> findOneByName(String name);
-
-    Page<Project> findAllByOwnerUsername(String username, Pageable pageable);
+    public static void main(String[] args) {
+        SpringApplication.run(ScriptinatorRestApi.class, args);
+    }
 }

@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -35,11 +37,11 @@ public class Script extends AbstractEntity {
     private String name;
 
     @NotNull
-    private String description;
+    private String description = "";
 
     @NotNull
     @Lob
-    private String code;
+    private String code = "";
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "project_id")
@@ -47,6 +49,7 @@ public class Script extends AbstractEntity {
 
     @NotNull
     @OneToMany(mappedBy = "script", orphanRemoval = true)
+    @JsonIgnore
     private List<Job> jobs = new ArrayList<>();
 
     /**
@@ -97,5 +100,14 @@ public class Script extends AbstractEntity {
 
     public void setJobs(List<Job> jobs) {
         this.jobs = jobs;
+    }
+
+    public Link getJobsUrl() {
+        return new Link("/scripts/" + getId() + "/jobs");
+    }
+
+    @Override
+    public Link getUrl() {
+        return new Link("/scripts/" + getId());
     }
 }
