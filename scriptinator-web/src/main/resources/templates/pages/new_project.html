@@ -27,49 +27,56 @@
 
 <h1 layout:fragment="title">
     New Project
-</h1>f
+</h1>
 
 <div layout:fragment="content">
-    <div class="ui clearing blue segment">
-        <form th:action="''"
-              th:method="post"
-              th:object="${project}"
-              class="ui form">
-            <div class="fields">
-                <div class="four wide field"
-                     th:classappend="${errors?.get('name') == null ? '' : 'error'}">
-                    <label>Name</label>
-                    <input type="text"
-                           name="name"
-                           th:field="*{name}"
-                           placeholder="ProjectName"
-                    >
-                </div>
-                <div class="twelve wide field">
-                    <label>Description</label>
-                    <input type="text"
-                           name="description"
-                           th:field="*{description}"
-                           placeholder="Description..."
-                    >
-                </div>
-            </div>
-
-            <div class="ui grid">
-                <div class="twelve wide column">
-                    <div class="ui error message" th:classappend="${errors != null ? 'visible': ''}">
-                        <ul class="list" th:if="${errors != null}">
-                            <li th:each="error : ${errors.values()}" th:text="${error}"></li>
-                        </ul>
+    <div class="ui segment">
+        <div class="ui blue segment">
+            <form th:action="''"
+                  th:method="post"
+                  th:object="${project}"
+                  class="ui form">
+                <div class="fields">
+                    <div class="four wide field"
+                         th:classappend="${errors?.get('name') == null ? '' : 'error'}">
+                        <label>Name</label>
+                        <input type="text"
+                               name="name"
+                               th:field="*{name}"
+                               placeholder="my-awesome-project"
+                        >
+                    </div>
+                    <div class="twelve wide field">
+                        <label>Description</label>
+                        <input type="text"
+                               name="description"
+                               th:field="*{description}"
+                               placeholder="Description..."
+                        >
                     </div>
                 </div>
-                <div class="four wide column">
-                    <button type="submit" class="ui primary right floated button">
-                        Create
-                    </button>
+
+                <div class="ui grid">
+                    <div class="twelve wide column">
+                        <div class="ui error message" th:classappend="${errors != null ? 'visible': ''}">
+                            <ul class="list" th:if="${errors != null}">
+                                <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <div class="ui right floated buttons">
+                            <a class="ui button" th:href="@{/projects}">
+                                Cancel
+                            </a>
+                            <button class="ui primary right floated button">
+                                Create
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 

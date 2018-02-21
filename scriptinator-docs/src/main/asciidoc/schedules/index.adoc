@@ -1,0 +1,41 @@
+//
+// Copyright © 2018 Scriptinator (support@scriptinator.io)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Schedules
+
+Schedules allow you to run parameterized scripts at given intervals.
+They are configured on a project level, at the `Schedules` tab.
+A minimal schedule requires a name, script and cron expression to run.
+One schedule can trigger a single script, but a script can be referenced by multiple schedules.
+
+Scriptinator has a scheduler that runs every N seconds.
+This scheduler checks for schedules that are enabled and scheduled to be run in the past,
+and processes them.
+Since the scheduler can only run periodically,
+schedules are unlikely to be processed at the exact time they are scheduled to run.
+This means that the minimum interval at which a schedule runs is the interval at which the scheduler runs.
+
+== Cron Expressions
+
+:leveloffset: +2
+
+include::structure.adoc[]
+
+include::special_characters.adoc[]
+
+include::examples.adoc[]
+
+:leveloffset: -2

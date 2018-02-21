@@ -15,11 +15,9 @@
  */
 package io.chapp.scriptinator.controller;
 
-import io.chapp.scriptinator.model.Link;
-import io.chapp.scriptinator.model.PageResult;
-import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.Script;
+import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.services.ProjectService;
+import io.chapp.scriptinator.services.ScheduleService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,10 +39,12 @@ import javax.servlet.http.HttpServletRequest;
 public class ProjectController {
     private final ProjectService projectService;
     private final ScriptService scriptService;
+    private final ScheduleService scheduleService;
 
-    public ProjectController(ProjectService projectService, ScriptService scriptService) {
+    public ProjectController(ProjectService projectService, ScriptService scriptService, ScheduleService scheduleService) {
         this.projectService = projectService;
         this.scriptService = scriptService;
+        this.scheduleService = scheduleService;
     }
 
     @GetMapping
@@ -69,6 +69,17 @@ public class ProjectController {
         return PageResult.of(
                 new Link("/projects/" + projectName + "/scripts"),
                 scriptService.get(
+                        projectName,
+                        PageResult.request(request)
+                )
+        );
+    }
+
+    @GetMapping("{projectName}/schedules")
+    public PageResult<Schedule> getProjectSchedules(@PathVariable String projectName, HttpServletRequest request) {
+        return PageResult.of(
+                new Link("/projects/" + projectName + "/schedules"),
+                scheduleService.get(
                         projectName,
                         PageResult.request(request)
                 )

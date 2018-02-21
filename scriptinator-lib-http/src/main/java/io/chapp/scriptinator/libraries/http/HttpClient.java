@@ -82,7 +82,6 @@ public class HttpClient extends HttpRequestExecutor {
             }
 
             return new HttpResponse(
-                    this,
                     request,
                     response
             );
@@ -155,9 +154,5 @@ public class HttpClient extends HttpRequestExecutor {
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
-    }
-
-    ObjectMapper getMapper() {
-        return objectMapper;
     }
 }

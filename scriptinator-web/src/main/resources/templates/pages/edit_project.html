@@ -26,16 +26,16 @@
           th:method="post"
           th:object="${project}"
           class="ui form">
+
         <div class="ui green clearing segment">
-            <h3>Project settings</h3>
+            <h3>Project Settings</h3>
 
             <div class="field" th:classappend="${errors?.name} ? 'error': ''">
                 <label>Name</label>
                 <input type="text"
                        th:field="*{name}"
                        name="name"
-                       placeholder="ProjectName"
-                >
+                       placeholder="new-project-name">
             </div>
 
             <div class="field">
@@ -43,8 +43,7 @@
                 <input type="text"
                        th:field="*{description}"
                        name="description"
-                       placeholder="Description..."
-                >
+                       placeholder="Description...">
             </div>
 
             <div class="ui grid">
@@ -56,7 +55,7 @@
                     </div>
                 </div>
                 <div class="four wide column">
-                    <button class="ui primary right floated button" type="submit">
+                    <button class="ui primary right floated button">
                         Save
                     </button>
                 </div>
@@ -65,29 +64,28 @@
     </form>
 
     <div class="ui red segment">
-        <h3>Danger zone</h3>
-        <button type="submit"
-                class="ui button red"
-                onclick="promptDeleteProject()">
+        <h3>Danger Zone</h3>
+        <button class="ui button red" onclick="promptDeleteProject()">
             Delete this project
         </button>
     </div>
+
     <div class="ui basic modal">
         <div class="ui icon header">
             <i class="delete icon"></i>
-            Delete <span th:text="${project.name}"></span>?
+            Delete project: <span th:text="${project.name}"></span>?
         </div>
         <div class="content">
             <p>Should you decide to delete this project, we will not be able to recover it for you.</p>
         </div>
         <div class="actions">
-            <button class="ui red basic cancel inverted button">
+            <button class="ui grey cancel button">
                 <i class="remove icon"></i>
-                No
+                Cancel
             </button>
-            <button onclick="deleteProject()" class="ui green ok inverted button">
+            <button onclick="deleteProject()" class="ui red ok button">
                 <i class="checkmark icon"></i>
-                Yes
+                Delete
             </button>
         </div>
     </div>

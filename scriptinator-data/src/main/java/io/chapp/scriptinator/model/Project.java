@@ -46,6 +46,11 @@ public class Project extends AbstractEntity {
     @JsonIgnore
     private List<Script> scripts = new ArrayList<>();
 
+    @NotNull
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @JsonIgnore
+    private List<Schedule> schedules = new ArrayList<>();
+
     public String getName() {
         return name;
     }
@@ -78,12 +83,24 @@ public class Project extends AbstractEntity {
         this.scripts = scripts;
     }
 
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+    }
+
     public Link getScriptsUrl() {
-        return new Link("/projects/" + name + "/scripts");
+        return new Link('/' + LIST_ATTRIBUTE + '/' + name + "/scripts");
     }
 
     @Override
     public Link getUrl() {
-        return new Link("/projects/" + name);
+        return new Link('/' + LIST_ATTRIBUTE + '/' + name);
+    }
+
+    public Link getSchedulesUrl() {
+        return new Link('/' + LIST_ATTRIBUTE + '/' + name + "/schedules");
     }
 }

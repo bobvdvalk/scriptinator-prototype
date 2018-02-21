@@ -33,6 +33,10 @@ include::writing_scripts/index.adoc[]
 
 <<<
 
+include::schedules/index.adoc[]
+
+<<<
+
 include::libraries/index.adoc[]
 
 <<<

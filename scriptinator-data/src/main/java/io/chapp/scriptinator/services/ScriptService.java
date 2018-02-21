@@ -16,20 +16,25 @@
 package io.chapp.scriptinator.services;
 
 import io.chapp.scriptinator.model.Job;
+import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
 @Service
 public class ScriptService extends AbstractEntityService<Script, ScriptRepository> {
     private final JobService jobService;
+    private final ProjectService projectService;
 
-    public ScriptService(JobService jobService) {
+    public ScriptService(JobService jobService, ProjectService projectService) {
         this.jobService = jobService;
+        this.projectService = projectService;
     }
 
     public Script get(String projectName, String scriptName) {
@@ -43,6 +48,30 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
 
     public Page<Script> get(String projectName, PageRequest request) {
         return getRepository().findAllByProjectName(projectName, request);
+    }
+
+    public Script getByFullName(String fullName, String defaultProjectName) {
+        String projectName = defaultProjectName;
+        String scriptName = fullName;
+
+        // Parse the name parts: (project/)?(script)
+        String[] parts = StringUtils.split(fullName, "/");
+        if (parts != null) {
+            if (parts.length == 2) {
+                projectName = parts[0];
+                scriptName = parts[1];
+            } else {
+                return null;
+            }
+        }
+
+        // Get the project.
+        Project project = projectService.find(projectName).orElse(null);
+        if (project == null) {
+            return null;
+        }
+
+        return get(project.getId(), scriptName).orElse(null);
     }
 
     /**
@@ -69,6 +98,17 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
             job.setTriggeredByJobId(trigger.getId());
         }
         return jobService.create(job);
+    }
+
+    /**
+     * Run a script triggered by a schedule.
+     *
+     * @param script The script to run.
+     */
+    public void runScheduled(Script script, Schedule schedule) {
+        Job job = createJob(script, schedule.getArgument());
+        job.setTriggeredByScheduleId(schedule.getId());
+        jobService.create(job);
     }
 
     private Job createJob(Script script, String argument) {

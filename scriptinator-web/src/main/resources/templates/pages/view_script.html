@@ -22,85 +22,89 @@
 <body>
 
 <div layout:fragment="content">
-    <h3 class="ui header">
-        <div class="content">
-            Script: <span th:text="${script.name}"></span>
-            <div class="sub header" th:text="${script.description}"></div>
+    <div class="ui grid">
+        <div class="twelve wide column">
+            <h3 class="ui header">
+                <div class="content">
+                    <span th:text="${script.name}"></span>
+                    <div class="sub header" th:text="${script.description}"></div>
+                </div>
+            </h3>
         </div>
-    </h3>
+        <div class="four wide column">
+            <a class="ui icon button right floated"
+               th:href="${'/project/' + script.project.id + '/script/' + script.id + '/settings'}">
+                <i class="settings icon"></i>
+                Script Settings
+            </a>
+        </div>
+    </div>
 
-    <table class="ui table">
+    <table class="ui blue table">
         <thead>
         <tr>
             <th>
             </th>
         </tr>
         </thead>
+
         <tbody>
         <tr>
             <td class="tight">
-                <div id="editor"
-                     class="read-only editor"
-                     th:text="${script.code}">
-                </div>
+                <form id="code-update-form"
+                      th:action="''"
+                      th:method="patch"
+                      th:object="${script}"
+                      class="ui form">
+                    <div id="editor" class="editor read-only" th:text="${script.code}"></div>
+                    <input type="hidden" id="code_field" th:field="*{code}">
+                </form>
             </td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
             <th>
-                <div id="view-btns"
-                     class="ui right floated buttons">
-                    <button class="ui primary button"
-                            onclick="editScript()">
-                        Edit
-                    </button>
-                    <form th:method="post"
-                          th:action="@{''}">
-                        <button class="ui positive icon button"
-                                type="submit">
-                            <i class="ui play icon"></i> Run
-                        </button>
-                    </form>
-                </div>
-                <div id="edit-btns"
-                     class="ui hidden right floated buttons">
-                    <button class="ui button"
-                            onclick="cancelEdit()">
+                <div id="edit-btns" class="ui right floated buttons hidden">
+                    <a class="ui grey button"
+                       th:href="${'/project/' + script.project.id + '/script/' + script.id}">
                         Cancel
-                    </button>
-                    <button class="ui negative button"
-                            onclick="promptDeleteScript()">
-                        Delete
-                    </button>
-                    <button class="ui positive button"
-                            onclick="saveScript()"
-                            type="button">
+                    </a>
+                    <button class="ui positive icon button" onclick="saveScript()">
                         Save
                     </button>
+                </div>
+                <div id="view-btns" class="ui right floated buttons">
+                    <a class="ui primary button" onclick="editScript()">
+                        Edit
+                    </a>
+                    <form th:method="post" th:action="@{''}">
+                        <button class="ui positive icon button">
+                            <i class="ui play icon"></i>
+                            Run
+                        </button>
+                    </form>
                 </div>
             </th>
         </tr>
         </tfoot>
     </table>
 
-    <h4 class="ui header">
-        Jobs
-    </h4>
+    <h4 class="ui header">Jobs</h4>
     <div id="jobs">
         <table class="ui compact table" th:classappend="${isRunning ? 'running' : ''}">
             <thead>
-            <tr>
+            <tr class="jobs-header">
                 <th>
                     Job
                 </th>
-                <th class="collapsing">
+                <th class="collapsing center">
                     Trigger
                 </th>
-                <th class="collapsing">
+                <th class="collapsing center">
                     Output
                 </th>
-                <th class="collapsing">
+                <th class="collapsing center">
                     Status
                 </th>
             </tr>
@@ -110,29 +114,44 @@
                     This script has not been executed yet.
                 </td>
             </tr>
-            <tr th:each="job : ${jobs}"
-                class="job"
-                th:classappend="${job.status.name().toLowerCase()}">
+            <tr th:each="job : ${jobs}" class="job" th:classappend="${job.status.name().toLowerCase()}">
                 <td th:text="${job.displayName}"></td>
-                <td>
+
+                <td class="center">
                     <th:block th:if="${job.triggeredByJobId}">
                         <th:block th:if="${jobTriggers.containsKey(job.id)}">
-                            <a th:href="${'/project/' + script.project.id + '/script/' + jobTriggers.get(job.id).script.id}">
-                                <button class="ui circular button"
-                                        th:data-tooltip="${'Triggered by script: ' + jobTriggers.get(job.id).script.toString()}"
-                                        th:text="${'#' + job.triggeredByJobId}">
-                                </button>
+                            <a th:href="${'/project/' + script.project.id + '/script/' + jobTriggers.get(job.id).script.id}"
+                               class="ui circular icon button"
+                               th:data-tooltip="${'Triggered by script: ' + jobTriggers.get(job.id).script.toString()}">
+                                <i class="code icon"></i>
                             </a>
                         </th:block>
                         <th:block th:unless="${jobTriggers.containsKey(job.id)}">
-                            <button class="ui circular button"
-                                    data-tooltip="Triggered by an unknown script."
-                                    th:text="${'#' + job.triggeredByJobId}">
+                            <button class="ui circular icon button"
+                                    data-tooltip="Triggered by an unknown script">
+                                <i class="code icon"></i>
+                            </button>
+                        </th:block>
+                    </th:block>
+
+                    <th:block th:if="${job.triggeredByScheduleId}">
+                        <th:block th:if="${schedulesById.containsKey(job.triggeredByScheduleId)}">
+                            <a class="ui circular icon button"
+                               th:href="${'/project/' + script.project.id + '/schedule/' + job.triggeredByScheduleId}"
+                               th:data-tooltip="${'Triggered by schedule: ' + schedulesById.get(job.triggeredByScheduleId).name}">
+                                <i class="hourglass end icon"></i>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${schedulesById.containsKey(job.triggeredByScheduleId)}">
+                            <button class="ui circular icon button"
+                                    data-tooltip="Triggered by an unknown schedule">
+                                <i class="hourglass end icon"></i>
                             </button>
                         </th:block>
                     </th:block>
                 </td>
-                <td>
+
+                <td class="center">
                     <th:block th:if="${!job.output.isEmpty()}">
                         <div class="ui fullscreen modal">
                             <div class="header">Output: <span th:text="${job.displayName}"></span></div>
@@ -147,7 +166,8 @@
                         </button>
                     </th:block>
                 </td>
-                <td>
+
+                <td class="center">
                     <th:block th:switch="${job.status}">
                         <div th:case="${job.status.QUEUED}"
                              class="ui circular icon button"
@@ -179,82 +199,18 @@
             </tfoot>
         </table>
     </div>
-
-    <div class="ui basic modal">
-        <div class="ui icon header">
-            <i class="delete icon"></i>
-            Delete <span th:text="${script.name}"></span>?
-        </div>
-        <div class="content">
-            <p>Should you decide to delete this script, we will not be able to recover it for you.</p>
-        </div>
-        <div class="actions">
-            <button class="ui red basic cancel inverted button">
-                <i class="remove icon"></i>
-                No
-            </button>
-            <button onclick="deleteScript()" class="ui green ok inverted button">
-                <i class="checkmark icon"></i>
-                Yes
-            </button>
-        </div>
-    </div>
 </div>
 
 <script layout:fragment="script" th:inline="javascript">
-    function editScript() {
-        editor.container.classList.remove("read-only");
-        setReadOnly(editor, false);
-        $('#edit-btns').removeClass('hidden');
-        $('#view-btns').addClass('hidden');
-    }
-
-    function cancelEdit() {
-        window.location.assign(window.location);
-    }
-
-    function promptDeleteScript() {
-        $('.ui.basic.modal').modal('show');
-    }
-
-    function deleteScript() {
-        var token = $('#_csrf').attr('content');
-        var header = $('#_csrf_header').attr('content');
-
-        $.ajax({
-            type: "DELETE",
-            url: "",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader(header, token);
-            },
-            success: function () {
-                window.location = /*[[@{'/project/' + ${project.id}}]]*/ "/projects";
-            }
-        });
-    }
-
-    function saveScript() {
-        var token = $('#_csrf').attr('content');
-        var header = $('#_csrf_header').attr('content');
-
-        $.ajax({
-            type: "PATCH",
-            url: "",
-            data: {
-                code: editor.getValue()
-            },
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader(header, token);
-            },
-            success: function () {
-                window.location.assign(window.location);
-            }
-        });
-    }
-
     $(document).ready(function () {
         refreshTable();
         linkModals();
+
+        // Link code field to editor.
+        var codeField = $("#code_field");
+        editor.getSession().on("change", function () {
+            codeField.val(editor.getValue());
+        });
 
         // Let Ace handle the save hotkey.
         editor.commands.addCommand({
@@ -268,6 +224,9 @@
         });
     });
 
+    /**
+     * Refresh the jobs table.
+     */
     function refreshTable() {
         var jobsContainer = $('#jobs');
         var table = $('#jobs > *');
@@ -285,10 +244,30 @@
         )
     }
 
+    /**
+     * Link the job log modals to the output buttons in the jobs table.
+     */
     function linkModals() {
         $('.output-btn').each(function (index, btn) {
             $(btn).siblings().modal('attach events', btn);
         })
+    }
+
+    /**
+     * Start editing the script.
+     */
+    function editScript() {
+        $('#view-btns').hide();
+        $('#edit-btns').show();
+        $('#editor').removeClass('read-only');
+        setReadOnly(editor, false);
+    }
+
+    /**
+     * Stop editing the script, saving the changes.
+     */
+    function saveScript() {
+        $('#code-update-form').submit();
     }
 </script>
 

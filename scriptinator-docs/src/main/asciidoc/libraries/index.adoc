@@ -18,6 +18,8 @@
 
 :leveloffset: +1
 
+include::script.adoc[]
+
 include::http.adoc[]
 
 :leveloffset: -1

@@ -23,54 +23,51 @@
 
 <div layout:fragment="content">
     <h3 class="ui header">New Script</h3>
+
     <form id="script-create-form"
           th:action="''"
           th:method="post"
           th:object="${script}"
           class="ui form"
           th:classappend="${errors != null ? 'error': ''}">
+
+        <div class="ui clearing blue segment">
+            <div class="ui grid">
+                <div class="four wide column">
+                    <div class="field"
+                         th:classappend="${errors?.get('name') == null ? '' : 'error'}">
+                        <label>Name</label>
+                        <input type="text"
+                               name="name"
+                               placeholder="script-name"
+                               th:field="*{name}">
+                    </div>
+                </div>
+                <div class="twelve wide column">
+                    <div class="field">
+                        <label>Description</label>
+                        <input
+                                type="text"
+                                name="description"
+                                placeholder="Description..."
+                                th:field="*{description}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <table class="ui table">
             <thead>
             <tr>
                 <th colspan="2">
-                    <div class="ui grid">
-                        <div class="four wide column">
-                            <div class="field"
-                                 th:classappend="${errors?.get('name') == null ? '' : 'error'}">
-                                Name
-                                <input type="text"
-                                       name="name"
-                                       placeholder="ScriptName"
-                                       th:field="*{name}"
-                                >
-                            </div>
-                        </div>
-                        <div class="twelve wide column">
-                            <div class="field">
-                                Description
-                                <input
-                                        type="text"
-                                        name="description"
-                                        placeholder="Description..."
-                                        th:field="*{description}"
-                                >
-                            </div>
-                        </div>
-                    </div>
                 </th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td colspan="2"
-                    class="tight">
-                    <div id="editor"
-                         class="editor"
-                         th:text="${script.code}"></div>
-                    <input type="hidden"
-                           id="code_field"
-                           th:field="*{code}"
-                    />
+                <td class="tight" colspan="2">
+                    <div id="editor" class="editor" th:text="${script.code}"></div>
+                    <input name="code" type="hidden" id="code_field" th:field="*{code}">
                 </td>
             </tr>
             </tbody>
@@ -84,10 +81,14 @@
                     </div>
                 </th>
                 <th>
-                    <button class="ui primary right floated button"
-                            type="submit">
-                        Create
-                    </button>
+                    <div class="ui right floated buttons">
+                        <a class="ui button" th:href="${'/project/' + project.id + '/scripts'}">
+                            Cancel
+                        </a>
+                        <button class="ui primary button">
+                            Create
+                        </button>
+                    </div>
                 </th>
             </tr>
             </tfoot>
@@ -95,10 +96,9 @@
     </form>
 </div>
 
-<script layout:fragment="script">
-
-    // Link code field to editor
+<script layout:fragment="script" th:inline="javascript">
     $(document).ready(function () {
+        // Link code field to editor.
         var codeField = $("#code_field");
         editor.getSession().on("change", function () {
             codeField.val(editor.getValue());
@@ -113,21 +113,10 @@
                 sender: 'editor|cli'
             },
             exec: function () {
-                $('#script-create-form').submit()
+                $('#script-create-form').submit();
             }
         });
     });
-
-    // Add code validator rule
-    $.fn.form.settings.rules.validCode = function () {
-        var annotations = editor.getSession().getAnnotations();
-        for (var key in annotations) {
-            if (annotations.hasOwnProperty(key) && annotations[key].type === "error") {
-                return false;
-            }
-        }
-        return true;
-    };
 
     // Enable form validation
     $('.ui.form')
@@ -147,15 +136,6 @@
                         {
                             type: 'regExp[/^[a-z]/i]',
                             prompt: 'Please rename your script to start with a letter.'
-                        }
-                    ]
-                },
-                code: {
-                    identifier: 'code',
-                    rules: [
-                        {
-                            type: 'validCode',
-                            prompt: 'There seems to be an issue in the code. Please check the editor.'
                         }
                     ]
                 }

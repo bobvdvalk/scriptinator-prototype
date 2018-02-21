@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-FROM java:8-jdk-alpine
+FROM openjdk:8
 
 COPY "target/*-exec.jar" /app.jar
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["/app.jar"]

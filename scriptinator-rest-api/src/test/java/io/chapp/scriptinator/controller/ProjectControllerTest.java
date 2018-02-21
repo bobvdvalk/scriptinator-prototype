@@ -18,9 +18,11 @@ package io.chapp.scriptinator.controller;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.ProjectRepository;
+import io.chapp.scriptinator.repositories.ScheduleRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import okhttp3.OkHttpClient;
@@ -47,6 +49,8 @@ public class ProjectControllerTest {
     ProjectRepository projectRepository;
     @Autowired
     ScriptRepository scriptRepository;
+    @Autowired
+    ScheduleRepository scheduleRepository;
 
     @Test
     public void testWhenProjectIsRequestedItIsReturned() throws IOException {
@@ -201,4 +205,50 @@ public class ProjectControllerTest {
         );
     }
 
+    @Test
+    public void testListProjectSchedulesReturnsAllSchedules() throws IOException {
+        // Precondition
+        Project project = new Project();
+        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME));
+        project.setName("aSuperScheduledProject");
+        project = projectRepository.save(project);
+
+        Script script = new Script();
+        script.setProject(project);
+        script.setName("triggered");
+        scriptRepository.save(script);
+
+        Schedule schedule = new Schedule();
+        schedule.setProject(project);
+        schedule.setName("scheduleMe");
+        schedule.setScriptName("triggered");
+        schedule.setCronString("* * * * * ?");
+        scheduleRepository.save(schedule);
+        schedule = new Schedule();
+        schedule.setProject(project);
+        schedule.setName("justInTime");
+        schedule.setScriptName("triggered");
+        schedule.setCronString("* * * * * ?");
+        scheduleRepository.save(schedule);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/projects/aSuperScheduledProject/schedules")
+                        .build()
+        ).execute();
+
+        // Validation
+        String body = response.body().string();
+        ReadContext json = JsonPath.parse(body);
+
+        assertEquals(
+                new HashSet<>(json.read("$.items[*].name")),
+                new HashSet<>(Arrays.asList(
+                        "scheduleMe",
+                        "justInTime"
+                ))
+        );
+    }
 }

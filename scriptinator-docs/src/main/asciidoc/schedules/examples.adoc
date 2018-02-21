@@ -1,0 +1,59 @@
+//
+// Copyright © 2018 Scriptinator (support@scriptinator.io)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Examples
+
+[cols="3,4,5"]
+|===
+h| Description h| Cron expression h| Notes
+
+| Every minute
+| `0 * * * * ?`
+| This is one of the most simple schedules.
+  The first 0 indicates the schedule should be triggered at second 0 of the minute.
+  All other signs are wildcards.
+
+| Every Saturday at noon
+| `0 0 12 ? * SAT` +
+  +
+  `0 0 12 ? * 7`
+| Days of the week can be specified either by its first 3 letters or its index.
+  The days are 1-indexed and a weeks start on a Sunday, so 1=SUN, 2=MON, etc.
+
+| Every 6 hours
+| `0 0 0/6 * * ?` +
+  +
+  `0 0 0,6,12,18 * * ?`
+| Both these notations function exactly the same.
+  The only difference is that the bottom one is more verbose.
+  If you want the schedule to be offset, simply replace the 0 before the slash with the offset.
+
+| Wednesday through Sunday at 8 in the evening
+| `0 0 20 ? * WED-SUN` +
+  +
+  `0 0 20 ? * 4-7,1`
+| When specifying a range of days by their short notation you can wrap around the week,
+  i.e. from Saturday to Sunday.
+  This is not possible when using their index.
+
+| On December 31st at 23:45
+| `00 45 23 L DEC ?` +
+  +
+  `00 45 23 31 DEC ?`
+| The L in this notation indicates that is has to be the last day of the month.
+  Because December always has 31 days we can also explicitly specify that it has to be day 31.
+
+|===

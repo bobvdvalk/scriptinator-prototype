@@ -25,16 +25,19 @@
 </head>
 <body>
 
-<h1 layout:fragment="title">
-    <span th:text="${projects.totalElements}"></span> Projects
-</h1>
+<h1 layout:fragment="title">Projects</h1>
 
 <div layout:fragment="content">
     <div class="ui segment">
-        <table class="ui table">
+        <table class="ui blue table">
             <thead>
             <tr>
-                <th></th>
+                <th>
+                    <div class="ui label">
+                        Projects
+                        <div class="detail" th:text="${projects.totalElements}"></div>
+                    </div>
+                </th>
             </tr>
             </thead>
             <tbody>

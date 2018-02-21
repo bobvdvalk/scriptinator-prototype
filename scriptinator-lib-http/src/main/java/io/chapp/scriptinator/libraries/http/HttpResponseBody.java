@@ -16,7 +16,7 @@
 package io.chapp.scriptinator.libraries.http;
 
 import io.chapp.scriptinator.libraries.core.DataValue;
-import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
+import jdk.nashorn.internal.runtime.JSONFunctions;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 
@@ -24,13 +24,9 @@ import java.io.IOException;
 
 public class HttpResponseBody extends DataValue {
     private final ResponseBody body;
-    private final HttpClient client;
-    private final HttpResponse response;
 
-    public HttpResponseBody(ResponseBody body, HttpClient client, HttpResponse response) {
+    public HttpResponseBody(ResponseBody body) {
         this.body = body;
-        this.client = client;
-        this.response = response;
     }
 
     public String contentType() {
@@ -50,18 +46,6 @@ public class HttpResponseBody extends DataValue {
     }
 
     public Object asJson() {
-        try {
-            return client.getMapper().readValue(
-                    asString(),
-                    Object.class
-            );
-        } catch (IOException e) {
-            throw new ScriptinatorExecutionException(
-                    "Could not parse response body from '" + response.request().getMethod() + " " + response.request().getUrl() + "' as json.",
-                    e
-            );
-        }
+        return JSONFunctions.parse(asString(), null);
     }
-
-
 }

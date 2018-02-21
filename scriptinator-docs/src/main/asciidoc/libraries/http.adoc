@@ -23,9 +23,12 @@ The `HTTP` library allows you to perform HTTP requests. It is equipped with some
 json web APIs. You can perform HTTP requests by calling the `HTTP` functions directly, or by creating a reusable
 <<HttpClient>> with which you can perform multiple requests.
 
+== HTTP
+
+=== HTTP.client
+
 :function_id: client
 include::_snippets/function.adoc[]
-
 
 == HttpClient
 :type_name: HttpClient
@@ -155,5 +158,3 @@ include::_snippets/function.adoc[]
 
 :function_id: asJson
 include::_snippets/function.adoc[]
-
-

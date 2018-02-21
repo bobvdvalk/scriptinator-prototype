@@ -18,11 +18,11 @@ package io.chapp.scriptinator.webcontrollers;
 import io.chapp.scriptinator.ScriptinatorWebConfiguration;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScriptService;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import static java.util.Collections.singletonMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/project/{projectId}/script")
@@ -56,43 +56,31 @@ public class ScriptController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("activeTab", "scripts");
+        model.addAttribute("activeTab", Tab.SCRIPTS);
     }
 
+    /*===== New script =====*/
+
     @GetMapping
-    public String showCreateScriptForm(@PathVariable long projectId, Model model) {
+    public String showNewScriptForm(@PathVariable long projectId, Model model) {
         model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
-        if (!model.containsAttribute(Script.ATTRIBUTE)) {
-            model.addAttribute(Script.ATTRIBUTE, new Script());
-        }
+        model.addAttribute(Script.ATTRIBUTE, new Script());
         return "pages/new_script";
     }
 
     @PostMapping
-    public String createNewScript(@PathVariable long projectId, @ModelAttribute("script") Script script, Model model) {
-        Project project = projectService.get(projectId);
-        script.setProject(project);
+    public String createScript(@PathVariable long projectId, @ModelAttribute("script") Script script, Model model) {
+        return saveScript(projectId, script, model, "pages/new_script");
+    }
 
-        try {
-            script = scriptService.create(script);
-        } catch (DataIntegrityViolationException e) {
-            Throwable cause = e.getCause();
+    /*===== View script =====*/
 
-            // Check for a duplicate script name constraint error.
-            if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals("script_name")) {
-                model.addAttribute(Script.ATTRIBUTE, script);
-                model.addAttribute(
-                        "errors",
-                        singletonMap(
-                                "name",
-                                "There already seems to be a script with that name, please choose a different one."
-                        )
-                );
-            }
-            return showCreateScriptForm(projectId, model);
-        }
-
-        return "redirect:/project/" + projectId + "/script/" + script.getId();
+    @PatchMapping("{scriptId}")
+    public String updateCode(@PathVariable long projectId, @PathVariable long scriptId, @RequestParam("code") String code, Model model) {
+        Script script = getSafeScript(projectId, scriptId);
+        script.setCode(code);
+        scriptService.update(script);
+        return showScript(projectId, scriptId, model);
     }
 
     @GetMapping("{scriptId}")
@@ -101,15 +89,13 @@ public class ScriptController {
         model.addAttribute(Script.ATTRIBUTE, script);
         model.addAttribute(Project.ATTRIBUTE, script.getProject());
 
+        // Get all job pages.
         Page<Job> jobs = jobService.get(
                 scriptId,
                 new PageRequest(
                         0,
                         configuration.getDefaultPageSize(),
-                        new Sort(
-                                Sort.Direction.DESC,
-                                "id"
-                        )
+                        new Sort(Sort.Direction.DESC, "id")
                 )
         );
 
@@ -123,11 +109,20 @@ public class ScriptController {
         }
         model.addAttribute("jobTriggers", jobTriggers);
 
+        // Add a map of all schedules by their id to the model.
+        model.addAttribute(
+                "schedulesById",
+                script.getProject().getSchedules().stream()
+                        .collect(Collectors.toMap(Schedule::getId, Function.identity()))
+        );
+
+        // Check if a job is running.
         model.addAttribute(Job.LIST_ATTRIBUTE, jobs);
         model.addAttribute(
                 "isRunning",
                 jobs.getContent().stream().anyMatch(job -> job.getFinishedTime() == null)
         );
+
         return "pages/view_script";
     }
 
@@ -137,19 +132,29 @@ public class ScriptController {
         return showScript(projectId, scriptId, model);
     }
 
-    @PatchMapping("{scriptId}")
-    public String updateScript(@PathVariable long projectId, @PathVariable long scriptId, @RequestParam("code") String code, Model model) {
-        Script script = getSafeScript(projectId, scriptId);
-        script.setCode(code);
-        scriptService.update(script);
-        return showScript(projectId, scriptId, model);
+    /*===== Script settings =====*/
+
+    @GetMapping("{scriptId}/settings")
+    public String showEditScriptForm(@PathVariable long projectId, @PathVariable long scriptId, Model model) {
+        model.addAttribute(Script.ATTRIBUTE, getSafeScript(projectId, scriptId));
+        model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
+        return "pages/edit_script";
     }
 
-    @DeleteMapping("{scriptId}")
+    @PostMapping("{scriptId}/settings")
+    public String updateScript(@PathVariable long projectId, @PathVariable long scriptId, @ModelAttribute("script") Script script, Model model) {
+        Script oldScript = getSafeScript(projectId, scriptId);
+        script.setId(scriptId);
+        script.setCode(oldScript.getCode());
+        return saveScript(projectId, script, model, "pages/edit_script");
+    }
+
+    @DeleteMapping("{scriptId}/settings")
     public String deleteScript(@PathVariable long projectId, @PathVariable long scriptId, Model model) {
         scriptService.delete(getSafeScript(projectId, scriptId).getId());
         return projectController.viewScripts(projectId, model);
     }
+
 
     private Script getSafeScript(long projectId, long scriptId) {
         Script script = scriptService.get(scriptId);
@@ -157,5 +162,23 @@ public class ScriptController {
             throw new NoSuchElementException();
         }
         return script;
+    }
+
+    private String saveScript(Long projectId, Script script, Model model, String errorPage) {
+        Project project = projectService.get(projectId);
+        script.setProject(project);
+        model.addAttribute(Project.ATTRIBUTE, project);
+
+        try {
+            // Create or update the script.
+            script = script.getId() == null ? scriptService.create(script) : scriptService.update(script);
+        } catch (DataIntegrityViolationException e) {
+            ProjectController.addDbErrorsToModel(e, model, project, "script_name", Script.ATTRIBUTE);
+            model.addAttribute(Script.ATTRIBUTE, script);
+            return errorPage;
+        }
+
+        model.addAttribute(Script.ATTRIBUTE, script);
+        return "redirect:/project/" + projectId + "/script/" + script.getId();
     }
 }

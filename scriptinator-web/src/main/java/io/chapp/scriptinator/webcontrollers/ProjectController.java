@@ -16,6 +16,7 @@
 package io.chapp.scriptinator.webcontrollers;
 
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.services.ProjectService;
@@ -41,30 +42,7 @@ public class ProjectController {
         this.projectsController = projectsController;
     }
 
-    @GetMapping("{projectId}")
-    public String viewOverview(@PathVariable long projectId) {
-        return "redirect:/project/" + projectId + "/scripts";
-    }
-
-    @GetMapping("{projectId}/scripts")
-    public String viewScripts(@PathVariable long projectId, Model model) {
-        Project project = projectService.get(projectId);
-        model.addAttribute(Project.ATTRIBUTE, project);
-        model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SCRIPTS);
-
-        model.addAttribute("scriptCount", project.getScripts().size());
-        return "pages/view_scripts";
-    }
-
-    @GetMapping("{projectId}/settings")
-    public String editProject(@PathVariable long projectId, Model model) {
-        if (!model.containsAttribute(Project.ATTRIBUTE)) {
-            model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
-        }
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
-        return "pages/edit_project";
-    }
+    /*===== New project =====*/
 
     @GetMapping
     public String showCreateProjectForm(Model model) {
@@ -81,11 +59,51 @@ public class ProjectController {
         try {
             project = projectService.create(project);
         } catch (DataIntegrityViolationException e) {
-            addDbErrorsToModel(e, model, project);
+            addDbErrorsToModel(e, model, project, "project_name", Project.ATTRIBUTE);
             return showCreateProjectForm(model);
         }
 
         return "redirect:/project/" + project.getId();
+    }
+
+    /*===== View project =====*/
+
+    @GetMapping("{projectId}")
+    public String viewOverview(@PathVariable long projectId) {
+        return "redirect:/project/" + projectId + "/scripts";
+    }
+
+    @GetMapping("{projectId}/scripts")
+    public String viewScripts(@PathVariable long projectId, Model model) {
+        Project project = projectService.get(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SCRIPTS);
+
+        model.addAttribute("scriptCount", project.getScripts().size());
+        return "pages/view_scripts";
+    }
+
+    @GetMapping("{projectId}/schedules")
+    public String viewSchedules(@PathVariable long projectId, Model model) {
+        Project project = projectService.get(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Schedule.LIST_ATTRIBUTE, project.getSchedules());
+
+        model.addAttribute("scheduleCount", project.getSchedules().size());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SCHEDULES);
+        return "pages/view_schedules";
+    }
+
+    /*===== Project settings =====*/
+
+    @GetMapping("{projectId}/settings")
+    public String editProject(@PathVariable long projectId, Model model) {
+        if (!model.containsAttribute(Project.ATTRIBUTE)) {
+            model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
+        }
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
+        return "pages/edit_project";
     }
 
     @PostMapping("{projectId}/settings")
@@ -98,7 +116,7 @@ public class ProjectController {
         try {
             projectService.update(currentProject);
         } catch (DataIntegrityViolationException e) {
-            addDbErrorsToModel(e, model, currentProject);
+            addDbErrorsToModel(e, model, currentProject, "project_name", Project.ATTRIBUTE);
             return editProject(currentProject.getId(), model);
         }
 
@@ -111,17 +129,20 @@ public class ProjectController {
         return projectsController.projectList(model);
     }
 
-    private void addDbErrorsToModel(DataIntegrityViolationException e, Model model, Project project) {
-        Throwable cause = e.getCause();
+
+    public static void addDbErrorsToModel(DataIntegrityViolationException e, Model model, Project project, String constraintName, String entityType) {
+        if (!model.containsAttribute(Project.ATTRIBUTE)) {
+            model.addAttribute(Project.ATTRIBUTE, project);
+        }
 
         // Check for a duplicate project name constraint error.
-        if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals("project_name")) {
-            model.addAttribute(Project.ATTRIBUTE, project);
+        Throwable cause = e.getCause();
+        if (cause instanceof ConstraintViolationException && ((ConstraintViolationException) cause).getConstraintName().equals(constraintName)) {
             model.addAttribute(
                     "errors",
                     singletonMap(
                             "name",
-                            "There already seems to be a project with that name, please choose a different one."
+                            "There already seems to be a " + entityType + " with that name, please choose a different one."
                     )
             );
         }

@@ -54,6 +54,8 @@ public class Job extends AbstractEntity {
     @Lob
     private String argument;
 
+    private Long triggeredByScheduleId;
+
     public String getDisplayName() {
         return displayName;
     }
@@ -132,6 +134,14 @@ public class Job extends AbstractEntity {
 
     public void setArgument(String argument) {
         this.argument = argument;
+    }
+
+    public Long getTriggeredByScheduleId() {
+        return triggeredByScheduleId;
+    }
+
+    public void setTriggeredByScheduleId(Long triggeredByScheduleId) {
+        this.triggeredByScheduleId = triggeredByScheduleId;
     }
 
     @Override

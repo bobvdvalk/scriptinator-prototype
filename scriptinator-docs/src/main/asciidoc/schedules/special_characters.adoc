@@ -1,0 +1,78 @@
+//
+// Copyright © 2018 Scriptinator (support@scriptinator.io)
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+= Special Characters
+
+[WARNING]
+Currently specifying a value in both day of month and day of week does not work.
+Instead, a `?` must be used in one of these fields.
+
+[cols="1,2,3"]
+|===
+h| Character h| Position h| Description
+
+| `*`
+| Any
+| A wildcard that matches all values.
+
+| `-`
+| Any
+| Used to specify a range, for example `1-14` or `MON-FRI`.
+
+| `,`
+| Any
+| Used to specify multiple values, for example `7,1` or `SAT,SUN`.
+  The values can also include ranges, like: `3,14-20`
+
+| `/`
+| Any
+| Used to specify increments.
+  For example: `0/6` as the hour part would mean every 6th hour starting from 0,
+  i.e.: 0, 6, 12 and 18.
+  This value can be offset by putting a different number before the `/`,
+  for example `2/6` would mean hours 2, 8, 14 and 20.
+
+| `?`
+| Day of month +
+  Day of week
+| Indicates no specific value.
+  This is used when you need to specify a value in either day of month or day of week,
+  but not the other.
+
+1.2+| `L`
+| Day of month
+| The last day of the month.
+
+| Day of week
+| If used by itself, this means the last day of the week (Saturday).
+  It can also be used to specify the last x-day of the month,
+  for example: `2L` means the last Monday of the month.
+
+| `W`
+| Day of month
+| The weekday nearest to the given day,
+  for example: `10W` means the weekday nearest to the 10th of the month.
+  If that day would be a Saturday, the nearest weekday would be the Friday before.
+  Note however that this does not cross month boundaries.
+  That means that if that Friday before is also the month before,
+  next Monday will be used instead.
+
+| `#`
+| Day of week
+| Used to indicate the nth x-day of the month,
+  for example: `2#1` or `MON#1` means the first Monday of the month.
+
+|===

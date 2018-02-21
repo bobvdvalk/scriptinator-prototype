@@ -35,13 +35,21 @@ tr td.clickable:hover, tr.clickable:hover td {
     text-decoration: underline;
 }
 
-.tight, .ui.table tr td.tight, .tight.sub.header {
+.tight, .ui.table tr td.tight, .tight.sub.header, .ui.segment.tight {
     padding: 0;
     margin: 0;
 }
 
 .hidden, .ui.button.hidden, .ui.buttons.hidden {
     display: none;
+}
+
+.checkbox label[for] {
+    cursor: pointer;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 /* LOGIN PAGE */
@@ -63,6 +71,10 @@ tr td.clickable:hover, tr.clickable:hover td {
     width: 100%;
 }
 
+#editor.small {
+    min-height: 150px;
+}
+
 .editor.read-only * {
     cursor: default;
 }
@@ -78,6 +90,10 @@ tr td.clickable:hover, tr.clickable:hover td {
 
 .job.failed {
     background-color: rgba(0, 0, 255, 0.2);
+}
+
+.ui.table .job .center, .ui.table .jobs-header .center {
+    text-align: center;
 }
 
 @keyframes queued_job {
@@ -104,4 +120,13 @@ tr td.clickable:hover, tr.clickable:hover td {
 
 .job.running {
     animation: running_job 1s infinite alternate;
+}
+
+/* Schedules */
+.schedule.true.success {
+    background-color: rgba(0, 255, 0, 0.2);
+}
+
+.schedule.true.invalid_cron, .schedule.true.invalid_script {
+    background-color: rgba(0, 0, 255, 0.2);
 }

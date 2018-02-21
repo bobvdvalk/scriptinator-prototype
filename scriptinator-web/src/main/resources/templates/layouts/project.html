@@ -62,9 +62,14 @@
                     <i class="ui code icon"></i> Scripts
                 </a>
                 <a class="item"
+                   th:href="@{'/project/' + ${project.id} + '/schedules'}"
+                   th:classappend="${activeTab} == 'schedules' ? 'active' : ''">
+                    <i class="ui hourglass end icon"></i> Schedules
+                </a>
+                <a class="item"
                    th:href="@{'/project/' + ${project.id} + '/settings'}"
                    th:classappend="${activeTab} == 'settings' ? 'active' : ''">
-                    <i class="ui settings icon"></i> Settings
+                    <i class="ui settings icon"></i> Project Settings
                 </a>
             </div>
             <div class="ui attached clearing segment" layout:fragment="content">

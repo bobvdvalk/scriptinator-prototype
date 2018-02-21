@@ -20,6 +20,7 @@ public class Tab {
     public static final String OVERVIEW = "overview";
     public static final String SCRIPTS = "scripts";
     public static final String SETTINGS = "settings";
+    public static final String SCHEDULES = "schedules";
 
     private Tab() {
     }
