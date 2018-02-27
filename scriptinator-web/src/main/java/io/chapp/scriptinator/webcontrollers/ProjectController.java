@@ -15,10 +15,7 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
-import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.Schedule;
-import io.chapp.scriptinator.model.Script;
-import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.services.ProjectService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -93,6 +90,17 @@ public class ProjectController {
         model.addAttribute("scheduleCount", project.getSchedules().size());
         model.addAttribute(Tab.ATTRIBUTE, Tab.SCHEDULES);
         return "pages/view_schedules";
+    }
+
+    @GetMapping("{projectId}/secrets")
+    public String viewSecrets(@PathVariable long projectId, Model model) {
+        Project project = projectService.get(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Secret.LIST_ATTRIBUTE, project.getSecrets());
+
+        model.addAttribute("secretCount", project.getSecrets().size());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SECRETS);
+        return "pages/view_secrets";
     }
 
     /*===== Project settings =====*/

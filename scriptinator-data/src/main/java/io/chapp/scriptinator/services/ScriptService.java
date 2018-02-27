@@ -50,6 +50,14 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         return getRepository().findAllByProjectName(projectName, request);
     }
 
+    /**
+     * Get a script by its full name.
+     * This can be either just the script name or the project and script name, e.g.: project-name/script-name.
+     *
+     * @param fullName           The full name of the script.
+     * @param defaultProjectName The project name to use if none is given in the full name.
+     * @return The script, or null if none was found.
+     */
     public Script getByFullName(String fullName, String defaultProjectName) {
         String projectName = defaultProjectName;
         String scriptName = fullName;

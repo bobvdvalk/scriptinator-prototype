@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.webcontrollers;
+package io.chapp.scriptinator.repositories;
 
-public class Tab {
-    public static final String ATTRIBUTE = "activeTab";
-    public static final String OVERVIEW = "overview";
-    public static final String SCRIPTS = "scripts";
-    public static final String SETTINGS = "settings";
-    public static final String SCHEDULES = "schedules";
-    public static final String SECRETS = "secrets";
+import io.chapp.scriptinator.model.Secret;
 
-    private Tab() {
-    }
+import java.util.List;
+import java.util.Optional;
+
+public interface SecretRepository extends AbstractEntityRepository<Secret> {
+    Optional<Secret> findOneByProjectIdAndName(long projectId, String name);
+
+    List<Secret> findAllByProjectId(long projectId);
 }

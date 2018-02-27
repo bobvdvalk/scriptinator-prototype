@@ -24,6 +24,7 @@ import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
+import io.chapp.scriptinator.services.SecretService;
 import jdk.nashorn.internal.objects.NativeJSON;
 import jdk.nashorn.internal.runtime.JSONFunctions;
 
@@ -46,13 +47,15 @@ public class ScriptLibrary {
     private final ScriptService scriptService;
     private final ObjectConverter converter;
     private final ClosableContext closableContext;
+    private final SecretService secretService;
 
-    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ClosableContext closableContext) {
+    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ClosableContext closableContext, SecretService secretService) {
         this.jobService = jobService;
         this.job = job;
         this.converter = new ObjectConverter(new ObjectMapper());
         this.closableContext = closableContext;
         this.scriptService = scriptService;
+        this.secretService = secretService;
     }
 
     public Object library(String name) {
@@ -80,12 +83,18 @@ public class ScriptLibrary {
     }
 
     private void log(String level, Object[] values) {
-        job.log(
-                level,
-                Arrays.stream(values)
-                        .map(this::getStringValue)
-                        .collect(Collectors.joining(" "))
+        // Get the string to be logged.
+        String logString = Arrays.stream(values)
+                .map(this::getStringValue)
+                .collect(Collectors.joining(" "));
+
+        // Filter out any secrets.
+        logString = secretService.filterSecrets(
+                job.getScript().getProject().getId(),
+                logString
         );
+
+        job.log(level, logString);
         jobService.update(job);
     }
 
@@ -124,5 +133,9 @@ public class ScriptLibrary {
         }
 
         return JSONFunctions.parse(job.getArgument(), null);
+    }
+
+    public String secret(String name) {
+        return secretService.getValue(job.getScript().getProject().getId(), name);
     }
 }

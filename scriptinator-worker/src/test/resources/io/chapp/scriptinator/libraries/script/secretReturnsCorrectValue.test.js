@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.webcontrollers;
+var Assert = Script.library("Assert");
 
-public class Tab {
-    public static final String ATTRIBUTE = "activeTab";
-    public static final String OVERVIEW = "overview";
-    public static final String SCRIPTS = "scripts";
-    public static final String SETTINGS = "settings";
-    public static final String SCHEDULES = "schedules";
-    public static final String SECRETS = "secrets";
+var token = Script.secret("my-token");
 
-    private Tab() {
-    }
-}
+Assert.equal(
+    "Secret returns correct value",
+    "9555701a-315b-419f-bffb-7c8ea8168b42",
+    token
+);

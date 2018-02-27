@@ -21,6 +21,7 @@ import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
+import io.chapp.scriptinator.services.SecretService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
@@ -35,11 +36,13 @@ public class ScriptExecutor {
     private final ObjectFactory<ScriptEngine> scriptEngineFactory;
     private final JobService jobService;
     private final ScriptService scriptService;
+    private final SecretService secretService;
 
-    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService) {
+    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, SecretService secretService) {
         this.scriptEngineFactory = scriptEngineFactory;
         this.jobService = jobService;
         this.scriptService = scriptService;
+        this.secretService = secretService;
     }
 
     public void execute(Job job) {
@@ -47,7 +50,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         try (ClosableContext context = new ClosableContext()) {
-            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context);
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             bindings.put("Script", scriptLibrary);
 

@@ -286,6 +286,7 @@
                             <exclude>**/node/**</exclude>
                             <exclude>**/banner.txt</exclude>
                             <exclude>**/asciidoc/**/*.js</exclude>
+                            <exclude>LICENSE.txt</exclude>
                         </excludes>
                     </configuration>
                     <executions>

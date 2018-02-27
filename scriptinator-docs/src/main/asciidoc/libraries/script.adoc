@@ -61,3 +61,8 @@ include::_snippets/function.adoc[]
 
 :function_id: argument
 include::_snippets/function.adoc[]
+
+=== Script.secret
+
+:function_id: secret
+include::_snippets/function.adoc[]

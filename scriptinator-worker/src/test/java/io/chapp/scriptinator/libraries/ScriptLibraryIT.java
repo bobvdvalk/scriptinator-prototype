@@ -16,12 +16,10 @@
 package io.chapp.scriptinator.libraries;
 
 import io.chapp.scriptinator.ScriptinatorWorker;
-import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.Script;
-import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
+import io.chapp.scriptinator.repositories.SecretRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.services.ScriptService;
 import org.apache.commons.io.FilenameUtils;
@@ -57,6 +55,8 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
     private UserRepository userRepository;
     @Autowired
     private JobRepository jobRepository;
+    @Autowired
+    private SecretRepository secretRepository;
 
     private Project project;
 
@@ -95,6 +95,12 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         project.setName("IntegrationTests");
         project.setOwner(user);
         project = projectRepository.save(project);
+
+        Secret secret = new Secret();
+        secret.setName("my-token");
+        secret.setValue("9555701a-315b-419f-bffb-7c8ea8168b42");
+        secret.setProject(project);
+        secretRepository.save(secret);
     }
 
 

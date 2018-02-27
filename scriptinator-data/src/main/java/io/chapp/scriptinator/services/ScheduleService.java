@@ -43,6 +43,12 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         CRON_DESCRIPTION_OPTIONS = options;
     }
 
+    /**
+     * Get all enabled schedules that were scheduled to run before now.
+     *
+     * @param now The date to use as now.
+     * @return The runnable schedules.
+     */
     public List<Schedule> getRunnableSchedules(Date now) {
         return getRepository().findAllByEnabledIsTrueAndNextRunBefore(now);
     }
@@ -78,6 +84,11 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         }
     }
 
+    /**
+     * Get the now date in UTC.
+     *
+     * @return The now date.
+     */
     public Date now() {
         return Date.from(Instant.now(Clock.systemUTC()));
     }

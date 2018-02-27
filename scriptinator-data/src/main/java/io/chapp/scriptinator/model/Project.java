@@ -51,6 +51,11 @@ public class Project extends AbstractEntity {
     @JsonIgnore
     private List<Schedule> schedules = new ArrayList<>();
 
+    @NotNull
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @JsonIgnore
+    private List<Secret> secrets = new ArrayList<>();
+
     public String getName() {
         return name;
     }
@@ -89,6 +94,14 @@ public class Project extends AbstractEntity {
 
     public void setSchedules(List<Schedule> schedules) {
         this.schedules = schedules;
+    }
+
+    public List<Secret> getSecrets() {
+        return secrets;
+    }
+
+    public void setSecrets(List<Secret> secrets) {
+        this.secrets = secrets;
     }
 
     public Link getScriptsUrl() {

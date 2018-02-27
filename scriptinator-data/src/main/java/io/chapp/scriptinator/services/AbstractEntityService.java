@@ -24,6 +24,12 @@ import org.springframework.data.domain.PageRequest;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+/**
+ * A base class for all entity service classes.
+ *
+ * @param <E> The type of the entity.
+ * @param <R> The type of the entity repository.
+ */
 public class AbstractEntityService<E extends AbstractEntity, R extends AbstractEntityRepository<E>> {
     private R repository;
 
