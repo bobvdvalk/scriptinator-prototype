@@ -1,0 +1,61 @@
+# Java Maven CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      - image: scriptinator/scriptinator-build-agent:1.0
+      - image: rabbitmq:3.6-management
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "pom.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Run Tests
+          command: |
+            mvn org.jacoco:jacoco-maven-plugin:prepare-agent install --fail-at-end
+
+      - run:
+          name: Copy Test Results
+          command: |
+            mkdir -p /tmp/test-results
+            find . -type f -regex ".*/target/.*-reports/.*xml" -exec cp {} /tmp/test-results \;
+          when: always
+      - store_test_results:
+          path: /tmp/test-results
+
+      - store_artifacts:
+          path: scriptinator-docs/target/generated-docs/index.html
+          destination: Documentation
+
+      - run:
+          name: Run Sonar
+          command: |
+            PR_NAME=${CIRCLE_PULL_REQUEST##*/}
+            if [[ -n "${PR_NAME}" ]]; then
+              PR_NAME="PR-${PR_NAME}"
+            fi
+            mvn sonar:sonar \
+              -Dsonar.branch.name="${PR_NAME:-$CIRCLE_BRANCH}" \
+              -Dsonar.login="${SONAR_LOGIN}" \
+              -Dsonar.host.url="https://sonarcloud.io" \
+              -Dsonar.organization=scriptinatorio
+          when: always
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+
