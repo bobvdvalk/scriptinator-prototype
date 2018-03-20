@@ -15,7 +15,7 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
-import io.chapp.scriptinator.ScriptinatorWebConfiguration;
+import io.chapp.scriptinator.ScriptinatorConfiguration;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.services.ProjectService;
 import org.springframework.data.domain.PageRequest;
@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import javax.validation.constraints.Min;
 
 @Controller
-public class ProjectsController {
+public class ProjectsWebController {
     private final ProjectService projectService;
-    private final ScriptinatorWebConfiguration configuration;
+    private final ScriptinatorConfiguration configuration;
 
-    public ProjectsController(ProjectService projectService, ScriptinatorWebConfiguration configuration) {
+    public ProjectsWebController(ProjectService projectService, ScriptinatorConfiguration configuration) {
         this.projectService = projectService;
         this.configuration = configuration;
     }
@@ -44,7 +44,7 @@ public class ProjectsController {
     @GetMapping("/projects/{pageId}")
     public String projectList(@PathVariable @Min(1) int pageId, Model model) {
         model.addAttribute(
-                Project.LIST_ATTRIBUTE, projectService.get(new PageRequest(
+                Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(new PageRequest(
                         pageId - 1,
                         configuration.getDefaultPageSize()
                 ))

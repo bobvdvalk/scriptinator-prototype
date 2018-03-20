@@ -67,6 +67,11 @@
             <groupId>net.redhogs.cronparser</groupId>
             <artifactId>cron-parser-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

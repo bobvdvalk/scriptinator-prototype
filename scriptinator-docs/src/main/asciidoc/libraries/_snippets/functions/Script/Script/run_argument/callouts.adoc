@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-<1> Run a script with an object as the argument
-<2> Check if the job was created
+<1> Run a script
+<2> Provide an object as the argument

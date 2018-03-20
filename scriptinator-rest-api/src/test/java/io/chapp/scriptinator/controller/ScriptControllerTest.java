@@ -25,6 +25,7 @@ import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.utils.ScriptinatorTestCase;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
@@ -36,12 +37,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
-import static io.chapp.scriptinator.controller.ScriptinatorTestCase.DEFAULT_USERNAME;
-import static org.testng.AssertJUnit.assertEquals;
+import static io.chapp.scriptinator.utils.ScriptinatorTestCase.DEFAULT_USERNAME;
+import static org.testng.Assert.assertEquals;
 
 @Listeners(ScriptinatorTestCase.class)
 public class ScriptControllerTest {
     private final OkHttpClient client = new OkHttpClient();
+    @Autowired
+    Headers accessToken;
 
     @Autowired
     ScriptRepository scriptRepository;
@@ -55,12 +58,7 @@ public class ScriptControllerTest {
     @Test
     public void testWhenScriptIsRequestedItReturned() throws IOException {
         // Precondition
-        User user = new User();
-        user.setDisplayName("UserTestUser");
-        user.setEmail("testuser@evil.incoperated");
-        user.setUsername("Superusertest93");
-        user.setPassword("thisistest");
-        userRepository.save(user);
+        User user = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
         project.setName("HelloWorld");
@@ -81,6 +79,7 @@ public class ScriptControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/scripts/" + script.getId())
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -104,19 +103,14 @@ public class ScriptControllerTest {
 
         assertEquals(
                 json.read("$.project.owner.username"),
-                "Superusertest93"
+                DEFAULT_USERNAME
         );
     }
 
     @Test
     public void testWhenScriptListIsRequestedItReturned() throws IOException {
         // Precondition
-        User user = new User();
-        user.setDisplayName("UserTestUser");
-        user.setEmail("testuser@evil.incoperated");
-        user.setUsername("Superusertest93");
-        user.setPassword("thisistest");
-        userRepository.save(user);
+        User user = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
         project.setName("HelloWorld");
@@ -137,11 +131,13 @@ public class ScriptControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/scripts/")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
         // Validation
-        ReadContext json = JsonPath.parse(response.body().string());
+        String body = response.body().string();
+        ReadContext json = JsonPath.parse(body);
 
         assertEquals(
                 json.read("$.totalItemCount"),
@@ -177,12 +173,7 @@ public class ScriptControllerTest {
     @Test
     public void scriptReturnEmptyScriptList() throws IOException {
         // Precondition
-        User user = new User();
-        user.setDisplayName("UserTestUser");
-        user.setEmail("testuser@evil.incoperated");
-        user.setUsername("Superusertest93");
-        user.setPassword("thisistest");
-        userRepository.save(user);
+        User user = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
         project.setName("HelloWorld");
@@ -195,6 +186,7 @@ public class ScriptControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/scripts")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -226,7 +218,7 @@ public class ScriptControllerTest {
     @Test
     public void testGettingJobsFromScriptListsAllJobs() throws IOException {
         // Precondition
-        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME);
+        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
         project.setName("testJobListing");
@@ -256,13 +248,14 @@ public class ScriptControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
         // Validation
         ReadContext json = JsonPath.parse(response.body().string());
 
-        Assert.assertEquals(
+        assertEquals(
                 new HashSet<>(json.read("$.items[*].id")),
                 new HashSet<>(Arrays.asList(
                         jobOne.getId().intValue(),
@@ -274,7 +267,7 @@ public class ScriptControllerTest {
     @Test
     public void testRunScriptCreatesNewJobWithLocationHeader() throws IOException {
         // Precondition
-        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME);
+        User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
         project.setName("testRunScriptJob");
@@ -292,11 +285,12 @@ public class ScriptControllerTest {
                 new Request.Builder()
                         .post(RequestBody.create(MediaType.parse("application/octet-stream"), "{\"Hello\": \"World\"}"))
                         .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
         // Validation
-        Assert.assertEquals(
+        assertEquals(
                 response.code(),
                 201
         );
@@ -308,19 +302,19 @@ public class ScriptControllerTest {
         // Pull the id from the location header
         int jobId = Integer.parseInt(location.substring(location.lastIndexOf('/') + 1));
 
-        Assert.assertEquals(
+        assertEquals(
                 (int) json.read("$.id"),
                 jobId
         );
-        Assert.assertEquals(
+        assertEquals(
                 json.read("$.scriptUrl"),
                 "http://localhost:8080/scripts/" + script.getId()
         );
-        Assert.assertEquals(
+        assertEquals(
                 json.read("$.status"),
                 "QUEUED"
         );
-        Assert.assertEquals(
+        assertEquals(
                 json.read("$.argument"),
                 "{\"Hello\": \"World\"}"
         );

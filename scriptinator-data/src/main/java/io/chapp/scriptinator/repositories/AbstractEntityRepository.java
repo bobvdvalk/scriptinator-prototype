@@ -17,8 +17,17 @@ package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.AbstractEntity;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.Repository;
+
+import java.util.Optional;
 
 @NoRepositoryBean
-public interface AbstractEntityRepository<E extends AbstractEntity> extends PagingAndSortingRepository<E, Long> {
+public interface AbstractEntityRepository<E extends AbstractEntity> extends Repository<E, Long> {
+    Optional<E> findOne(long id);
+
+    E save(E entity);
+
+    void deleteAll();
+
+    long count();
 }

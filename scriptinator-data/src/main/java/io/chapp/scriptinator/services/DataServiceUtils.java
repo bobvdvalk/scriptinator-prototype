@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator;
+package io.chapp.scriptinator.services;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-@Configuration
-@ConfigurationProperties
-public class ScriptinatorWebConfiguration {
-    private int defaultPageSize = 20;
-
-    public int getDefaultPageSize() {
-        return defaultPageSize;
+class DataServiceUtils {
+    private DataServiceUtils() {
+        // Util Class
     }
 
-    public void setDefaultPageSize(int defaultPageSize) {
-        this.defaultPageSize = defaultPageSize;
+    static String getPrincipalName() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication auth = context.getAuthentication();
+        return auth.getName();
     }
 }

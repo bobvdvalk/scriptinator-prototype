@@ -17,9 +17,12 @@ package io.chapp.scriptinator.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.utils.ScriptinatorTestCase;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -33,6 +36,8 @@ import static org.testng.Assert.assertEquals;
 @Listeners(ScriptinatorTestCase.class)
 public class RootControllerTest {
     private final OkHttpClient client = new OkHttpClient();
+    @Autowired
+    Headers accessToken;
 
     @Test
     public void testUrlsAreSetCorrectly() throws IOException {
@@ -41,6 +46,7 @@ public class RootControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -54,13 +60,11 @@ public class RootControllerTest {
                 new HashSet<>(Arrays.asList(
                         "jobsUrl",
                         "scriptsUrl",
-                        "usersUrl",
                         "projectsUrl"
                 ))
         );
         assertEquals(urls.get("jobsUrl"), "http://localhost:8080/jobs");
         assertEquals(urls.get("scriptsUrl"), "http://localhost:8080/scripts");
-        assertEquals(urls.get("usersUrl"), "http://localhost:8080/users");
         assertEquals(urls.get("projectsUrl"), "http://localhost:8080/projects");
     }
 
@@ -71,6 +75,7 @@ public class RootControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080")
+                        .headers(accessToken)
                         .header("Host", "custom_host")
                         .build()
         ).execute();
@@ -85,13 +90,11 @@ public class RootControllerTest {
                 new HashSet<>(Arrays.asList(
                         "jobsUrl",
                         "scriptsUrl",
-                        "usersUrl",
                         "projectsUrl"
                 ))
         );
         assertEquals(urls.get("jobsUrl"), "http://custom_host/jobs");
         assertEquals(urls.get("scriptsUrl"), "http://custom_host/scripts");
-        assertEquals(urls.get("usersUrl"), "http://custom_host/users");
         assertEquals(urls.get("projectsUrl"), "http://custom_host/projects");
     }
 }

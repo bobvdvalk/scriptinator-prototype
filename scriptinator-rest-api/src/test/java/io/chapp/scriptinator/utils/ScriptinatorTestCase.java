@@ -13,24 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.controller;
+package io.chapp.scriptinator.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.ScriptinatorRestApi;
+import io.chapp.scriptinator.model.OAuthApp;
 import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.repositories.OAuthAppRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import okhttp3.OkHttpClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.testng.*;
 
 public class ScriptinatorTestCase implements IClassListener, IInvokedMethodListener {
     public static final String DEFAULT_USERNAME = "test_user";
-    public static final String DEFAULT_PASSWORD = "thisispassword";
+    public static final String DEFAULT_CLIENT_ID = "012345678901234567890123456789";
+    private static final String DEFAULT_PASSWORD = "thisispassword";
+    private static final String DEFAULT_CLIENT_SECRET = "012345678901234567890123456789";
+
+    private final OkHttpClient client = new OkHttpClient();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private ApplicationContext context;
 
     @Override
     public void onBeforeClass(ITestClass testClass) {
-        context = SpringApplication.run(ScriptinatorRestApi.class);
+        context = SpringApplication.run(new Class[]{
+                ScriptinatorRestApi.class,
+                OkHTTPClientConfig.class
+        }, new String[]{
+                //"--debug"
+        });
 
         for (Object instance : testClass.getInstances(true)) {
             context.getAutowireCapableBeanFactory().autowireBean(instance);
@@ -44,11 +58,22 @@ public class ScriptinatorTestCase implements IClassListener, IInvokedMethodListe
 
     @Override
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
+        String methodName = method.getTestMethod().getMethodName();
+
+        // Create a new user.
         User user = new User();
-        user.setDisplayName("Test User: " + method.getTestMethod().getMethodName());
+        user.setDisplayName("Test User: " + methodName);
         user.setUsername(DEFAULT_USERNAME);
         user.setPassword(DEFAULT_PASSWORD);
-        context.getBean(UserRepository.class).save(user);
+        user = context.getBean(UserRepository.class).save(user);
+
+        // Create an OAuth app for the user.
+        OAuthApp app = new OAuthApp();
+        app.setName("Test App: " + methodName);
+        app.setClientId(DEFAULT_CLIENT_ID);
+        app.setClientSecret(DEFAULT_CLIENT_SECRET);
+        app.setOwner(user);
+        context.getBean(OAuthAppRepository.class).save(app);
     }
 
     @Override

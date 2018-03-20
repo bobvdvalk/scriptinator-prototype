@@ -101,6 +101,18 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         secret.setValue("9555701a-315b-419f-bffb-7c8ea8168b42");
         secret.setProject(project);
         secretRepository.save(secret);
+
+
+        // This project is called using Script.run
+        Project myFirstProject = new Project();
+        myFirstProject.setName("my-first-project");
+        myFirstProject.setOwner(user);
+        myFirstProject = projectRepository.save(myFirstProject);
+
+        Script script = new Script();
+        script.setName("a-script");
+        script.setProject(myFirstProject);
+        scriptService.create(script);
     }
 
 
@@ -118,9 +130,9 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
 
         await("Wait for test to complete: " + file)
                 .atMost(1, TimeUnit.MINUTES)
-                .until(() -> jobRepository.findOne(jobId).getFinishedTime() != null);
+                .until(() -> jobRepository.findOne(jobId).get().getFinishedTime() != null);
 
-        Job finishedJob = jobRepository.findOne(jobId);
+        Job finishedJob = jobRepository.findOne(jobId).get();
 
         LOGGER.info(
                 "Job {} [{} ms]: {}",

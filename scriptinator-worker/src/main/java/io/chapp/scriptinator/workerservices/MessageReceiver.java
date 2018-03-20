@@ -15,41 +15,22 @@
  */
 package io.chapp.scriptinator.workerservices;
 
-import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.services.JobService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.chapp.scriptinator.repositories.JobRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @Service
 public class MessageReceiver {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
-    private final JobService jobService;
+    private final JobRepository jobRepository;
     private final ScriptExecutor scriptExecutor;
 
-    public MessageReceiver(JobService jobService, ScriptExecutor scriptExecutor) {
-        this.jobService = jobService;
+    public MessageReceiver(JobRepository jobRepository, ScriptExecutor scriptExecutor) {
+        this.jobRepository = jobRepository;
         this.scriptExecutor = scriptExecutor;
     }
 
+
     public void executeJob(long jobId) {
-        Job job = getJob(jobId);
-        if (job == null) {
-            return;
-        }
-
-        scriptExecutor.execute(job);
-    }
-
-    private Job getJob(long jobId) {
-        try {
-            return jobService.get(jobId);
-        } catch (NoSuchElementException e) {
-            // The job no longer exists
-            LOGGER.debug("The job was not found", e);
-            return null;
-        }
+        jobRepository.findOne(jobId)
+                .ifPresent(scriptExecutor::execute);
     }
 }

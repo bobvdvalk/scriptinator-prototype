@@ -17,6 +17,8 @@ package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.User;
 
+import java.util.Optional;
+
 public interface UserRepository extends AbstractEntityRepository<User> {
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

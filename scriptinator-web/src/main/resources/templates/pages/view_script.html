@@ -149,6 +149,13 @@
                             </button>
                         </th:block>
                     </th:block>
+
+                    <th:block th:if="${job.triggeredByScheduleId == null && job.triggeredByJobId == null}">
+                        <button class="ui circular icon button"
+                                data-tooltip="Triggered by the run button">
+                            <i class="play icon"></i>
+                        </button>
+                    </th:block>
                 </td>
 
                 <td class="center">

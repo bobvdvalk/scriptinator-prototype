@@ -17,7 +17,6 @@ package io.chapp.scriptinator.webcontrollers;
 
 public class Tab {
     public static final String ATTRIBUTE = "activeTab";
-    public static final String OVERVIEW = "overview";
     public static final String SCRIPTS = "scripts";
     public static final String SETTINGS = "settings";
     public static final String SCHEDULES = "schedules";

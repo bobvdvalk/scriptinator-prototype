@@ -29,7 +29,7 @@ import javax.script.ScriptEngine;
 @Configuration
 @ConfigurationProperties
 public class WorkerConfiguration {
-    private int workers = Runtime.getRuntime().availableProcessors();
+    private int workers = Runtime.getRuntime().availableProcessors() * 4;
 
     public int getWorkers() {
         return workers;

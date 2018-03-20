@@ -23,13 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.quartz.CronExpression;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRepository> {
@@ -43,35 +43,70 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         CRON_DESCRIPTION_OPTIONS = options;
     }
 
-    /**
-     * Get all enabled schedules that were scheduled to run before now.
-     *
-     * @param now The date to use as now.
-     * @return The runnable schedules.
-     */
-    public List<Schedule> getRunnableSchedules(Date now) {
-        return getRepository().findAllByEnabledIsTrueAndNextRunBefore(now);
+    public Page<Schedule> findAllOwnedByPrincipal(Pageable pageable) {
+        return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
     }
 
-    public Page<Schedule> get(String projectName, PageRequest request) {
-        return getRepository().findAllByProjectName(projectName, request);
+    public Page<Schedule> findAllOwnedBy(String username, Pageable pageable) {
+        return getRepository().findAllByProjectOwnerUsername(username, pageable);
+    }
+
+    public Optional<Schedule> findOwnedBy(String username, long projectId, long id) {
+        return getRepository().findByProjectOwnerUsernameAndProjectIdAndId(username, projectId, id);
+    }
+
+    public Optional<Schedule> findOwnedByPrincipal(long projectId, long id) {
+        return findOwnedBy(DataServiceUtils.getPrincipalName(), projectId, id);
+    }
+
+    public Schedule getOwnedByPrincipal(long projectId, long id) {
+        return findOwnedByPrincipal(projectId, id).orElseThrow(() -> noSuchElement(id));
+    }
+
+    public Optional<Schedule> findOwnedBy(String username, long id) {
+        return getRepository().findByProjectOwnerUsernameAndId(username, id);
+    }
+
+    public Optional<Schedule> findOwnedByPrincipal(long id) {
+        return findOwnedBy(DataServiceUtils.getPrincipalName(), id);
+    }
+
+    public Schedule getOwnedByPrincipal(long id) {
+        return findOwnedByPrincipal(id).orElseThrow(() -> noSuchElement(id));
+    }
+
+    public Page<Schedule> getAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
+        return getRepository().findAllByProjectOwnerUsernameAndProjectName(username, projectName, pageable);
+    }
+
+    public Page<Schedule> getAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
+        return getAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
+    }
+
+    public void deleteIfOwnedBy(String username, long id) {
+        getRepository().deleteAllByProjectOwnerUsernameAndId(username, id);
+    }
+
+    public void deleteIfOwnedByPrincipal(long id) {
+        deleteIfOwnedBy(DataServiceUtils.getPrincipalName(), id);
     }
 
     @Override
     public Schedule create(Schedule entity) {
         setNextRun(entity);
-        entity.setCronString(sanitizeCronString(entity.getCronString()));
         return super.create(entity);
     }
 
     @Override
     public Schedule update(Schedule entity) {
         setNextRun(entity);
-        entity.setCronString(sanitizeCronString(entity.getCronString()));
         return super.update(entity);
     }
 
     private void setNextRun(Schedule schedule) {
+        // The cron string needs to be sanitized for the expression parser.
+        schedule.setCronString(sanitizeCronString(schedule.getCronString()));
+
         // Try to parse the cron expression.
         // Format documentation: http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html
         try {

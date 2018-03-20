@@ -19,10 +19,16 @@ import io.chapp.scriptinator.model.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface ProjectRepository extends AbstractEntityRepository<Project> {
-    Optional<Project> findOneByName(String name);
-
     Page<Project> findAllByOwnerUsername(String username, Pageable pageable);
+
+    Optional<Project> findOneByOwnerUsernameAndId(String username, long id);
+
+    Optional<Project> findOneByOwnerUsernameAndName(String username, String name);
+
+    @Transactional
+    void deleteAllByOwnerUsernameAndId(String username, long id);
 }

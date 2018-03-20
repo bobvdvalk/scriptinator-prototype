@@ -27,10 +27,10 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("explain")
-public class ExplainController {
+public class ExplainWebController {
     private final ScheduleService scheduleService;
 
-    public ExplainController(ScheduleService scheduleService) {
+    public ExplainWebController(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
 

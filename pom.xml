@@ -52,7 +52,7 @@
     <name>Scriptinator</name>
     <description>An open easy-to-use and easy-to-scale serverless scripting platform</description>
     <inceptionYear>2018</inceptionYear>
-    <url>https://github.com/ChappIO/scriptinator</url>
+    <url>https://github.com/ScriptinatorIO/scriptinator</url>
 
     <organization>
         <name>Scriptinator</name>
@@ -60,14 +60,14 @@
     </organization>
 
     <scm>
-        <connection>scm:git:git://github.com/ChappIO/scriptinator.git</connection>
-        <developerConnection>scm:git:ssh://github.com:ChappIO/scriptinator.git</developerConnection>
-        <url>http://github.com/ChappIO/scriptinator/tree/master</url>
+        <connection>scm:git:git://github.com/ScriptinatorIO/scriptinator.git</connection>
+        <developerConnection>scm:git:ssh://github.com:ScriptinatorIO/scriptinator.git</developerConnection>
+        <url>http://github.com/ScriptinatorIO/scriptinator/tree/master</url>
     </scm>
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/ChappIO/scriptinator/issues</url>
+        <url>https://github.com/ScriptinatorIO/scriptinator/issues</url>
     </issueManagement>
 
     <licenses>
@@ -105,6 +105,7 @@
         <okhttp.version>3.9.1</okhttp.version>
         <apache-commons-lang.version>3.7</apache-commons-lang.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
+        <thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
         <quartz.version>2.3.0</quartz.version>
         <cron-parser.version>3.4</cron-parser.version>
 
@@ -189,6 +190,11 @@
                 <groupId>net.redhogs.cronparser</groupId>
                 <artifactId>cron-parser-core</artifactId>
                 <version>${cron-parser.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${spring-security.version}</version>
             </dependency>
 
             <!-- Test Dependencies -->

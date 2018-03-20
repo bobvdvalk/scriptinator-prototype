@@ -19,11 +19,22 @@ import io.chapp.scriptinator.model.Schedule;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository extends AbstractEntityRepository<Schedule> {
     List<Schedule> findAllByEnabledIsTrueAndNextRunBefore(Date date);
 
-    Page<Schedule> findAllByProjectName(String projectName, Pageable pageable);
+    Optional<Schedule> findByProjectOwnerUsernameAndProjectIdAndId(String username, long projectId, long id);
+
+    Optional<Schedule> findByProjectOwnerUsernameAndId(String username, long id);
+
+    Page<Schedule> findAllByProjectOwnerUsernameAndProjectName(String username, String projectName, Pageable pageable);
+
+    Page<Schedule> findAllByProjectOwnerUsername(String username, Pageable pageable);
+
+    @Transactional
+    void deleteAllByProjectOwnerUsernameAndId(String username, long id);
 }

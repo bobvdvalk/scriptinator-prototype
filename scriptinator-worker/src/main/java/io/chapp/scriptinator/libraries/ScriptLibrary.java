@@ -27,6 +27,7 @@ import io.chapp.scriptinator.services.ScriptService;
 import io.chapp.scriptinator.services.SecretService;
 import jdk.nashorn.internal.objects.NativeJSON;
 import jdk.nashorn.internal.runtime.JSONFunctions;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -105,18 +106,35 @@ public class ScriptLibrary {
         return argToString(value);
     }
 
-    public Long run(String fullName) {
-        return run(fullName, null);
+    public void run(String fullName) {
+        run(fullName, null);
     }
 
-    public Long run(String fullName, Object argument) {
-        // Get the script.
-        Script script = scriptService.getByFullName(fullName, job.getScript().getProject().getName());
-        if (script == null) {
-            return null;
+    public void run(String fullName, Object argument) {
+        String[] nameParts = StringUtils.split(fullName, '/');
+        String projectName = job.getScript().getProject().getName();
+        String scriptName = "";
+
+        switch (nameParts.length) {
+            case 1:
+                scriptName = nameParts[0];
+                break;
+            case 2:
+                projectName = nameParts[0];
+                scriptName = nameParts[1];
+                break;
+            default:
+                throw new IllegalArgumentException("It seems like '" + fullName + "' is not a valid script name.");
         }
 
-        return scriptService.run(script, job, argToString(argument)).getId();
+        // Get the script.
+        Script script = scriptService.getOwnedBy(
+                job.getScript().getProject().getOwner().getUsername(),
+                projectName,
+                scriptName
+        );
+
+        scriptService.run(script, job, argToString(argument));
     }
 
     private String argToString(Object argument) {

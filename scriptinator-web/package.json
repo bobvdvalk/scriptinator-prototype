@@ -2,7 +2,7 @@
   "name": "scriptinator",
   "version": "1.0.0",
   "description": "npm dependencies for scriptinator",
-  "repository": "ChappIO/scriptinator",
+  "repository": "ScriptinatorIO/scriptinator",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

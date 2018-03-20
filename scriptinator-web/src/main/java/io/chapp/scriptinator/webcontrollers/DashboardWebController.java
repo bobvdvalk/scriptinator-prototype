@@ -23,11 +23,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class DashboardController {
+public class DashboardWebController {
     public static final int PROJECT_EXCERPT_COUNT = 5;
     private final ProjectService projectService;
 
-    public DashboardController(ProjectService projectService) {
+    public DashboardWebController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
@@ -38,7 +38,7 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        model.addAttribute(Project.LIST_ATTRIBUTE, projectService.get(new PageRequest(
+        model.addAttribute(Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(new PageRequest(
                 0,
                 PROJECT_EXCERPT_COUNT
         )));

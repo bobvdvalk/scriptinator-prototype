@@ -18,11 +18,8 @@ package io.chapp.scriptinator.services;
 import io.chapp.scriptinator.model.AbstractEntity;
 import io.chapp.scriptinator.repositories.AbstractEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * A base class for all entity service classes.
@@ -32,47 +29,6 @@ import java.util.Optional;
  */
 public class AbstractEntityService<E extends AbstractEntity, R extends AbstractEntityRepository<E>> {
     private R repository;
-
-    /**
-     * Get an entity by id from this repository.
-     *
-     * @param id the id
-     * @return the entity
-     * @throws NoSuchElementException if the entity was not found
-     */
-    public E get(long id) {
-        E entity = repository.findOne(id);
-        if (entity == null) {
-            throw noSuchElement(id);
-        }
-        return entity;
-    }
-
-    protected NoSuchElementException noSuchElement(String name) {
-        return new NoSuchElementException("We could not find a " + getEntityName() + " with name: " + name);
-    }
-
-    protected NoSuchElementException noSuchElement(long id) {
-        return new NoSuchElementException("We could not find a " + getEntityName() + " with id: " + id);
-    }
-
-    private String getEntityName() {
-        String name = getClass().getSimpleName();
-        if (name.endsWith("Service")) {
-            name = name.substring(0, name.length() - "Service".length());
-        }
-        return name.toLowerCase();
-    }
-
-    /**
-     * Get all entities in a paginated set.
-     *
-     * @param pageRequest the paging settings
-     * @return the page
-     */
-    public Page<E> get(PageRequest pageRequest) {
-        return repository.findAll(pageRequest);
-    }
 
     /**
      * Create a new entity.
@@ -99,23 +55,20 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
         return repository.save(entity);
     }
 
-    /**
-     * Delete an entity.
-     *
-     * @param id the id of the entity to delete
-     */
-    public void delete(long id) {
-        repository.delete(id);
+    protected NoSuchElementException noSuchElement(String name) {
+        return new NoSuchElementException("We could not find a " + getEntityName() + " with name: " + name);
     }
 
-    /**
-     * Find an entity.
-     *
-     * @param id the id
-     * @return an optional containing the entity
-     */
-    public Optional<E> findOne(long id) {
-        return Optional.ofNullable(repository.findOne(id));
+    protected NoSuchElementException noSuchElement(long id) {
+        return new NoSuchElementException("We could not find a " + getEntityName() + " with id: " + id);
+    }
+
+    private String getEntityName() {
+        String name = getClass().getSimpleName();
+        if (name.endsWith("Service")) {
+            name = name.substring(0, name.length() - "Service".length());
+        }
+        return name.toLowerCase();
     }
 
     protected R getRepository() {

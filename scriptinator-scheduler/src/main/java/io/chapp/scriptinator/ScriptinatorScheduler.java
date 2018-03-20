@@ -23,6 +23,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class ScriptinatorScheduler {
     public static void main(String[] args) {
-        SpringApplication.run(ScriptinatorScheduler.class);
+        SpringApplication.run(ScriptinatorScheduler.class, args);
     }
 }

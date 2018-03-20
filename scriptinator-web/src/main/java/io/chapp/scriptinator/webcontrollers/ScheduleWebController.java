@@ -28,22 +28,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/project/{projectId}/schedule")
-public class ScheduleController {
+public class ScheduleWebController {
     private static final String EDIT_SCHEDULE_PAGE = "pages/edit_schedule";
 
     private final ProjectService projectService;
     private final ScheduleService scheduleService;
-    private final ProjectController projectController;
+    private final ProjectWebController projectWebController;
     private final ScriptService scriptService;
 
-    public ScheduleController(ProjectService projectService, ScheduleService scheduleService, ProjectController projectController, ScriptService scriptService) {
+    public ScheduleWebController(ProjectService projectService, ScheduleService scheduleService, ProjectWebController projectWebController, ScriptService scriptService) {
         this.projectService = projectService;
         this.scheduleService = scheduleService;
-        this.projectController = projectController;
+        this.projectWebController = projectWebController;
         this.scriptService = scriptService;
     }
 
@@ -68,12 +67,12 @@ public class ScheduleController {
 
     @GetMapping("{scheduleId}")
     public String showEditScheduleForm(@PathVariable long projectId, @PathVariable long scheduleId, Model model) {
-        return showEditSchedule(projectId, getSafeSchedule(projectId, scheduleId), model);
+        return showEditSchedule(projectId, scheduleService.getOwnedByPrincipal(projectId, scheduleId), model);
     }
 
     @PostMapping("{scheduleId}")
     public String updateSchedule(@PathVariable long projectId, @PathVariable long scheduleId, @ModelAttribute("schedule") Schedule schedule, Model model) {
-        Schedule oldSchedule = getSafeSchedule(projectId, scheduleId);
+        Schedule oldSchedule = scheduleService.getOwnedByPrincipal(projectId, scheduleId);
         schedule.setId(scheduleId);
         schedule.setLastRun(oldSchedule.getLastRun()); // Remember the last run.
         return saveSchedule(projectId, schedule, model);
@@ -81,13 +80,13 @@ public class ScheduleController {
 
     @DeleteMapping("{scheduleId}")
     public String deleteSchedule(@PathVariable long projectId, @PathVariable long scheduleId, Model model) {
-        scheduleService.delete(getSafeSchedule(projectId, scheduleId).getId());
-        return projectController.viewSchedules(projectId, model);
+        scheduleService.deleteIfOwnedByPrincipal(scheduleService.getOwnedByPrincipal(projectId, scheduleId).getId());
+        return projectWebController.viewSchedules(projectId, model);
     }
 
 
     private String showEditSchedule(long projectId, Schedule schedule, Model model) {
-        Project project = projectService.get(projectId);
+        Project project = projectService.getOwnedByPrincipal(projectId);
         model.addAttribute(Project.ATTRIBUTE, project);
         model.addAttribute(Schedule.ATTRIBUTE, schedule);
         model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
@@ -96,13 +95,13 @@ public class ScheduleController {
     }
 
     private String saveSchedule(long projectId, Schedule schedule, Model model) {
-        Project project = projectService.get(projectId);
+        Project project = projectService.getOwnedByPrincipal(projectId);
         model.addAttribute(Project.ATTRIBUTE, project);
         model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
         schedule.setProject(project);
 
         // Check if the script exists.
-        if (scriptService.getByFullName(schedule.getScriptName(), schedule.getProject().getName()) == null) {
+        if (scriptService.getOwnedByPrincipal(schedule.getProject().getName(), schedule.getScriptName()) == null) {
             return saveError(schedule, model, "scriptName", "The referenced script could not be found.");
         }
 
@@ -115,7 +114,7 @@ public class ScheduleController {
             // Create or update the schedule.
             schedule = schedule.getId() == null ? scheduleService.create(schedule) : scheduleService.update(schedule);
         } catch (DataIntegrityViolationException e) {
-            ProjectController.addDbErrorsToModel(e, model, project, "schedule_name", Schedule.ATTRIBUTE);
+            ProjectWebController.addDbErrorsToModel(e, model, project, "schedule_name", Schedule.ATTRIBUTE);
             model.addAttribute(Schedule.ATTRIBUTE, schedule);
             return EDIT_SCHEDULE_PAGE;
         }
@@ -132,13 +131,5 @@ public class ScheduleController {
 
         model.addAttribute(Schedule.ATTRIBUTE, schedule);
         return EDIT_SCHEDULE_PAGE;
-    }
-
-    private Schedule getSafeSchedule(long projectId, long scheduleId) {
-        Schedule schedule = scheduleService.get(scheduleId);
-        if (!schedule.getProject().getId().equals(projectId)) {
-            throw new NoSuchElementException();
-        }
-        return schedule;
     }
 }

@@ -86,5 +86,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         public boolean isEnabled() {
             return true;
         }
+
+        public String getDisplayName() {
+            return user.getDisplayName();
+        }
+
+        public String getAvatarUrl() {
+            return user.getAvatarUrl();
+        }
     }
 }

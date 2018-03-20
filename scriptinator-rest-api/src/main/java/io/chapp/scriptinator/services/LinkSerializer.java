@@ -50,7 +50,7 @@ public class LinkSerializer extends StdSerializer<Link> {
                 entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())
         ).collect(Collectors.toList());
 
-        if(!parameters.isEmpty()) {
+        if (!parameters.isEmpty()) {
             resourceUrl.setParameters(parameters);
         }
 

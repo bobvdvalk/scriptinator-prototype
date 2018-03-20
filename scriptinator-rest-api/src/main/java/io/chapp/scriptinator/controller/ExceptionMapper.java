@@ -19,39 +19,25 @@ import io.chapp.scriptinator.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class ExceptionMapper {
-    private static final Map<Class, HttpStatus> HTTP_STATUS_MAP;
 
-    static {
-        Map<Class, HttpStatus> map = new HashMap<>();
-        HTTP_STATUS_MAP = Collections.unmodifiableMap(map);
-
-        map.put(NoSuchElementException.class, HttpStatus.NOT_FOUND);
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(NoSuchElementException e, HttpServletRequest request, HttpServletResponse response) {
+        return handle(e, request, response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
-    public ErrorResponse handle(Exception e, HttpServletRequest request) {
-        Class checkErrorClass = e.getClass();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-
-        // Scan for super classes as well
-        while (checkErrorClass != null) {
-            HttpStatus mappedStatus = HTTP_STATUS_MAP.get(checkErrorClass);
-            if (mappedStatus != null) {
-                status = mappedStatus;
-                break;
-            }
-            checkErrorClass = checkErrorClass.getSuperclass();
-        }
-
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(Exception e, HttpServletRequest request, HttpServletResponse response, HttpStatus status) {
+        response.setStatus(status.value());
         return handle(
                 e,
                 request,

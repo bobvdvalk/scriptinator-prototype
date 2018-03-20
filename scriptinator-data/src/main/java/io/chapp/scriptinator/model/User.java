@@ -51,6 +51,12 @@ public class User extends AbstractEntity {
     @JsonIgnore
     private List<Project> projects = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    @NotNull
+    @JsonIgnore
+    private List<OAuthApp> apps = new ArrayList<>();
+
+
     public String getUsername() {
         return username;
     }
@@ -109,7 +115,15 @@ public class User extends AbstractEntity {
     }
 
     public Link getProjectsUrl() {
-        return new Link("/users/" + username + "/projects");
+        return new Link(getUrl().getHref() + "/projects");
+    }
+
+    public List<OAuthApp> getApps() {
+        return apps;
+    }
+
+    public void setApps(List<OAuthApp> apps) {
+        this.apps = apps;
     }
 
     @Override

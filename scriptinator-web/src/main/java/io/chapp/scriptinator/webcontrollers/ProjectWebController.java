@@ -28,117 +28,20 @@ import static java.util.Collections.singletonMap;
 
 @Controller
 @RequestMapping("/project")
-public class ProjectController {
+public class ProjectWebController {
     private final ProjectService projectService;
     private final ObjectFactory<User> currentUserFactory;
-    private final ProjectsController projectsController;
+    private final ProjectsWebController projectsWebController;
 
-    public ProjectController(ProjectService projectService, ObjectFactory<User> currentUserFactory, ProjectsController projectsController) {
+    public ProjectWebController(ProjectService projectService, ObjectFactory<User> currentUserFactory, ProjectsWebController projectsWebController) {
         this.projectService = projectService;
         this.currentUserFactory = currentUserFactory;
-        this.projectsController = projectsController;
+        this.projectsWebController = projectsWebController;
     }
 
     /*===== New project =====*/
 
-    @GetMapping
-    public String showCreateProjectForm(Model model) {
-        if (!model.containsAttribute(Project.ATTRIBUTE)) {
-            model.addAttribute(Project.ATTRIBUTE, new Project());
-        }
-        return "pages/new_project";
-    }
-
-    @PostMapping
-    public String createNewProject(@ModelAttribute(Project.ATTRIBUTE) Project project, Model model) {
-        project.setOwner(currentUserFactory.getObject());
-
-        try {
-            project = projectService.create(project);
-        } catch (DataIntegrityViolationException e) {
-            addDbErrorsToModel(e, model, project, "project_name", Project.ATTRIBUTE);
-            return showCreateProjectForm(model);
-        }
-
-        return "redirect:/project/" + project.getId();
-    }
-
-    /*===== View project =====*/
-
-    @GetMapping("{projectId}")
-    public String viewOverview(@PathVariable long projectId) {
-        return "redirect:/project/" + projectId + "/scripts";
-    }
-
-    @GetMapping("{projectId}/scripts")
-    public String viewScripts(@PathVariable long projectId, Model model) {
-        Project project = projectService.get(projectId);
-        model.addAttribute(Project.ATTRIBUTE, project);
-        model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SCRIPTS);
-
-        model.addAttribute("scriptCount", project.getScripts().size());
-        return "pages/view_scripts";
-    }
-
-    @GetMapping("{projectId}/schedules")
-    public String viewSchedules(@PathVariable long projectId, Model model) {
-        Project project = projectService.get(projectId);
-        model.addAttribute(Project.ATTRIBUTE, project);
-        model.addAttribute(Schedule.LIST_ATTRIBUTE, project.getSchedules());
-
-        model.addAttribute("scheduleCount", project.getSchedules().size());
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SCHEDULES);
-        return "pages/view_schedules";
-    }
-
-    @GetMapping("{projectId}/secrets")
-    public String viewSecrets(@PathVariable long projectId, Model model) {
-        Project project = projectService.get(projectId);
-        model.addAttribute(Project.ATTRIBUTE, project);
-        model.addAttribute(Secret.LIST_ATTRIBUTE, project.getSecrets());
-
-        model.addAttribute("secretCount", project.getSecrets().size());
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SECRETS);
-        return "pages/view_secrets";
-    }
-
-    /*===== Project settings =====*/
-
-    @GetMapping("{projectId}/settings")
-    public String editProject(@PathVariable long projectId, Model model) {
-        if (!model.containsAttribute(Project.ATTRIBUTE)) {
-            model.addAttribute(Project.ATTRIBUTE, projectService.get(projectId));
-        }
-        model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
-        return "pages/edit_project";
-    }
-
-    @PostMapping("{projectId}/settings")
-    public String updateProject(@PathVariable long projectId, @ModelAttribute(Project.ATTRIBUTE) Project projectChanges, Model model) {
-        // Update the current project with the project changes.
-        Project currentProject = projectService.get(projectId);
-        currentProject.setName(projectChanges.getName());
-        currentProject.setDescription(projectChanges.getDescription());
-
-        try {
-            projectService.update(currentProject);
-        } catch (DataIntegrityViolationException e) {
-            addDbErrorsToModel(e, model, currentProject, "project_name", Project.ATTRIBUTE);
-            return editProject(currentProject.getId(), model);
-        }
-
-        return viewScripts(projectId, model);
-    }
-
-    @DeleteMapping("{projectId}")
-    public String deleteProject(@PathVariable long projectId, Model model) {
-        projectService.delete(projectId);
-        return projectsController.projectList(model);
-    }
-
-
-    public static void addDbErrorsToModel(DataIntegrityViolationException e, Model model, Project project, String constraintName, String entityType) {
+    static void addDbErrorsToModel(DataIntegrityViolationException e, Model model, Project project, String constraintName, String entityType) {
         if (!model.containsAttribute(Project.ATTRIBUTE)) {
             model.addAttribute(Project.ATTRIBUTE, project);
         }
@@ -154,5 +57,101 @@ public class ProjectController {
                     )
             );
         }
+    }
+
+    @GetMapping
+    public String showCreateProjectForm(Model model) {
+        if (!model.containsAttribute(Project.ATTRIBUTE)) {
+            model.addAttribute(Project.ATTRIBUTE, new Project());
+        }
+        return "pages/new_project";
+    }
+
+    /*===== View project =====*/
+
+    @PostMapping
+    public String createNewProject(@ModelAttribute(Project.ATTRIBUTE) Project project, Model model) {
+        project.setOwner(currentUserFactory.getObject());
+
+        try {
+            project = projectService.create(project);
+        } catch (DataIntegrityViolationException e) {
+            addDbErrorsToModel(e, model, project, "project_name", Project.ATTRIBUTE);
+            return showCreateProjectForm(model);
+        }
+
+        return "redirect:/project/" + project.getId();
+    }
+
+    @GetMapping("{projectId}")
+    public String viewOverview(@PathVariable long projectId) {
+        return "redirect:/project/" + projectId + "/scripts";
+    }
+
+    @GetMapping("{projectId}/scripts")
+    public String viewScripts(@PathVariable long projectId, Model model) {
+        Project project = projectService.getOwnedByPrincipal(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SCRIPTS);
+
+        model.addAttribute("scriptCount", project.getScripts().size());
+        return "pages/view_scripts";
+    }
+
+    @GetMapping("{projectId}/schedules")
+    public String viewSchedules(@PathVariable long projectId, Model model) {
+        Project project = projectService.getOwnedByPrincipal(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Schedule.LIST_ATTRIBUTE, project.getSchedules());
+
+        model.addAttribute("scheduleCount", project.getSchedules().size());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SCHEDULES);
+        return "pages/view_schedules";
+    }
+
+    /*===== Project settings =====*/
+
+    @GetMapping("{projectId}/secrets")
+    public String viewSecrets(@PathVariable long projectId, Model model) {
+        Project project = projectService.getOwnedByPrincipal(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Secret.LIST_ATTRIBUTE, project.getSecrets());
+
+        model.addAttribute("secretCount", project.getSecrets().size());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SECRETS);
+        return "pages/view_secrets";
+    }
+
+    @GetMapping("{projectId}/settings")
+    public String editProject(@PathVariable long projectId, Model model) {
+        if (!model.containsAttribute(Project.ATTRIBUTE)) {
+            model.addAttribute(Project.ATTRIBUTE, projectService.getOwnedByPrincipal(projectId));
+        }
+        model.addAttribute(Tab.ATTRIBUTE, Tab.SETTINGS);
+        return "pages/edit_project";
+    }
+
+    @PostMapping("{projectId}/settings")
+    public String updateProject(@PathVariable long projectId, @ModelAttribute(Project.ATTRIBUTE) Project projectChanges, Model model) {
+        // Update the current project with the project changes.
+        Project currentProject = projectService.getOwnedByPrincipal(projectId);
+        currentProject.setName(projectChanges.getName());
+        currentProject.setDescription(projectChanges.getDescription());
+
+        try {
+            projectService.update(currentProject);
+        } catch (DataIntegrityViolationException e) {
+            addDbErrorsToModel(e, model, currentProject, "project_name", Project.ATTRIBUTE);
+            return editProject(currentProject.getId(), model);
+        }
+
+        return viewScripts(projectId, model);
+    }
+
+    @DeleteMapping("{projectId}")
+    public String deleteProject(@PathVariable long projectId, Model model) {
+        projectService.deleteIfOwnedByPrincipal(projectId);
+        return projectsWebController.projectList(model);
     }
 }

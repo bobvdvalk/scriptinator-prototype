@@ -23,6 +23,7 @@ import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,10 +47,11 @@ public class ScriptController {
     }
 
     @GetMapping("")
+    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:read')")
     public PageResult<Script> getScripts(HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts"),
-                scriptService.get(
+                scriptService.getAllOwnedByPrincipal(
                         PageResult.request(request)
                 )
         );
@@ -62,15 +64,17 @@ public class ScriptController {
      * within the project.
      */
     @GetMapping("{scriptId}")
+    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:read')")
     public Script getScriptById(@PathVariable long scriptId) {
-        return scriptService.get(scriptId);
+        return scriptService.getOwnedByPrincipal(scriptId);
     }
 
     @GetMapping("{scriptId}/jobs")
+    @PreAuthorize("#oauth2.hasScope('job:read')")
     public PageResult<Job> getJobs(@PathVariable long scriptId, HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts/" + scriptId + "/jobs"),
-                jobService.get(
+                jobService.getAllForScriptOwnedByPrincipal(
                         scriptId,
                         PageResult.request(request)
                 )
@@ -79,10 +83,11 @@ public class ScriptController {
 
     @PostMapping("{scriptId}/jobs")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:run')")
     public Job runScript(@PathVariable long scriptId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try (InputStream data = request.getInputStream()) {
             Job result = scriptService.run(
-                    scriptService.get(scriptId),
+                    scriptService.getOwnedByPrincipal(scriptId),
                     null,
                     StreamUtils.copyToString(data, Charset.defaultCharset())
             );

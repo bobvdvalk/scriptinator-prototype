@@ -96,9 +96,14 @@ public class ScheduledScriptRunnerIT extends AbstractTestNGSpringContextTests {
         */
         await("Wait until schedule is processed.")
                 .atMost(3, TimeUnit.SECONDS) // Less than 3 seconds resulted in inconsistency as well. *sigh*
-                .until(() -> scheduleRepository.findOne(scheduleId).getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
-        Page<Job> jobs = jobRepository.findByScriptId(script.getId(), new PageRequest(0, 1));
+        Page<Job> jobs = jobRepository.findAllByScriptProjectOwnerUsernameAndScriptId(
+                project.getOwner().getUsername(),
+                script.getId(),
+                new PageRequest(0, 1)
+        );
+
         for (Job job : jobs) {
             assertEquals((long) job.getTriggeredByScheduleId(), scheduleId);
             assertEquals(job.getArgument(), "true");
@@ -111,9 +116,9 @@ public class ScheduledScriptRunnerIT extends AbstractTestNGSpringContextTests {
 
         await("Wait until schedule is processed.")
                 .atMost(2, TimeUnit.SECONDS)
-                .until(() -> scheduleRepository.findOne(scheduleId).getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
-        Schedule schedule = scheduleRepository.findOne(scheduleId);
+        Schedule schedule = scheduleRepository.findOne(scheduleId).get();
         assertFalse(schedule.isEnabled());
         assertEquals(schedule.getStatus(), Schedule.Status.INVALID_SCRIPT);
     }
@@ -124,9 +129,9 @@ public class ScheduledScriptRunnerIT extends AbstractTestNGSpringContextTests {
 
         await("Wait until schedule is processed.")
                 .atMost(2, TimeUnit.SECONDS)
-                .until(() -> scheduleRepository.findOne(scheduleId).getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
-        Schedule schedule = scheduleRepository.findOne(scheduleId);
+        Schedule schedule = scheduleRepository.findOne(scheduleId).get();
         assertFalse(schedule.isEnabled());
         assertEquals(schedule.getStatus(), Schedule.Status.INVALID_CRON);
     }

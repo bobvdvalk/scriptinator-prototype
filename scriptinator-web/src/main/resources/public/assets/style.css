@@ -52,6 +52,10 @@ tr td.clickable:hover, tr.clickable:hover td {
     font-weight: bold;
 }
 
+.ui.item.indent {
+    margin-left: 20px;
+}
+
 /* LOGIN PAGE */
 #login {
     height: 100%;

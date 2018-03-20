@@ -15,12 +15,14 @@
  */
 package io.chapp.scriptinator;
 
+import io.chapp.scriptinator.model.OAuthApp;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.services.OAuthAppService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -31,12 +33,14 @@ public class LoadDefaultContent implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final ScriptRepository scriptRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OAuthAppService appService;
 
-    public LoadDefaultContent(UserRepository userRepository, ProjectRepository projectRepository, ScriptRepository scriptRepository, PasswordEncoder passwordEncoder) {
+    public LoadDefaultContent(UserRepository userRepository, ProjectRepository projectRepository, ScriptRepository scriptRepository, PasswordEncoder passwordEncoder, OAuthAppService appService) {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.scriptRepository = scriptRepository;
         this.passwordEncoder = passwordEncoder;
+        this.appService = appService;
     }
 
     @Override
@@ -61,6 +65,12 @@ public class LoadDefaultContent implements CommandLineRunner {
             script.setDescription("Hello World");
             script.setName("greet");
             scriptRepository.save(script);
+
+            OAuthApp app = new OAuthApp();
+            app.setName("Example App");
+            app.setOwner(defaultUser);
+            app.setDescription("An example OAuth application");
+            appService.create(app);
         }
     }
 }

@@ -24,6 +24,8 @@ import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScheduleRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.utils.ScriptinatorTestCase;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -38,6 +40,8 @@ import static org.testng.Assert.assertEquals;
 @Listeners(ScriptinatorTestCase.class)
 public class ScheduleControllerTest {
     private final OkHttpClient client = new OkHttpClient();
+    @Autowired
+    Headers accessToken;
 
     @Autowired
     UserRepository userRepository;
@@ -52,7 +56,7 @@ public class ScheduleControllerTest {
     public void testGetScheduleByIdReturnsValidInformation() throws IOException {
         // Precondition
         Project project = new Project();
-        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME));
+        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get());
         project.setName("aSuperScheduledProject");
         project = projectRepository.save(project);
 
@@ -73,6 +77,7 @@ public class ScheduleControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/schedules/" + schedule.getId())
+                        .headers(accessToken)
                         .build()
         ).execute();
 

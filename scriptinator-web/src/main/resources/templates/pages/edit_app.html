@@ -1,0 +1,266 @@
+<!--
+
+    Copyright © 2018 Scriptinator (support@scriptinator.io)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/page}">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Profile</title>
+</head>
+<body>
+
+<h1 layout:fragment="title"></h1>
+
+<div layout:fragment="content">
+    <div class="ui grid">
+        <div class="four wide column">
+            <div th:replace="fragments/navigation :: settings"></div>
+        </div>
+
+        <div class="twelve wide column">
+            <div class="ui segment">
+                <h2 class="ui header" th:text="${oauthApp.name}"></h2>
+                <div class="ui green segment">
+                    <h3 class="ui header">App Settings</h3>
+
+                    <form th:action="''"
+                          th:method="post"
+                          th:object="${oauthApp}"
+                          class="ui form">
+
+                        <div class="ui grid">
+                            <div class="row">
+                                <div class="six wide column">
+                                    <div class="field"
+                                         th:classappend="${errors?.get('name') == null ? '' : 'error'}">
+                                        <label>Name</label>
+                                        <input type="text"
+                                               name="name"
+                                               th:field="*{name}"
+                                               placeholder="My App">
+                                    </div>
+                                </div>
+                                <div class="ten wide column">
+                                    <div class="field">
+                                        <label>Description</label>
+                                        <input type="text"
+                                               name="description"
+                                               th:field="*{description}"
+                                               placeholder="Description...">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="six wide column field">
+                                    <label>Client Id</label>
+                                    <div class="ui action input">
+                                        <input id="client-id"
+                                               type="text"
+                                               readonly="readonly"
+                                               th:field="*{clientId}"
+                                               placeholder="clientId">
+                                        <button type="button" class="ui icon button" onclick="copyClientId()">
+                                            <i class="copy icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="ten wide column field">
+                                    <label>Client Secret</label>
+                                    <div class="ui action input">
+                                        <input id="client-secret"
+                                               type="text"
+                                               readonly="readonly"
+                                               th:field="*{clientSecret}"
+                                               placeholder="Seeeeeeecretsss...">
+                                        <button type="button" class="ui icon button" onclick="copyClientSecret()">
+                                            <i class="copy icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="twelve wide column field">
+                                    <label>Scopes</label>
+                                    <div class="ui list">
+                                        <th:block th:each="scope: ${allScopes}">
+                                            <div class="item field ui checkbox"
+                                                 th:classappend="${scope.contains(':') ? 'indent' : ''}">
+                                                <input th:id="${'scope-' + scope}"
+                                                       th:name="${'scope-' + scope}"
+                                                       class="scope-checkbox"
+                                                       type="checkbox"
+                                                       th:field="*{scopes}"
+                                                       th:value="|${scope}|">
+                                                <label th:for="${'scope-' + scope}" th:text="${scope}"></label>
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ui grid">
+                            <div class="twelve wide column">
+                                <div class="ui error message" th:classappend="${errors != null ? 'visible': ''}">
+                                    <ul class="list" th:if="${errors != null}">
+                                        <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="four wide column">
+                                <div class="ui right floated buttons">
+                                    <a class="ui button" th:href="@{/user/apps}">
+                                        Cancel
+                                    </a>
+                                    <button class="ui primary right floated button">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="ui red segment">
+                    <h3>Danger Zone</h3>
+                    <button class="ui button red" onclick="promptDeleteApp()">
+                        Delete this app
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="ui basic modal">
+        <div class="ui icon header">
+            <i class="delete icon"></i>
+            Delete app: <span th:text="${oauthApp.name}"></span>?
+        </div>
+        <div class="content">
+            <p>Should you decide to delete this app, we will not be able to recover it for you.</p>
+        </div>
+        <div class="actions">
+            <button class="ui grey cancel button">
+                <i class="remove icon"></i>
+                Cancel
+            </button>
+            <button onclick="deleteApp()" class="ui red ok button">
+                <i class="checkmark icon"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    $(document).ready(function () {
+        // Hook into scope checkbox changes.
+        $('.scope-checkbox').change(updateCheckboxes);
+    });
+
+    function updateCheckboxes() {
+        var box = this;
+        var scope = box.id;
+        var parentScope = scope.substr(0, scope.indexOf(':'));
+
+        if (scope.indexOf(':') === -1) {
+            // If a parent scope is changed, update all child scopes accordingly.
+            $('.scope-checkbox').each(function (i, check) {
+                if (check.id.indexOf(scope) === 0) {
+                    $(check).prop('checked', box.checked);
+                }
+            });
+        } else if (!box.checked) {
+            // If a child scope is unchecked, uncheck the parent scope.
+            $('#' + parentScope).each(function (i, parent) {
+                $(parent).prop('checked', false);
+            })
+        } else {
+            // Check if all child scopes are checked.
+            var allChecked = true;
+            $('.scope-checkbox').each(function (i, check) {
+                if (check.id.indexOf(parentScope) === 0 && check.id !== parentScope && !check.checked) {
+                    allChecked = false;
+                }
+            });
+
+            // If so, check the parent scope.
+            if (allChecked) {
+                $('#' + parentScope).each(function (i, parent) {
+                    $(parent).prop('checked', true);
+                })
+            }
+        }
+    }
+
+    function copyClientId() {
+        $('#client-id').select();
+        document.execCommand('copy');
+    }
+
+    function copyClientSecret() {
+        $('#client-secret').select();
+        document.execCommand('copy');
+    }
+
+    function promptDeleteApp() {
+        $('.ui.basic.modal').modal('show');
+    }
+
+    function deleteApp() {
+        var token = $('#_csrf').attr('content');
+        var header = $('#_csrf_header').attr('content');
+
+        $.ajax({
+            type: 'DELETE',
+            url: '',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function () {
+                window.location = '/user/apps';
+            }
+        });
+    }
+
+    // Enable form validation
+    $('.ui.form').form({
+        fields: {
+            name: {
+                identifier: 'name',
+                rules: [
+                    {
+                        type: 'empty',
+                        prompt: 'What would you like to call this app?'
+                    },
+                    {
+                        type: 'maxLength[80]',
+                        prompt: 'The app name can\'t be longer than 80 characters.'
+                    }
+                ]
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

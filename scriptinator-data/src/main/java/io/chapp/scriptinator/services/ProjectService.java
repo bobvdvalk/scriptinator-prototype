@@ -18,22 +18,57 @@ package io.chapp.scriptinator.services;
 import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class ProjectService extends AbstractEntityService<Project, ProjectRepository> {
-    public Optional<Project> find(String name) {
-        return getRepository().findOneByName(name);
+    public Project getOwnedBy(String username, long id) {
+        return getRepository().findOneByOwnerUsernameAndId(
+                username,
+                id
+        )
+                .orElseThrow(() -> noSuchElement(id));
     }
 
-    public Project get(String projectName) {
-        return this.find(projectName).orElseThrow(() -> noSuchElement(projectName));
+    public Project getOwnedByPrincipal(long id) {
+        return getOwnedBy(
+                DataServiceUtils.getPrincipalName(),
+                id
+        );
     }
 
-    public Page<Project> get(String username, PageRequest pageRequest) {
-        return getRepository().findAllByOwnerUsername(username, pageRequest);
+    public Project getOwnedBy(String username, String name) {
+        return getRepository().findOneByOwnerUsernameAndName(
+                username,
+                name
+        )
+                .orElseThrow(() -> noSuchElement(name));
     }
+
+    public Project getOwnedByPrincipal(String name) {
+        return getOwnedBy(
+                DataServiceUtils.getPrincipalName(),
+                name
+        );
+    }
+
+
+    public void deleteIfOwnedBy(String username, long id) {
+        getRepository().deleteAllByOwnerUsernameAndId(username, id);
+    }
+
+    public Page<Project> findAllOwnedBy(String username, Pageable pageable) {
+        return getRepository().findAllByOwnerUsername(username, pageable);
+    }
+
+    public Page<Project> findAllOwnedByPrincipal(Pageable pageable) {
+        return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
+    }
+
+    public void deleteIfOwnedByPrincipal(long id) {
+        deleteIfOwnedBy(DataServiceUtils.getPrincipalName(), id);
+    }
+
+
 }

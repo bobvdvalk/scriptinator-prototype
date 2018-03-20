@@ -16,6 +16,6 @@
 
 | *script* +
 Type: <<String>>
-2.1+| The full name of the script to run.
-      This can be just the script name, or a script from a different project.
-      In that case, the full name should be formatted like: `project-name/script-name`.
+2.1+| The name of the script.
+      Format: `project-name/script-name`
+      If you leave out `project-name` it defaults to the current script's project.

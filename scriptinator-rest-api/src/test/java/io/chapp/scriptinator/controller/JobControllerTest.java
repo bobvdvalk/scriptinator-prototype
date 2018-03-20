@@ -24,6 +24,8 @@ import io.chapp.scriptinator.repositories.JobRepository;
 import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.utils.ScriptinatorTestCase;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -36,12 +38,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
-import static io.chapp.scriptinator.controller.ScriptinatorTestCase.DEFAULT_USERNAME;
+import static io.chapp.scriptinator.utils.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.Assert.assertEquals;
+
 
 @Listeners(ScriptinatorTestCase.class)
 public class JobControllerTest {
     private final OkHttpClient client = new OkHttpClient();
+    @Autowired
+    Headers accessToken;
 
     @Autowired
     UserRepository userRepository;
@@ -74,6 +79,7 @@ public class JobControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/jobs")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -108,6 +114,7 @@ public class JobControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/jobs/" + job.getId())
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -137,7 +144,7 @@ public class JobControllerTest {
     private Script createTestScript() {
         Project project = new Project();
         project.setName("jobTestProject");
-        project.setOwner(userRepository.findByUsername(DEFAULT_USERNAME));
+        project.setOwner(userRepository.findByUsername(DEFAULT_USERNAME).get());
         project = projectRepository.save(project);
 
         Script script = new Script();

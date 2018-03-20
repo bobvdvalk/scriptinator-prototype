@@ -16,7 +16,7 @@
 
 -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <div th:fragment="navigation" id="navigation" class="ui inverted attached labeled icon menu">
@@ -31,6 +31,33 @@
         Projects
         <i class="book icon"></i>
     </a>
+    <div class="ui fluid container"></div>
+    <a class="item"
+       th:href="@{/user}">
+        <img class="ui avatar image" th:src="${#authentication.principal.avatarUrl}">
+        <span sec:authentication="principal.displayName"></span>
+    </a>
 </div>
+
+<div th:fragment="settings" class="ui fluid vertical menu">
+    <div class="item">
+        <div class="header">Personal Settings</div>
+        <div class="menu">
+            <a class="item">Profile</a>
+            <a class="item">Notifications</a>
+        </div>
+    </div>
+    <div class="item">
+        <div class="header">Developer Settings</div>
+        <div class="menu">
+            <a class="item"
+               th:href="@{/user/apps}"
+               th:classappend="${#httpServletRequest.getRequestURI().startsWith('/user/app') ? 'active':''}">
+                OAuth Applications
+            </a>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

@@ -17,10 +17,16 @@ package io.chapp.scriptinator.repositories;
 
 import io.chapp.scriptinator.model.Secret;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 public interface SecretRepository extends AbstractEntityRepository<Secret> {
+    Optional<Secret> findByProjectOwnerUsernameAndProjectIdAndId(String username, long projectId, long id);
+
+    @Transactional
+    void deleteAllByProjectOwnerUsernameAndId(String username, long id);
+
     Optional<Secret> findOneByProjectIdAndName(long projectId, String name);
 
     List<Secret> findAllByProjectId(long projectId);

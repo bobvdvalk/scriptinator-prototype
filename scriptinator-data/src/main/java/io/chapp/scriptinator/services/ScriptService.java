@@ -16,70 +16,80 @@
 package io.chapp.scriptinator.services;
 
 import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Project;
 import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
 @Service
 public class ScriptService extends AbstractEntityService<Script, ScriptRepository> {
     private final JobService jobService;
-    private final ProjectService projectService;
 
-    public ScriptService(JobService jobService, ProjectService projectService) {
+    public ScriptService(JobService jobService) {
         this.jobService = jobService;
-        this.projectService = projectService;
     }
 
-    public Script get(String projectName, String scriptName) {
-        return getRepository().findOneByProjectNameAndName(projectName, scriptName)
-                .orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
+    public Optional<Script> findOwnedBy(String username, long projectId, long scriptId) {
+        return getRepository().findByProjectOwnerUsernameAndProjectIdAndId(username, projectId, scriptId);
     }
 
-    public Optional<Script> get(long projectId, String name) {
-        return getRepository().findOneByProjectIdAndName(projectId, name);
+    public Optional<Script> findOwnedByPrincipal(long projectId, long scriptId) {
+        return findOwnedBy(DataServiceUtils.getPrincipalName(), projectId, scriptId);
     }
 
-    public Page<Script> get(String projectName, PageRequest request) {
-        return getRepository().findAllByProjectName(projectName, request);
+    public Script getOwnedByPrincipal(long projectId, long scriptId) {
+        return findOwnedByPrincipal(projectId, scriptId).orElseThrow(() -> noSuchElement(scriptId));
     }
 
-    /**
-     * Get a script by its full name.
-     * This can be either just the script name or the project and script name, e.g.: project-name/script-name.
-     *
-     * @param fullName           The full name of the script.
-     * @param defaultProjectName The project name to use if none is given in the full name.
-     * @return The script, or null if none was found.
-     */
-    public Script getByFullName(String fullName, String defaultProjectName) {
-        String projectName = defaultProjectName;
-        String scriptName = fullName;
+    public Script getOwnedByPrincipal(long scriptId) {
+        return getRepository().findByProjectOwnerUsernameAndId(
+                DataServiceUtils.getPrincipalName(),
+                scriptId
+        ).orElseThrow(() -> noSuchElement(scriptId));
+    }
 
-        // Parse the name parts: (project/)?(script)
-        String[] parts = StringUtils.split(fullName, "/");
-        if (parts != null) {
-            if (parts.length == 2) {
-                projectName = parts[0];
-                scriptName = parts[1];
-            } else {
-                return null;
-            }
-        }
+    public Script getOwnedBy(String username, String projectName, String scriptName) {
+        return getRepository().findByProjectOwnerUsernameAndProjectNameAndName(
+                username,
+                projectName,
+                scriptName
+        ).orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
+    }
 
-        // Get the project.
-        Project project = projectService.find(projectName).orElse(null);
-        if (project == null) {
-            return null;
-        }
+    public Script getOwnedByPrincipal(String projectName, String scriptName) {
+        return getOwnedBy(DataServiceUtils.getPrincipalName(), projectName, scriptName);
+    }
 
-        return get(project.getId(), scriptName).orElse(null);
+    public Page<Script> getAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
+        return getRepository().findAllByProjectOwnerUsernameAndProjectName(
+                username,
+                projectName,
+                pageable
+        );
+    }
+
+    public Page<Script> getAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
+        return getAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
+    }
+
+    public Page<Script> getAllOwnedBy(String username, Pageable pageable) {
+        return getRepository().findAllByProjectOwnerUsername(username, pageable);
+    }
+
+    public Page<Script> getAllOwnedByPrincipal(Pageable pageable) {
+        return getAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
+    }
+
+    public void deleteIfOwnedBy(String username, long scriptId) {
+        getRepository().deleteAllByProjectOwnerUsernameAndId(username, scriptId);
+    }
+
+    public void deleteIfOwnedByPrincipal(long scriptId) {
+        deleteIfOwnedBy(DataServiceUtils.getPrincipalName(), scriptId);
     }
 
     /**

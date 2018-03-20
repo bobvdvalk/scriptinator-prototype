@@ -24,21 +24,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
-
 @Controller
 @RequestMapping("/project/{projectId}/secret")
-public class SecretController {
+public class SecretWebController {
     private static final String EDIT_SECRET_PAGE = "pages/edit_secret";
 
     private final ProjectService projectService;
     private final SecretService secretService;
-    private final ProjectController projectController;
+    private final ProjectWebController projectWebController;
 
-    public SecretController(ProjectService projectService, SecretService secretService, ProjectController projectController) {
+    public SecretWebController(ProjectService projectService, SecretService secretService, ProjectWebController projectWebController) {
         this.projectService = projectService;
         this.secretService = secretService;
-        this.projectController = projectController;
+        this.projectWebController = projectWebController;
     }
 
     @ModelAttribute
@@ -62,7 +60,7 @@ public class SecretController {
 
     @GetMapping("{secretId}")
     public String showEditSecretForm(@PathVariable long projectId, @PathVariable long secretId, Model model) {
-        return showEditSecret(projectId, getSafeSecret(projectId, secretId), model);
+        return showEditSecret(projectId, secretService.getOwnedByPrincipal(projectId, secretId), model);
     }
 
     @PostMapping("{secretId}")
@@ -71,7 +69,7 @@ public class SecretController {
 
         // If the new value is empty, keep the old value.
         if ("".equals(secret.getValue())) {
-            secret.setValue(getSafeSecret(projectId, secretId).getValue());
+            secret.setValue(secretService.getOwnedByPrincipal(projectId, secretId).getValue());
         }
 
         return saveSecret(projectId, secret, model);
@@ -79,20 +77,20 @@ public class SecretController {
 
     @DeleteMapping("{secretId}")
     public String deleteSecret(@PathVariable long projectId, @PathVariable long secretId, Model model) {
-        secretService.delete(getSafeSecret(projectId, secretId).getId());
-        return projectController.viewSecrets(projectId, model);
+        secretService.deleteIfOwnedByPrincipal(secretService.getOwnedByPrincipal(projectId, secretId).getId());
+        return projectWebController.viewSecrets(projectId, model);
     }
 
 
     private String showEditSecret(long projectId, Secret secret, Model model) {
-        Project project = projectService.get(projectId);
+        Project project = projectService.getOwnedByPrincipal(projectId);
         model.addAttribute(Project.ATTRIBUTE, project);
         model.addAttribute(Secret.ATTRIBUTE, secret);
         return EDIT_SECRET_PAGE;
     }
 
     private String saveSecret(long projectId, Secret secret, Model model) {
-        Project project = projectService.get(projectId);
+        Project project = projectService.getOwnedByPrincipal(projectId);
         model.addAttribute(Project.ATTRIBUTE, project);
         secret.setProject(project);
 
@@ -100,20 +98,12 @@ public class SecretController {
             // Create or update the secret.
             secret = secret.getId() == null ? secretService.create(secret) : secretService.update(secret);
         } catch (DataIntegrityViolationException e) {
-            ProjectController.addDbErrorsToModel(e, model, project, "secret_name", Secret.ATTRIBUTE);
+            ProjectWebController.addDbErrorsToModel(e, model, project, "secret_name", Secret.ATTRIBUTE);
             model.addAttribute(Secret.ATTRIBUTE, secret);
             return EDIT_SECRET_PAGE;
         }
 
         model.addAttribute(Secret.ATTRIBUTE, secret);
         return "redirect:/project/" + projectId + "/secret/" + secret.getId();
-    }
-
-    private Secret getSafeSecret(long projectId, long secretId) {
-        Secret secret = secretService.get(secretId);
-        if (!secret.getProject().getId().equals(projectId)) {
-            throw new NoSuchElementException();
-        }
-        return secret;
     }
 }

@@ -19,6 +19,7 @@ import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Link;
 import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.services.JobService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,17 +38,19 @@ public class JobController {
     }
 
     @GetMapping("")
+    @PreAuthorize("#oauth2.hasScope('job:read')")
     public PageResult<Job> listJobs(HttpServletRequest request) {
         return PageResult.of(
                 new Link("/jobs"),
-                jobService.get(
+                jobService.getAllOwnedByPrincipal(
                         PageResult.request(request)
                 )
         );
     }
 
     @GetMapping("{jobId}")
+    @PreAuthorize("#oauth2.hasScope('job:read')")
     public Job getJobById(@PathVariable long jobId) {
-        return jobService.get(jobId);
+        return jobService.getOwnedByPrincipal(jobId);
     }
 }

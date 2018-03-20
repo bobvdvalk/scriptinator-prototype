@@ -19,12 +19,20 @@ import io.chapp.scriptinator.model.Script;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface ScriptRepository extends AbstractEntityRepository<Script> {
-    Optional<Script> findOneByProjectIdAndName(long projectId, String name);
+    Optional<Script> findByProjectOwnerUsernameAndProjectIdAndId(String username, long projectId, long id);
 
-    Optional<Script> findOneByProjectNameAndName(String projectName, String scriptName);
+    Optional<Script> findByProjectOwnerUsernameAndId(String username, long id);
 
-    Page<Script> findAllByProjectName(String projectName, Pageable pageable);
+    Optional<Script> findByProjectOwnerUsernameAndProjectNameAndName(String username, String projectName, String name);
+
+    Page<Script> findAllByProjectOwnerUsernameAndProjectName(String username, String projectName, Pageable pageable);
+
+    Page<Script> findAllByProjectOwnerUsername(String username, Pageable pageable);
+
+    @Transactional
+    void deleteAllByProjectOwnerUsernameAndId(String username, long id);
 }

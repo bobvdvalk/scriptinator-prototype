@@ -17,15 +17,25 @@ package io.chapp.scriptinator.services;
 
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 public class UserService extends AbstractEntityService<User, UserRepository> {
     public User getByUsername(String username) {
-        User user = getRepository().findByUsername(username);
-        if (user == null) {
-            throw noSuchElement(username);
-        }
-        return user;
+        return getRepository()
+                .findByUsername(username)
+                .orElseThrow(() -> noSuchElement(username));
+    }
+
+    public Page<User> getAllOwnedBy(String username) {
+        return new PageImpl<>(Collections.singletonList(getByUsername(username)));
+    }
+
+    public Page<User> getAllOwnedByPrincipal() {
+        return getAllOwnedBy(DataServiceUtils.getPrincipalName());
     }
 }

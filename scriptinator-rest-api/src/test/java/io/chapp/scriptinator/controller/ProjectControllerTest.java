@@ -25,6 +25,8 @@ import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScheduleRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.utils.ScriptinatorTestCase;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -42,6 +44,8 @@ import static org.testng.Assert.assertEquals;
 @Listeners(ScriptinatorTestCase.class)
 public class ProjectControllerTest {
     private final OkHttpClient client = new OkHttpClient();
+    @Autowired
+    Headers accessToken;
 
     @Autowired
     UserRepository userRepository;
@@ -56,7 +60,7 @@ public class ProjectControllerTest {
     public void testWhenProjectIsRequestedItIsReturned() throws IOException {
         // Precondition
         Project project = new Project();
-        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME));
+        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get());
         project.setName("hoiBobDitIsEenTest");
         project.setDescription("We can enter a nice description");
         projectRepository.save(project);
@@ -66,6 +70,7 @@ public class ProjectControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/projects/hoiBobDitIsEenTest")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -97,7 +102,7 @@ public class ProjectControllerTest {
     @Test
     public void testWhenProjectListIsRequestedAllProjectsArePresent() throws IOException {
         // Precondition
-        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME);
+        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get();
         Project project = new Project();
         project.setOwner(defaultUser);
         project.setName("thisIsProject1");
@@ -112,6 +117,7 @@ public class ProjectControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/projects")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -131,7 +137,7 @@ public class ProjectControllerTest {
     @Test
     public void testWhenRequestingPageNumberTooHighNoDataIsReturned() throws IOException {
         // Precondition
-        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME);
+        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get();
         Project project = new Project();
         project.setOwner(defaultUser);
         project.setName("thisIsProject1");
@@ -146,6 +152,7 @@ public class ProjectControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/projects?page=2")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -169,7 +176,7 @@ public class ProjectControllerTest {
     @Test
     public void testListProjectScriptReturnsAllScripts() throws IOException {
         // Precondition
-        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME);
+        User defaultUser = userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get();
         Project project = new Project();
         project.setOwner(defaultUser);
         project.setName("aNiceProjectWithScripts");
@@ -189,6 +196,7 @@ public class ProjectControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/projects/aNiceProjectWithScripts/scripts")
+                        .headers(accessToken)
                         .build()
         ).execute();
 
@@ -209,7 +217,7 @@ public class ProjectControllerTest {
     public void testListProjectSchedulesReturnsAllSchedules() throws IOException {
         // Precondition
         Project project = new Project();
-        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME));
+        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get());
         project.setName("aSuperScheduledProject");
         project = projectRepository.save(project);
 
@@ -236,6 +244,7 @@ public class ProjectControllerTest {
                 new Request.Builder()
                         .get()
                         .url("http://localhost:8080/projects/aSuperScheduledProject/schedules")
+                        .headers(accessToken)
                         .build()
         ).execute();
 

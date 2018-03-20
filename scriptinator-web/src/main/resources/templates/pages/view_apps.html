@@ -1,0 +1,81 @@
+<!--
+
+    Copyright © 2018 Scriptinator (support@scriptinator.io)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/page}">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Profile</title>
+</head>
+<body>
+
+<h1 layout:fragment="title"></h1>
+
+<div layout:fragment="content">
+    <div class="ui grid">
+        <div class="four wide column">
+            <div th:replace="fragments/navigation :: settings"></div>
+        </div>
+        <div class="twelve wide column">
+            <div class="ui segment">
+                <h2 class="ui header">OAuth Apps</h2>
+                <table class="ui blue table">
+                    <thead>
+                    <tr>
+                        <th>
+                            <div class="ui label">
+                                Apps
+                                <div class="detail" th:text="${oauthApps.getTotalElements()}"></div>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${oauthApps.getTotalElements() == 0}">
+                        <td>
+                            You don't have any OAuth apps yet.
+                        </td>
+                    </tr>
+                    <tr th:each="app : ${oauthApps}">
+                        <td class="clickable">
+                            <a th:href="@{'/user/apps/' + ${app.id}}">
+                                <span th:text="${app.name}"></span>
+                                <span th:text="${app.description}" class="ui right floated sub header"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="2">
+                            <a th:href="@{/user/app}"
+                               class="ui primary right floated button">
+                                Add
+                            </a>
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

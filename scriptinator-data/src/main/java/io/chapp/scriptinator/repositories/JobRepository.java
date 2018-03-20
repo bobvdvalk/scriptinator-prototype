@@ -19,8 +19,13 @@ import io.chapp.scriptinator.model.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface JobRepository extends AbstractEntityRepository<Job> {
-    Page<Job> findByScriptId(long scriptId, Pageable pageable);
+import java.util.Optional;
 
-    Page<Job> findByStatus(Job.Status status, Pageable pageable);
+public interface JobRepository extends AbstractEntityRepository<Job> {
+
+    Optional<Job> findOneByScriptProjectOwnerUsernameAndId(String username, long scriptId);
+
+    Page<Job> findAllByScriptProjectOwnerUsernameAndScriptId(String username, long scriptId, Pageable pageable);
+
+    Page<Job> findAllByScriptProjectOwnerUsername(String username, Pageable pageable);
 }

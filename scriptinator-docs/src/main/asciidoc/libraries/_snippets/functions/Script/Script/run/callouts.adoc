@@ -14,5 +14,4 @@
 // limitations under the License.
 //
 
-<1> Run a script
-<2> Check if the job was created
+<1> Specify the script name

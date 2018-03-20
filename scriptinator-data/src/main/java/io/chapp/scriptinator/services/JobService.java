@@ -19,10 +19,11 @@ import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.repositories.JobRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class JobService extends AbstractEntityService<Job, JobRepository> {
@@ -32,8 +33,44 @@ public class JobService extends AbstractEntityService<Job, JobRepository> {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public Page<Job> get(long scriptId, PageRequest pageRequest) {
-        return getRepository().findByScriptId(scriptId, pageRequest);
+    public Page<Job> getAllForScriptOwnedByPrincipal(long scriptId, Pageable pageable) {
+        return getAllForScriptOwnedBy(
+                DataServiceUtils.getPrincipalName(),
+                scriptId,
+                pageable
+        );
+    }
+
+    public Page<Job> getAllForScriptOwnedBy(String username, long scriptId, Pageable pageable) {
+        return getRepository().findAllByScriptProjectOwnerUsernameAndScriptId(
+                username,
+                scriptId,
+                pageable
+        );
+    }
+
+    public Page<Job> getAllOwnedBy(String username, Pageable pageable) {
+        return getRepository().findAllByScriptProjectOwnerUsername(username, pageable);
+    }
+
+    public Page<Job> getAllOwnedByPrincipal(Pageable pageable) {
+        return getAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
+    }
+
+    public Optional<Job> findOwnedBy(String username, long jobId) {
+        return getRepository().findOneByScriptProjectOwnerUsernameAndId(username, jobId);
+    }
+
+    public Optional<Job> findOwnedByPrincipal(long jobId) {
+        return findOwnedBy(
+                DataServiceUtils.getPrincipalName(),
+                jobId
+        );
+    }
+
+    public Job getOwnedByPrincipal(long jobId) {
+        return findOwnedByPrincipal(jobId)
+                .orElseThrow(() -> noSuchElement(jobId));
     }
 
     @Override

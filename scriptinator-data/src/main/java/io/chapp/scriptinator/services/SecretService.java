@@ -21,9 +21,31 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SecretService extends AbstractEntityService<Secret, SecretRepository> {
+
+    public Optional<Secret> findOwnedBy(String username, long projectId, long id) {
+        return getRepository().findByProjectOwnerUsernameAndProjectIdAndId(username, projectId, id);
+    }
+
+    public Optional<Secret> findOwnedByPrincipal(long projectId, long id) {
+        return findOwnedBy(DataServiceUtils.getPrincipalName(), projectId, id);
+    }
+
+    public Secret getOwnedByPrincipal(long projectId, long id) {
+        return findOwnedByPrincipal(projectId, id).orElseThrow(() -> noSuchElement(id));
+    }
+
+    public void deleteIfOwnedBy(String username, long id) {
+        getRepository().deleteAllByProjectOwnerUsernameAndId(username, id);
+    }
+
+    public void deleteIfOwnedByPrincipal(long id) {
+        deleteIfOwnedBy(DataServiceUtils.getPrincipalName(), id);
+    }
+
     /**
      * Mask secrets in a string.
      *
