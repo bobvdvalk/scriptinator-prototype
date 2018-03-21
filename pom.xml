@@ -124,6 +124,7 @@
         <!-- Build Configuration -->
         <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
+        <dockerfile.skip>true</dockerfile.skip>
     </properties>
 
     <dependencyManagement>

@@ -29,6 +29,10 @@
 
     <artifactId>scriptinator-rest-api</artifactId>
 
+    <properties>
+        <dockerfile.skip>false</dockerfile.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -59,15 +59,21 @@ jobs:
       - run:
           name: Run Sonar
           command: |
-            mvn sonar:sonar \
-              -Dsonar.branch.name="${CIRCLE_BRANCH}" \
-              -Dsonar.login="${SONAR_LOGIN}" \
-              -Dsonar.host.url="https://sonarcloud.io" \
-              -Dsonar.organization=scriptinatorio
+            mvn --settings .circleci/settings.xml sonar:sonar
           when: always
 
       - save_cache:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
+
+      - deploy:
+          name: Push to Docker Hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              mvn --settings .circleci/settings.xml dockerfile:push
+            else
+              echo "Deployment skipped for ${CIRCLE_BRANCH}"
+            fi
+
 

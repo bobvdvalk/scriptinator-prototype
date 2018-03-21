@@ -29,6 +29,10 @@
 
     <artifactId>scriptinator-worker</artifactId>
 
+    <properties>
+        <dockerfile.skip>false</dockerfile.skip>
+    </properties>
+
     <dependencies>
         <!-- Libraries -->
         <dependency>

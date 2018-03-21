@@ -29,6 +29,10 @@
 
     <artifactId>scriptinator-docs</artifactId>
 
+    <properties>
+        <dockerfile.skip>false</dockerfile.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

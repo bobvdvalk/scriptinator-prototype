@@ -29,6 +29,10 @@
 
     <artifactId>scriptinator-web</artifactId>
 
+    <properties>
+        <dockerfile.skip>false</dockerfile.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.chapp.scriptinator</groupId>
