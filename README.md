@@ -1,7 +1,7 @@
 # Scriptinator
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Sonarcloud](https://sonarcloud.io/api/badges/gate?key=io.chapp.scriptinator:scriptinator-parent)](https://sonarcloud.io/dashboard?id=io.chapp.scriptinator%3Ascriptinator-parent)
-[![CircleCI](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master.svg?style=svg)](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master)
+[![CircleCI](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master.svg?style=shield)](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master)
 
 [![Waffle](https://badge.waffle.io/ScriptinatorIO/scriptinator.svg?columns=all)](https://waffle.io/ScriptinatorIO/scriptinator)
