@@ -22,14 +22,19 @@
 <div th:fragment="navigation" id="navigation" class="ui inverted attached labeled icon menu">
     <div class="item">
         <a th:href="@{/dashboard}">
-            <img id="logo" class="ui small image" th:src="@{/assets/logo.png}"/>
+            <img id="logo" class="ui small image" th:src="@{/assets/logo_light.png}"/>
         </a>
     </div>
     <a class="item"
        th:href="@{/projects}"
        th:classappend="${#httpServletRequest.getRequestURI().startsWith('/projects') ? 'active':''}">
-        Projects
         <i class="book icon"></i>
+        Projects
+    </a>
+    <a class="item"
+       href="/docs">
+        <i class="question circle icon"></i>
+        Documentation
     </a>
     <div class="ui fluid container"></div>
     <a class="item"
