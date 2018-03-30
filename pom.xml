@@ -125,6 +125,7 @@
         <sonar.jacoco.reportPaths>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.java.binaries>${project.build.directory}/classes</sonar.java.binaries>
         <dockerfile.skip>true</dockerfile.skip>
+        <dockerfile.tag>${project.version}</dockerfile.tag>
     </properties>
 
     <dependencyManagement>
@@ -369,7 +370,7 @@
                     <version>${dockerfile-plugin.version}</version>
                     <configuration>
                         <repository>scriptinator/${project.artifactId}</repository>
-                        <tag>${project.version}</tag>
+                        <tag>${dockerfile.tag}</tag>
                     </configuration>
                     <executions>
                         <execution>
