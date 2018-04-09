@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class UserService extends AbstractEntityService<User, UserRepository> {
@@ -37,5 +38,13 @@ public class UserService extends AbstractEntityService<User, UserRepository> {
 
     public Page<User> getAllOwnedByPrincipal() {
         return getAllOwnedBy(DataServiceUtils.getPrincipalName());
+    }
+
+    public boolean exists(String username) {
+        return getRepository().findByUsername(username).isPresent();
+    }
+
+    public Optional<User> getByToken(String activationToken) {
+        return getRepository().findByEmailActivationToken(activationToken);
     }
 }

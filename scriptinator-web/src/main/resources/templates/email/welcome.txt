@@ -1,0 +1,15 @@
+Hey [(${user.displayName})],
+Thank you for signing up for Scriptinator!
+
+Before you can use your account you should activate it.
+To activate your account, copy the url to your browser:
+
+[(${activateUrl})]
+
+
+To help you get started we created a documentation page ([(${docUrl})]) where you can find
+a lot of information about creating en executing scripts.
+
+
+Welcome on board,
+the Scriptinator team.

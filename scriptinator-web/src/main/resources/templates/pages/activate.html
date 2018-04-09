@@ -53,56 +53,10 @@
             <img th:src="@{/assets/logo.png}" class="image">
         </h2>
 
-        <div th:if="${newUserEmail}" class="positive ui message">
-            <p>Thank you for signing up. A confirmation email was sent to <span th:text="${newUserEmail}"></span></p>
-        </div>
-
-        <form id="login-form" class="ui large form" th:action="@{/login}" method="post">
-            <div class="ui stacked segment">
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input autofocus
-                               required
-                               type="text"
-                               name="username"
-                               placeholder="Username"
-                        >
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input required
-                               type="password"
-                               name="password"
-                               placeholder="Password"
-                        >
-                    </div>
-                </div>
-                <button class="ui fluid large primary submit button">Log In</button>
-            </div>
-        </form>
-
-        <div id="server-error" class="ui hidden error message">
-            We don't seem to know anyone with this username/password combination.
-        </div>
-
-        <div id="signup-link" class="ui message">
-            <p>New to us?</p>
-            <a class="ui small button" th:href="@{/register}">Sign Up</a>
+        <div class="positive ui message">
+            <p>Thank you for your registration. You can now <a th:href="@{/login}">log in</a> to your account.</p>
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function () {
-        // Check for a login error.
-        if (window.location.search.indexOf("error") >= 0) {
-            $('#server-error').removeClass('hidden');
-        }
-    });
-</script>
-
 </body>
 </html>

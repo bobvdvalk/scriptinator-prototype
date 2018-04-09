@@ -15,14 +15,53 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
+import io.chapp.scriptinator.model.User;
+import io.chapp.scriptinator.services.UserRegistrationService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.net.URI;
 
 @Controller
 public class LoginWebController {
+    private final UserRegistrationService userRegistrationService;
+
+    public LoginWebController(UserRegistrationService userRegistrationService) {
+        this.userRegistrationService = userRegistrationService;
+    }
 
     @RequestMapping("/login")
-    public String showLoginPage() {
+    public String showLoginPage(Model model, HttpSession httpSession) {
+        if (httpSession.getAttribute("email") != null) {
+            model.addAttribute("newUserEmail", httpSession.getAttribute("email"));
+            httpSession.removeAttribute("email");
+        }
         return "pages/login";
+    }
+
+    @GetMapping("/register")
+    public String showRegisterPage(Model model) {
+        model.addAttribute("newUser", new User());
+        return "pages/register";
+    }
+
+    @PostMapping("/register")
+    public String register(@Valid @ModelAttribute("newUser") User user, Model model, HttpServletRequest request, HttpSession httpSession) {
+        if (!userRegistrationService.register(user, URI.create(request.getRequestURL().toString()))) {
+            model.addAttribute("error", "A user with that username already exists");
+            return "pages/register";
+        }
+        httpSession.setAttribute("email", user.getEmail());
+        return "redirect:/login";
+    }
+
+    @GetMapping("/register/activate")
+    public String activate(@RequestParam("token") String activationToken) {
+        userRegistrationService.activate(activationToken);
+        return "pages/activate";
     }
 }

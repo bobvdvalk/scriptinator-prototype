@@ -71,4 +71,7 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
     }
 
 
+    public boolean exists(String name) {
+        return getRepository().findByName(name).isPresent();
+    }
 }

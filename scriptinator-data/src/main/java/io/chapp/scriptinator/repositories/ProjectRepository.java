@@ -31,4 +31,6 @@ public interface ProjectRepository extends AbstractEntityRepository<Project> {
 
     @Transactional
     void deleteAllByOwnerUsernameAndId(String username, long id);
+
+    Optional<Project> findByName(String name);
 }

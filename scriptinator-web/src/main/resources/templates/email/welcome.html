@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<p>
+    Hey <span th:text="${user.displayName}"></span>,<br/>
+    Thank you for signing up for Scriptinator!
+</p>
+
+<p>
+    Before you can use your account you should activate it <a th:href="${activateUrl}">here</a>.
+    If the link does not work for you can copy the url to your browser:
+    <code>
+<pre th:text="'    ' + ${activateUrl}">
+        https://scriptinator.io/weirdurl
+</pre>
+    </code>
+</p>
+
+<p>
+    To help you get started we created a <a th:href="${docUrl}">documentation page</a> where you can find
+    a lot of information about creating en executing scripts.
+</p>
+
+<p>
+    Welcome on board,<br/>
+    the Scriptinator team.
+</p>
+</body>
+</html>

@@ -30,3 +30,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: scriptinator
     network_mode: host
+  fakesmtp:
+    image: munkyboy/fakesmtp
+    network_mode: host
+    volumes:
+      - ./mail:/var/mail

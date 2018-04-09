@@ -18,6 +18,7 @@ package io.chapp.scriptinator.libraries;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.libraries.core.ClosableContext;
 import io.chapp.scriptinator.libraries.core.ObjectConverter;
+import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -128,13 +130,17 @@ public class ScriptLibrary {
         }
 
         // Get the script.
-        Script script = scriptService.getOwnedBy(
-                job.getScript().getProject().getOwner().getUsername(),
-                projectName,
-                scriptName
-        );
+        try {
+            Script script = scriptService.getOwnedBy(
+                    job.getScript().getProject().getOwner().getUsername(),
+                    projectName,
+                    scriptName
+            );
 
-        scriptService.run(script, job, argToString(argument));
+            scriptService.run(script, job, argToString(argument));
+        } catch (NoSuchElementException e) {
+            throw new ScriptinatorExecutionException("Could not start the script '" + fullName + "' because it could not be found.");
+        }
     }
 
     private String argToString(Object argument) {

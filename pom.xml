@@ -301,6 +301,8 @@
                             <exclude>**/banner.txt</exclude>
                             <exclude>**/asciidoc/**/*.js</exclude>
                             <exclude>LICENSE.txt</exclude>
+                            <exclude>**/resources/scripts/**</exclude>
+                            <exclude>**/templates/email/**</exclude>
                         </excludes>
                     </configuration>
                     <executions>

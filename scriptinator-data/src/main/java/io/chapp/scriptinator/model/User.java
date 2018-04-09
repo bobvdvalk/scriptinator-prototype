@@ -56,6 +56,9 @@ public class User extends AbstractEntity {
     @JsonIgnore
     private List<OAuthApp> apps = new ArrayList<>();
 
+    @JsonIgnore
+    private String emailActivationToken;
+
 
     public String getUsername() {
         return username;
@@ -124,6 +127,14 @@ public class User extends AbstractEntity {
 
     public void setApps(List<OAuthApp> apps) {
         this.apps = apps;
+    }
+
+    public String getEmailActivationToken() {
+        return emailActivationToken;
+    }
+
+    public void setEmailActivationToken(String emailActivationToken) {
+        this.emailActivationToken = emailActivationToken;
     }
 
     @Override
