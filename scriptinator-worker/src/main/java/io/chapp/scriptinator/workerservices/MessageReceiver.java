@@ -16,10 +16,13 @@
 package io.chapp.scriptinator.workerservices;
 
 import io.chapp.scriptinator.repositories.JobRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MessageReceiver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
     private final JobRepository jobRepository;
     private final ScriptExecutor scriptExecutor;
 
@@ -30,7 +33,12 @@ public class MessageReceiver {
 
 
     public void executeJob(long jobId) {
+        LOGGER.debug("Received job message {}", jobId);
         jobRepository.findOne(jobId)
-                .ifPresent(scriptExecutor::execute);
+                .ifPresent(job -> {
+                    LOGGER.debug("Found job: {}", job.getDisplayName());
+                    scriptExecutor.execute(job);
+                });
+        LOGGER.debug("Finished execution of {}", jobId);
     }
 }

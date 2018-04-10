@@ -25,9 +25,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfiguration {
+    private final ScriptinatorConfiguration scriptinatorConfiguration;
+
+    public RabbitMQConfiguration(ScriptinatorConfiguration scriptinatorConfiguration) {
+        this.scriptinatorConfiguration = scriptinatorConfiguration;
+    }
+
     @Bean
     public Queue executeJobQueue() {
-        return new Queue(Job.EXECUTE_JOB_QUEUE, false);
+        return new Queue(Job.EXECUTE_JOB_QUEUE, scriptinatorConfiguration.isDurableQueue());
     }
 
     @Bean

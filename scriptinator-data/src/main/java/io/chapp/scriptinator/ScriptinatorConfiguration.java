@@ -24,6 +24,7 @@ public class ScriptinatorConfiguration {
     private String signingKey = "secret";
     private String resourceId = "scriptinator-api";
     private int defaultPageSize = 20;
+    private boolean durableQueue = true;
 
     public String getSigningKey() {
         return signingKey;
@@ -47,5 +48,9 @@ public class ScriptinatorConfiguration {
 
     public void setDefaultPageSize(int defaultPageSize) {
         this.defaultPageSize = defaultPageSize;
+    }
+
+    public boolean isDurableQueue() {
+        return durableQueue;
     }
 }
