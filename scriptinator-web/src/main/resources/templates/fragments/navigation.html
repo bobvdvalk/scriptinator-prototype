@@ -38,6 +38,12 @@
         Documentation
     </a>
     <div class="ui fluid container"></div>
+    <form th:action="@{/logout}" th:method="POST">
+        <a class="item" onclick="this.parentNode.submit()">
+            <i class="sign out alternate icon"></i>
+            Log Out
+        </a>
+    </form>
     <a class="item"
        th:href="@{/user}">
         <img class="ui avatar image" th:src="${#authentication.principal.avatarUrl}">
