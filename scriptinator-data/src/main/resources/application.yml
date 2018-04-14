@@ -26,14 +26,13 @@ spring:
     password: root
   mail:
     host: localhost
-    from: support@localhost
 #   G-Suite Example
 #
 #   Note: This requires an authorized ip address
 #
 #    host: smtp-relay.gmail.com
 #    port: 587
-#    from: user@domain.com
+#    from: Support <user@domain.com>
 #    properties:
 #      mail.transport.protocol: smtp
 #      mail.smtp.auth: false

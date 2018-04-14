@@ -60,19 +60,28 @@ public class UserRegistrationService {
         user.setEmailActivationToken(RandomStringUtils.randomAlphanumeric(50));
         User createdUser = userService.create(user);
 
-        HashMap<String, Object> variables = new HashMap<>();
-        variables.put("user", createdUser);
-        variables.put("activateUrl", buildActivationUrl(requestURI, user));
-        variables.put("docUrl", buildDocsUrl(requestURI));
 
-        mailService.sendEmail(
-                user.getEmail(),
-                "Welcome to Scriptinator!",
-                "email/welcome",
-                variables
-        );
+        if (mailService.isConfigured()) {
+            HashMap<String, Object> variables = new HashMap<>();
+            variables.put("user", createdUser);
+            variables.put("activateUrl", buildActivationUrl(requestURI, user));
+            variables.put("docUrl", buildDocsUrl(requestURI));
+
+            mailService.sendEmail(
+                    user.getEmail(),
+                    "Welcome to Scriptinator!",
+                    "email/welcome",
+                    variables
+            );
+        } else {
+            activate(user.getEmailActivationToken());
+        }
 
         return true;
+    }
+
+    public boolean isEmailVerificationEnabled() {
+        return mailService.isConfigured();
     }
 
     private String buildDocsUrl(URI requestURI) {

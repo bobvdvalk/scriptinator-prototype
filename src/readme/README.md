@@ -58,7 +58,7 @@ If you want to try out Scriptinator on your own infrastructure, you can take the
           --docker.watch
     
       web:
-        image: scriptinator/scriptinator-web:1.0-SNAPSHOT
+        image: scriptinator/scriptinator-web:@project.version@
         deploy:
           labels:
             traefik.port: 8081
@@ -67,7 +67,7 @@ If you want to try out Scriptinator on your own infrastructure, you can take the
           --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
           --spring.rabbitmq.host=rabbitmq
       worker:
-        image: scriptinator/scriptinator-worker:1.0-SNAPSHOT
+        image: scriptinator/scriptinator-worker:@project.version@
         command: |
           --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
           --spring.rabbitmq.host=rabbitmq
@@ -77,7 +77,7 @@ If you want to try out Scriptinator on your own infrastructure, you can take the
           --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
           --spring.rabbitmq.host=rabbitmq
       docs:
-        image: scriptinator/scriptinator-docs:1.0-SNAPSHOT
+        image: scriptinator/scriptinator-docs:@project.version@
         deploy:
           labels:
             traefik.port: 80

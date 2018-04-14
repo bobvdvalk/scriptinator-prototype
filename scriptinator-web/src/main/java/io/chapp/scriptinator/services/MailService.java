@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -34,10 +35,14 @@ public class MailService {
     private final JavaMailSender sender;
     private final String fromMail;
 
-    public MailService(TemplateEngine templateEngine, JavaMailSender sender, @Value("${spring.mail.from}") String fromMail) {
+    public MailService(TemplateEngine templateEngine, JavaMailSender sender, @Value("${spring.mail.from:#{''}}") String fromMail) {
         this.templateEngine = templateEngine;
         this.sender = sender;
         this.fromMail = fromMail;
+    }
+
+    public boolean isConfigured() {
+        return !StringUtils.isEmpty(fromMail);
     }
 
     public void sendEmail(String to, String subject, String template, Map<String, Object> variables) {

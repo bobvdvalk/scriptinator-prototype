@@ -55,7 +55,10 @@ public class LoginWebController {
             model.addAttribute("error", "A user with that username already exists");
             return "pages/register";
         }
-        httpSession.setAttribute("email", user.getEmail());
+        if (userRegistrationService.isEmailVerificationEnabled()) {
+            httpSession.setAttribute("email", user.getEmail());
+        }
+
         return "redirect:/login";
     }
 
