@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.patch(              // <2>
     "http://jsonplaceholder.typicode.com/users/2"
@@ -7,7 +7,7 @@ var response = HTTP.patch(              // <2>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "The request was accepted",

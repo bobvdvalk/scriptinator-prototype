@@ -23,9 +23,13 @@ import io.chapp.scriptinator.repositories.ProjectRepository;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.services.OAuthAppService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 @Component
 public class LoadDefaultContent implements CommandLineRunner {
@@ -44,7 +48,7 @@ public class LoadDefaultContent implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... strings) {
+    public void run(String... strings) throws IOException {
         if (userRepository.count() == 0) {
             User defaultUser = new User();
             defaultUser.setUsername("user");
@@ -61,7 +65,9 @@ public class LoadDefaultContent implements CommandLineRunner {
 
             Script script = new Script();
             script.setProject(project);
-            script.setCode("Script.info('Hello World');");
+            try (InputStream data = getClass().getResourceAsStream("/scripts/hello-world.js")) {
+                script.setCode(IOUtils.toString(data, "UTF-8"));
+            }
             script.setDescription("Hello World");
             script.setName("greet");
             scriptRepository.save(script);

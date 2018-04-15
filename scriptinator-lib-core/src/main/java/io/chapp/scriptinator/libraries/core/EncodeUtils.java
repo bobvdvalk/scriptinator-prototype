@@ -15,6 +15,8 @@
  */
 package io.chapp.scriptinator.libraries.core;
 
+import jdk.nashorn.internal.objects.NativeJSON;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
@@ -37,5 +39,13 @@ public class EncodeUtils {
 
     public static String toBase64(String input) {
         return Base64.getEncoder().encodeToString(input.getBytes());
+    }
+
+    public static String toNativeJsonOrNull(Object argument) {
+        if (argument == null) {
+            return null;
+        }
+
+        return NativeJSON.stringify(null, argument, null, null).toString();
     }
 }

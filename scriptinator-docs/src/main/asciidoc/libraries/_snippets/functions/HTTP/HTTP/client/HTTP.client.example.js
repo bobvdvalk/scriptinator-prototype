@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");      // <1>
 
 var httpClient = HTTP.client();         // <2>
 
@@ -18,7 +18,7 @@ var tokenAuthClient = HTTP.client({     // <4>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.notNull("HTTP library exists", HTTP);
 Assert.notNull("Client is created", httpClient);

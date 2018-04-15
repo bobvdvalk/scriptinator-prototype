@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = Script.library("Assert");
-var HTTP = Script.library("HTTP");
+var Assert = library("Assert");
+var HTTP = library("HTTP");
 
 Assert.notNull("HTTP", HTTP);

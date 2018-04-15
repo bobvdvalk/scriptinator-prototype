@@ -16,26 +16,20 @@
 package io.chapp.scriptinator.libraries;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.libraries.builtins.*;
 import io.chapp.scriptinator.libraries.core.ClosableContext;
 import io.chapp.scriptinator.libraries.core.ObjectConverter;
-import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
 import io.chapp.scriptinator.libraries.test.AssertLibrary;
 import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
 import io.chapp.scriptinator.services.SecretService;
-import jdk.nashorn.internal.objects.NativeJSON;
-import jdk.nashorn.internal.runtime.JSONFunctions;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
+import javax.script.Bindings;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ScriptLibrary {
     private static final Map<String, Function<ScriptLibrary, ?>> LIBRARIES = new HashMap<>();
@@ -61,105 +55,22 @@ public class ScriptLibrary {
         this.secretService = secretService;
     }
 
+    public void apply(Bindings bindings) {
+        bindings.put("debug", new BuiltInLogFunction("DEBUG", jobService, job, secretService));
+        bindings.put("info", new BuiltInLogFunction("INFO", jobService, job, secretService));
+        bindings.put("warn", new BuiltInLogFunction("WARN", jobService, job, secretService));
+        bindings.put("error", new BuiltInLogFunction("ERROR", jobService, job, secretService));
+        bindings.put("library", new LibraryFunction(this));
+        bindings.put("run", new RunFunction(job, scriptService));
+        bindings.put("argument", new ArgumentFunction(job));
+        bindings.put("secret", new SecretFunction(secretService, job));
+    }
+
     public Object library(String name) {
         Function<ScriptLibrary, ?> builder = LIBRARIES.get(name);
         if (builder == null) {
             return null;
         }
         return builder.apply(this);
-    }
-
-    public void debug(Object... values) {
-        log("DEBUG", values);
-    }
-
-    public void info(Object... values) {
-        log("INFO", values);
-    }
-
-    public void warn(Object... values) {
-        log("WARN", values);
-    }
-
-    public void error(Object... values) {
-        log("ERROR", values);
-    }
-
-    private void log(String level, Object[] values) {
-        // Get the string to be logged.
-        String logString = Arrays.stream(values)
-                .map(this::getStringValue)
-                .collect(Collectors.joining(" "));
-
-        // Filter out any secrets.
-        logString = secretService.filterSecrets(
-                job.getScript().getProject().getId(),
-                logString
-        );
-
-        job.log(level, logString);
-        jobService.update(job);
-    }
-
-    private String getStringValue(Object value) {
-        if (value instanceof String) {
-            return (String) value;
-        }
-        return argToString(value);
-    }
-
-    public void run(String fullName) {
-        run(fullName, null);
-    }
-
-    public void run(String fullName, Object argument) {
-        String[] nameParts = StringUtils.split(fullName, '/');
-        String projectName = job.getScript().getProject().getName();
-        String scriptName = "";
-
-        switch (nameParts.length) {
-            case 1:
-                scriptName = nameParts[0];
-                break;
-            case 2:
-                projectName = nameParts[0];
-                scriptName = nameParts[1];
-                break;
-            default:
-                throw new IllegalArgumentException("It seems like '" + fullName + "' is not a valid script name.");
-        }
-
-        // Get the script.
-        try {
-            Script script = scriptService.getOwnedBy(
-                    job.getScript().getProject().getOwner().getUsername(),
-                    projectName,
-                    scriptName
-            );
-
-            scriptService.run(script, job, argToString(argument));
-        } catch (NoSuchElementException e) {
-            throw new ScriptinatorExecutionException("Could not start the script '" + fullName + "' because it could not be found.");
-        }
-    }
-
-    private String argToString(Object argument) {
-        if (argument == null) {
-            return null;
-        }
-
-        return NativeJSON.stringify(null, argument, null, null).toString();
-    }
-
-    public Object argument() {
-        if (job.getArgument() == null) {
-            return null;
-        }
-
-        return JSONFunctions.parse(job.getArgument(), null);
-    }
-
-    public String secret(String name) {
-        return secretService.getValue(job.getScript().getProject().getId(), name);
     }
 }

@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.post(               // <2>
     "https://httpbin.org/anything"
@@ -7,7 +7,7 @@ var response = HTTP.post(               // <2>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 var body = response.body().asJson();
 

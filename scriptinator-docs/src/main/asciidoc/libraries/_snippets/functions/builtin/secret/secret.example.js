@@ -1,7 +1,7 @@
 // tag::docs[]
-var HTTP = Script.library('HTTP');              // <1>
+var HTTP = library('HTTP');                     // <1>
 
-var token = Script.secret('secret-token');      // <2>
+var token = secret('secret-token');             // <2>
 
 var response = HTTP.post({                      // <3>
     url: "https://httpbin.org/post",
@@ -11,7 +11,7 @@ var response = HTTP.post({                      // <3>
 });
 
 // end::docs[]
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "Secret is null",

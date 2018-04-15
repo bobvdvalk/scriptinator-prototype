@@ -52,7 +52,7 @@ public class ScriptExecutor {
         try (ClosableContext context = new ClosableContext()) {
             ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
-            bindings.put("Script", scriptLibrary);
+            scriptLibrary.apply(bindings);
 
             execute(engine, job);
         }

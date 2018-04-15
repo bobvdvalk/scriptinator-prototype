@@ -103,7 +103,7 @@ public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
         secretRepository.save(secret);
 
 
-        // This project is called using Script.run
+        // This project is called using run
         Project myFirstProject = new Project();
         myFirstProject.setName("my-first-project");
         myFirstProject.setOwner(user);

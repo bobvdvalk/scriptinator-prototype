@@ -19,4 +19,4 @@ include::../run/parameters.adoc[]
 | *argument* +
 Type: <<Any>>
 2.1+| The argument to pass to the script.
-      This argument can be retrieved in the target script using <<Script.argument>>.
+      This argument can be retrieved in the target script using <<argument>>.

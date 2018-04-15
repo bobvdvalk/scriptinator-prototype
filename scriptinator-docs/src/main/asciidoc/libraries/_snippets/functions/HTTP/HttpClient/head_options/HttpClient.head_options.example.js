@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.head({              // <2>
     url: "https://httpbin.org/headers",
@@ -10,12 +10,12 @@ var response = HTTP.head({              // <2>
 
 var contentLength = response.header("Content-Length");
 var server = response.header("Server");
-Script.info(contentLength);             // <3>
-Script.info(server);
+info(contentLength);                    // <3>
+info(server);
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "The server is described",

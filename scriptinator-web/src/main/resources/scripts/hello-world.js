@@ -5,15 +5,15 @@
  */
 
 
-// You can use Script.info to log an informational message.
+// You can use info to log an informational message.
 
-Script.info("Hello World!");
+info("Hello World!");
 
-Script.debug("You can print less important messages using Script.debug");
+debug("You can print less important messages using debug");
 
-Script.warn("If you run into a case which might require some attention you can use Script.warn");
+warn("If you run into a case which might require some attention you can use warn");
 
-Script.error("Unexpected failures can be logged using Script.error");
+error("Unexpected failures can be logged using error");
 
 // To run this script, simply click the green "run" button below the editor.
 

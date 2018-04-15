@@ -1,16 +1,16 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.get(                // <2>
     "https://jsonplaceholder.typicode.com/posts/5"
 );
 
 var post = response.body().asJson();
-Script.info(post.title);
+info(post.title);
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "Post 5 is retrieved",

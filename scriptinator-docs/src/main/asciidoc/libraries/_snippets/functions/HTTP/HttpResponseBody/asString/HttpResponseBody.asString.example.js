@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var body = HTTP.get(                    // <2>
     "https://baconipsum.com/api/?type=meat-and-filler&paras=1&format=text"
@@ -7,11 +7,11 @@ var body = HTTP.get(                    // <2>
 
 var text = body.asString();              // <3>
 
-Script.info(text);                       // <4>
+info(text);                              // <4>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.notNullOrEmpty(
     "body",

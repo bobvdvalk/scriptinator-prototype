@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var HTTP = Script.library("HTTP");
-var Assert = Script.library("Assert");
+var HTTP = library("HTTP");
+var Assert = library("Assert");
 
 var authenticatedResponse = HTTP.get({
     url: "https://httpbin.org/basic-auth/someuser/secret123",

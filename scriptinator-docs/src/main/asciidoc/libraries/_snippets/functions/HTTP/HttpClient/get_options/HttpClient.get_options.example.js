@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.get({               // <2>
     url: "https://httpbin.org/basic-auth/user/p455w0rd",
@@ -11,7 +11,7 @@ var response = HTTP.get({               // <2>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "The request is authenticated",

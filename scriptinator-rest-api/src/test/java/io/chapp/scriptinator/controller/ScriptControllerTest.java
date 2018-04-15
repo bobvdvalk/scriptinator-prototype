@@ -68,7 +68,7 @@ public class ScriptControllerTest {
 
         Script script = new Script();
         script.setProject(project);
-        script.setCode("Script.info('Hello World');");
+        script.setCode("info('Hello World');");
         script.setName("greet");
         script.setDescription("Prints hello world.");
         scriptRepository.save(script);
@@ -93,7 +93,7 @@ public class ScriptControllerTest {
 
         assertEquals(
                 json.read("$.code"),
-                "Script.info('Hello World');"
+                "info('Hello World');"
         );
 
         assertEquals(
@@ -120,7 +120,7 @@ public class ScriptControllerTest {
 
         Script script = new Script();
         script.setProject(project);
-        script.setCode("Script.info('Hello World');");
+        script.setCode("info('Hello World');");
         script.setName("greet");
         script.setDescription("Prints hello world.");
         scriptRepository.save(script);
@@ -277,7 +277,7 @@ public class ScriptControllerTest {
         Script script = new Script();
         script.setName("greetingScript");
         script.setProject(project);
-        script.setCode("Script.info('Hello!');");
+        script.setCode("info('Hello!');");
         script = scriptRepository.save(script);
 
         // Action

@@ -1,15 +1,15 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.get(                // <2>
     "https://httpbin.org/anything"
 );
 
-Script.debug(response.code());          // <3>
+debug(response.code());                 // <3>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "Status is OK",

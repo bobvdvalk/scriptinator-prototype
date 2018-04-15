@@ -1,15 +1,15 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var response = HTTP.get(                // <2>
     "https://httpbin.org/ip"
 );
 
-Script.info(response.protocol());       // <3>
+info(response.protocol());              // <3>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "Protocol is HTTP 1.1",

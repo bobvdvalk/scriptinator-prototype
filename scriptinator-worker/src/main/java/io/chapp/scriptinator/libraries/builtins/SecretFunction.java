@@ -13,12 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = library("Assert");
+package io.chapp.scriptinator.libraries.builtins;
 
-var token = secret("my-token");
+import io.chapp.scriptinator.model.Job;
+import io.chapp.scriptinator.services.SecretService;
 
-Assert.equal(
-    "Secret returns correct value",
-    "9555701a-315b-419f-bffb-7c8ea8168b42",
-    token
-);
+import java.util.function.Function;
+
+public class SecretFunction implements Function<String, String> {
+    private final SecretService secretService;
+    private final Job job;
+
+    public SecretFunction(SecretService secretService, Job job) {
+        this.secretService = secretService;
+        this.job = job;
+    }
+
+    @Override
+    public String apply(String name) {
+        return secretService.getValue(job.getScript().getProject().getId(), name);
+    }
+}

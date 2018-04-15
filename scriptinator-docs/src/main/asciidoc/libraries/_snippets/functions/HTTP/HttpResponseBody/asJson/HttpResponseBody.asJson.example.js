@@ -1,5 +1,5 @@
 // tag::docs[]
-var HTTP = Script.library("HTTP");      // <1>
+var HTTP = library("HTTP");             // <1>
 
 var body = HTTP.get(                    // <2>
     "https://httpbin.org/get"
@@ -7,11 +7,11 @@ var body = HTTP.get(                    // <2>
 
 var object = body.asJson();             // <3>
 
-Script.info(object.url);                // <4>
+info(object.url);                       // <4>
 
 // end::docs[]
 
-var Assert = Script.library("Assert");
+var Assert = library("Assert");
 
 Assert.equal(
     "Url is https://httpbin.org/get",

@@ -13,12 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = library("Assert");
+package io.chapp.scriptinator.libraries.builtins;
 
-var token = secret("my-token");
+import io.chapp.scriptinator.model.Job;
+import jdk.nashorn.internal.runtime.JSONFunctions;
 
-Assert.equal(
-    "Secret returns correct value",
-    "9555701a-315b-419f-bffb-7c8ea8168b42",
-    token
-);
+import java.util.function.Supplier;
+
+public class ArgumentFunction implements Supplier<Object> {
+    private final Job job;
+
+    public ArgumentFunction(Job job) {
+        this.job = job;
+    }
+
+    @Override
+    public Object get() {
+        if (job.getArgument() == null) {
+            return null;
+        }
+
+        return JSONFunctions.parse(job.getArgument(), null);
+    }
+}

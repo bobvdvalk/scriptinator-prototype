@@ -14,42 +14,45 @@
 // limitations under the License.
 //
 
-:library_name: Script
+= Built In
+:!library_name:
+:!type_name:
 
-= Script
-:type_name: Script
-
-The `Script` library is a built-in library that is automatically included in every script.
+Scriptinator has a built-in library that is automatically included in every script.
 It can be used to log information, load libraries and interact with other scripts.
 
-== Script
+== Logging
 
-=== Script.info
+=== info
 
 :function_id: info
 include::_snippets/function.adoc[]
 
-=== Script.debug
+=== debug
 
 :function_id: debug
 include::_snippets/function.adoc[]
 
-=== Script.warn
+=== warn
 
 :function_id: warn
 include::_snippets/function.adoc[]
 
-=== Script.error
+=== error
 
 :function_id: error
 include::_snippets/function.adoc[]
 
-=== Script.library
+== Loading Libraries
+
+=== library
 
 :function_id: library
 include::_snippets/function.adoc[]
 
-=== Script.run
+== Running Scripts
+
+=== run
 
 :function_id: run
 include::_snippets/function.adoc[]
@@ -57,12 +60,14 @@ include::_snippets/function.adoc[]
 :function_id: run_argument
 include::_snippets/function.adoc[]
 
-=== Script.argument
+=== argument
 
 :function_id: argument
 include::_snippets/function.adoc[]
 
-=== Script.secret
+== Using Secrets
+
+=== secret
 
 :function_id: secret
 include::_snippets/function.adoc[]

@@ -13,12 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var Assert = library("Assert");
+package io.chapp.scriptinator.libraries.builtins;
 
-var token = secret("my-token");
+import io.chapp.scriptinator.libraries.ScriptLibrary;
 
-Assert.equal(
-    "Secret returns correct value",
-    "9555701a-315b-419f-bffb-7c8ea8168b42",
-    token
-);
+import java.util.function.Function;
+
+public class LibraryFunction implements Function<String, Object> {
+    private final ScriptLibrary scriptLibrary;
+
+    public LibraryFunction(ScriptLibrary scriptLibrary) {
+        this.scriptLibrary = scriptLibrary;
+    }
+
+    @Override
+    public Object apply(String name) {
+        return scriptLibrary.library(name);
+    }
+}
