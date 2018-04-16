@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-:signature: put({url, headers, basicAuth, bearerAuth})
-:description: Send a `PUT` request to the server
+:signature: put({url, headers, basicAuth, bearerAuth, body, contentType})
+:description: Send data to the server using a `PUT` request

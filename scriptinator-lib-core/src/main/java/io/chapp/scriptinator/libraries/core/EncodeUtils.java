@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.libraries.core;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.internal.objects.NativeJSON;
 
 import java.io.UnsupportedEncodingException;
@@ -42,7 +43,7 @@ public class EncodeUtils {
     }
 
     public static String toNativeJsonOrNull(Object argument) {
-        if (argument == null) {
+        if (argument == null || ScriptObjectMirror.isUndefined(argument)) {
             return null;
         }
 

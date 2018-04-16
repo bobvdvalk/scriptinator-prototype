@@ -16,5 +16,13 @@
 package io.chapp.scriptinator.libraries.http;
 
 public class ClientOptions extends RequestOptions {
+    private String baseUrl;
 
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 }

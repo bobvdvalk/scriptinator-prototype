@@ -15,10 +15,6 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class HttpRequest extends RequestOptions {
@@ -26,10 +22,11 @@ public class HttpRequest extends RequestOptions {
     private String url;
     private String contentType = "";
     private Object body;
-    private List<String> headers = new ArrayList<>();
 
     public HttpRequest(ClientOptions clientOptions) {
         super(clientOptions);
+        // Clear headers from client options (these are added by HttpClient)
+        setHeaders(null);
     }
 
     public String getMethod() {
@@ -62,15 +59,6 @@ public class HttpRequest extends RequestOptions {
 
     public void setBody(Object body) {
         this.body = body;
-    }
-
-    public List<String> getHeaders() {
-        return headers;
-    }
-
-    @JsonSetter
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = new ArrayList<>(headers.values());
     }
 
     @Override

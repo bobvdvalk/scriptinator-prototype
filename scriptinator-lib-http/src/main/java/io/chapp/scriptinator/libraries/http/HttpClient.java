@@ -41,12 +41,14 @@ public class HttpClient extends HttpRequestExecutor {
         REQUIRE_BODY = Collections.unmodifiableSet(methods);
     }
 
+    private final ClientOptions clientOptions;
     private final OkHttpClient client;
     private final ObjectMapper objectMapper;
     private final ClosableContext closableContext;
 
     public HttpClient(ClientOptions clientOptions, OkHttpClient client, ObjectConverter converter, ObjectMapper objectMapper, ClosableContext closableContext) {
         super(converter, clientOptions);
+        this.clientOptions = clientOptions;
         this.client = client;
         this.objectMapper = objectMapper;
         this.closableContext = closableContext;
@@ -71,7 +73,7 @@ public class HttpClient extends HttpRequestExecutor {
 
             Response response = client.newCall(
                     new Request.Builder()
-                            .url(request.getUrl())
+                            .url(constructUrl(clientOptions, request))
                             .headers(headers)
                             .method(request.getMethod(), body)
                             .build()
@@ -90,8 +92,27 @@ public class HttpClient extends HttpRequestExecutor {
         }
     }
 
+    private String constructUrl(ClientOptions clientOptions, HttpRequest request) {
+        if (StringUtils.isEmpty(clientOptions.getBaseUrl())) {
+            return request.getUrl();
+        }
+        // Prepend base url
+        String baseUrl = clientOptions.getBaseUrl();
+        String suffix = request.getUrl();
+
+        if (baseUrl.endsWith("/") && suffix.startsWith("/")) {
+            // Ignore double slashes
+            suffix = suffix.substring(1);
+        }
+        return baseUrl + suffix;
+    }
+
     private Headers buildHeaders(HttpRequest request) {
         Headers.Builder headers = new Headers.Builder();
+        if (clientOptions.getHeaders() != null) {
+            clientOptions.getHeaders().forEach(headers::add);
+        }
+
         if (request.getHeaders() != null) {
             request.getHeaders().forEach(headers::add);
         }
@@ -124,7 +145,7 @@ public class HttpClient extends HttpRequestExecutor {
             throw new IllegalArgumentException("Invalid contentType: " + request.getContentType());
         }
 
-        if (mediaType.toString().contains("json")) {
+        if (mediaType.subtype().equals("json")) {
             return jsonBody(mediaType, request.getBody());
         }
 

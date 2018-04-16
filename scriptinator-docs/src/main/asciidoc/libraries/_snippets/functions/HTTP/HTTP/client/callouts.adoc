@@ -21,4 +21,5 @@
 <4> Create an <<HttpClient>> with bearer (or token) authentication enabled.
     This allows you to make requests using token authentication, which is
     commonly used by OAuth secured web APIs.
-
+<5> Create an <<HttpClient>> with a base url, which allows you to only specify
+    the suffix for the url when performing http requets.

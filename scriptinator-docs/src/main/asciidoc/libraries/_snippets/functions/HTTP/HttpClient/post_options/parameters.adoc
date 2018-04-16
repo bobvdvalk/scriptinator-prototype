@@ -14,12 +14,12 @@
 // limitations under the License.
 //
 
-include::../get_url/parameters.adoc[]
+include::../get_options/parameters.adoc[]
 
 | *body* +
 Type: <<Any>>
 2.1+| Set this to the request payload. Setting it to an <<Object>> and the *contentType* parameter to `"application/x-www-form-urlencoded"`
-      serializes every field of the <<Object>> to an url encoded form body. +
+      serializes every field of the <<Object>> to a url encoded (or percent encoded) form body. +
       Setting this to anything and the *contentType* parameter to `"application/json"` causes the value of this parameter
       to be json serialized as the request body.
 
@@ -27,6 +27,3 @@ Type: <<Any>>
 Type: <<String>>
 2.1+| Set this value to control the way the *body* parameter is parsed. The value of this parameter is also sent as the
       value of the https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type[Content-Type^] header.
-
-include::../../HTTP/client/parameters.adoc[]
-

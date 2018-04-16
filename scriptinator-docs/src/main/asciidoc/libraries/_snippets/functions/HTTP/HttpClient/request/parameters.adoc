@@ -14,19 +14,8 @@
 // limitations under the License.
 //
 
-include::../get_url/parameters.adoc[]
-
 | *method* +
 Type: <<String>>
 2.1+| The method to use for the request
 
-| *contentType* +
-Type: <<String>>
-2.1+| The content type of the request body
-
-| *body* +
-Type: <<Object>>
-2.1+| The body to send with the request
-
-include::../../HTTP/client/parameters.adoc[]
-
+include::../post_options/parameters.adoc[]

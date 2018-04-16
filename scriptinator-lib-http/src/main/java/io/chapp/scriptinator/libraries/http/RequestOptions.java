@@ -16,13 +16,17 @@
 package io.chapp.scriptinator.libraries.http;
 
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import io.chapp.scriptinator.libraries.core.DataValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class RequestOptions extends DataValue {
     private BasicAuthentication basicAuth;
     private BearerAuthentication bearerAuth;
+    private List<String> headers = new ArrayList<>();
 
     public RequestOptions() {
     }
@@ -30,6 +34,7 @@ public class RequestOptions extends DataValue {
     public RequestOptions(RequestOptions clientOptions) {
         basicAuth = clientOptions.basicAuth;
         bearerAuth = clientOptions.bearerAuth;
+        headers = new ArrayList<>(clientOptions.headers);
     }
 
     public BasicAuthentication getBasicAuth() {
@@ -46,6 +51,20 @@ public class RequestOptions extends DataValue {
 
     public void setBearerAuth(BearerAuthentication bearerAuth) {
         this.bearerAuth = bearerAuth;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    // Due to the way we handle json serialization, arrays are mapped to maps with "$index" for keys.
+    @JsonSetter
+    public void setHeaders(Map<String, String> headers) {
+        if (headers == null) {
+            this.headers = null;
+        } else {
+            this.headers = new ArrayList<>(headers.values());
+        }
     }
 
     @Override

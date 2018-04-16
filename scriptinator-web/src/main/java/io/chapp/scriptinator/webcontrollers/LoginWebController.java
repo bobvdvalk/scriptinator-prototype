@@ -28,6 +28,7 @@ import java.net.URI;
 
 @Controller
 public class LoginWebController {
+    private static final String EMAIL_SESSION_ATTRIBUTE = "email";
     private final UserRegistrationService userRegistrationService;
 
     public LoginWebController(UserRegistrationService userRegistrationService) {
@@ -36,9 +37,9 @@ public class LoginWebController {
 
     @RequestMapping("/login")
     public String showLoginPage(Model model, HttpSession httpSession) {
-        if (httpSession.getAttribute("email") != null) {
-            model.addAttribute("newUserEmail", httpSession.getAttribute("email"));
-            httpSession.removeAttribute("email");
+        if (httpSession.getAttribute(EMAIL_SESSION_ATTRIBUTE) != null) {
+            model.addAttribute("newUserEmail", httpSession.getAttribute(EMAIL_SESSION_ATTRIBUTE));
+            httpSession.removeAttribute(EMAIL_SESSION_ATTRIBUTE);
         }
         return "pages/login";
     }
@@ -56,7 +57,7 @@ public class LoginWebController {
             return "pages/register";
         }
         if (userRegistrationService.isEmailVerificationEnabled()) {
-            httpSession.setAttribute("email", user.getEmail());
+            httpSession.setAttribute(EMAIL_SESSION_ATTRIBUTE, user.getEmail());
         }
 
         return "redirect:/login";

@@ -19,7 +19,6 @@ package io.chapp.scriptinator.libraries.builtins;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.SecretService;
-import jdk.nashorn.internal.objects.NativeJSON;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
