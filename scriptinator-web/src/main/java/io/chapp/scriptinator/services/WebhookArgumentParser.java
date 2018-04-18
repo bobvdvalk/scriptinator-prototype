@@ -15,15 +15,18 @@
  */
 package io.chapp.scriptinator.services;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.model.WebhookArgument;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,10 +78,6 @@ public class WebhookArgumentParser {
             return null;
         }
 
-        if (contentType.startsWith("text/") || contentType.startsWith("application/xml")) {
-            // Return the plain text.
-            return IOUtils.toString(request.getInputStream(), characterEncoding);
-        }
         if (contentType.startsWith("multipart/form-data")) {
             // Create a map from all parts.
             Collection<Part> bodyParts = getBodyParts(request);
@@ -93,18 +92,39 @@ public class WebhookArgumentParser {
             }
 
             return partsMap;
-        } else if (contentType.startsWith("application/json")) {
-            // Read the body as a map.
-            return objectMapper.readValue(IOUtils.toString(request.getInputStream(), characterEncoding), Map.class);
         } else if (contentType.startsWith("application/x-www-form-urlencoded")) {
             return Collections.list(request.getParameterNames()).stream()
                     .collect(Collectors.toMap(
                             Function.identity(),
                             request::getParameter
                     ));
+        } else if (isSupportedType(contentType)) {
+            try (InputStream data = request.getInputStream()) {
+                String stringData = IOUtils.toString(data, characterEncoding);
+                if (StringUtils.isEmpty(stringData) || isText(contentType)) {
+                    return stringData;
+                } else if (isJson(contentType)) {
+                    try {
+                        return objectMapper.readValue(stringData, Map.class);
+                    } catch (JsonParseException e) {
+                        throw new IllegalArgumentException("Invalid json body: " + e.getMessage(), e);
+                    }
+                }
+            }
         }
-
         return null;
+    }
+
+    private boolean isSupportedType(String contentType) {
+        return isJson(contentType) || isText(contentType);
+    }
+
+    private boolean isJson(String contentType) {
+        return contentType.startsWith("application/json");
+    }
+
+    private boolean isText(String contentType) {
+        return contentType.startsWith("text/") || contentType.startsWith("application/xml");
     }
 
     private Collection<Part> getBodyParts(HttpServletRequest request) throws IOException {
