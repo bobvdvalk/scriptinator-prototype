@@ -26,6 +26,7 @@ public enum ApiScope {
     JOB_READ,
     PROJECT_READ,
     SCHEDULE_READ,
+    WEBHOOK_READ,
     SCRIPT,
     SCRIPT_READ,
     SCRIPT_RUN;

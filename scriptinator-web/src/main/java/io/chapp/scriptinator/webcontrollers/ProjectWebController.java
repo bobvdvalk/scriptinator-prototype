@@ -110,6 +110,17 @@ public class ProjectWebController {
         return "pages/view_schedules";
     }
 
+    @GetMapping("{projectId}/webhooks")
+    public String viewWebhooks(@PathVariable long projectId, Model model) {
+        Project project = projectService.getOwnedByPrincipal(projectId);
+        model.addAttribute(Project.ATTRIBUTE, project);
+        model.addAttribute(Webhook.LIST_ATTRIBUTE, project.getWebhooks());
+
+        model.addAttribute("webhookCount", project.getWebhooks().size());
+        model.addAttribute(Tab.ATTRIBUTE, Tab.WEBHOOKS);
+        return "pages/view_webhooks";
+    }
+
     /*===== Project settings =====*/
 
     @GetMapping("{projectId}/secrets")

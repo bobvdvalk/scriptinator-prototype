@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.chapp.scriptinator.webcontrollers;
+package io.chapp.scriptinator.model;
 
-public class Tab {
-    public static final String ATTRIBUTE = "activeTab";
-    public static final String SCRIPTS = "scripts";
-    public static final String SETTINGS = "settings";
-    public static final String SCHEDULES = "schedules";
-    public static final String SECRETS = "secrets";
-    public static final String WEBHOOKS = "webhooks";
+import java.util.Map;
 
-    private Tab() {
+public class WebhookArgument {
+    private final String method;
+    private final Object body;
+    private final Map<String, String> headers;
+
+    public WebhookArgument(String method, Object body, Map<String, String> headers) {
+        this.method = method;
+        this.body = body;
+        this.headers = headers;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public Object getBody() {
+        return body;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 }

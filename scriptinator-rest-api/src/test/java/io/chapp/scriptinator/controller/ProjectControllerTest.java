@@ -17,14 +17,8 @@ package io.chapp.scriptinator.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
-import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.Schedule;
-import io.chapp.scriptinator.model.Script;
-import io.chapp.scriptinator.model.User;
-import io.chapp.scriptinator.repositories.ProjectRepository;
-import io.chapp.scriptinator.repositories.ScheduleRepository;
-import io.chapp.scriptinator.repositories.ScriptRepository;
-import io.chapp.scriptinator.repositories.UserRepository;
+import io.chapp.scriptinator.model.*;
+import io.chapp.scriptinator.repositories.*;
 import io.chapp.scriptinator.utils.ScriptinatorTestCase;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
@@ -37,6 +31,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 import static org.testng.Assert.assertEquals;
@@ -45,16 +40,18 @@ import static org.testng.Assert.assertEquals;
 public class ProjectControllerTest {
     private final OkHttpClient client = new OkHttpClient();
     @Autowired
-    Headers accessToken;
+    private Headers accessToken;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
     @Autowired
-    ScriptRepository scriptRepository;
+    private ScriptRepository scriptRepository;
     @Autowired
-    ScheduleRepository scheduleRepository;
+    private ScheduleRepository scheduleRepository;
+    @Autowired
+    private WebhookRepository webhookRepository;
 
     @Test
     public void testWhenProjectIsRequestedItIsReturned() throws IOException {
@@ -257,6 +254,54 @@ public class ProjectControllerTest {
                 new HashSet<>(Arrays.asList(
                         "scheduleMe",
                         "justInTime"
+                ))
+        );
+    }
+
+    @Test
+    public void testListProjectWebhooksReturnsAllWebhooks() throws IOException {
+        // Precondition
+        Project project = new Project();
+        project.setOwner(userRepository.findByUsername(ScriptinatorTestCase.DEFAULT_USERNAME).get());
+        project.setName("sensitiveProject");
+        project = projectRepository.save(project);
+
+        Script script = new Script();
+        script.setProject(project);
+        script.setName("hashtagTriggered");
+        scriptRepository.save(script);
+
+        Webhook webhook = new Webhook();
+        webhook.setUuid(UUID.randomUUID().toString());
+        webhook.setProject(project);
+        webhook.setScriptName("hashtagTriggered");
+        webhook.setName("triggerMe");
+        webhookRepository.save(webhook);
+        webhook = new Webhook();
+        webhook.setUuid(UUID.randomUUID().toString());
+        webhook.setProject(project);
+        webhook.setScriptName("hashtagTriggered");
+        webhook.setName("triggerHappy");
+        webhookRepository.save(webhook);
+
+        // Action
+        Response response = client.newCall(
+                new Request.Builder()
+                        .get()
+                        .url("http://localhost:8080/projects/sensitiveProject/webhooks")
+                        .headers(accessToken)
+                        .build()
+        ).execute();
+
+        // Validation
+        String body = response.body().string();
+        ReadContext json = JsonPath.parse(body);
+
+        assertEquals(
+                new HashSet<>(json.read("$.items[*].name")),
+                new HashSet<>(Arrays.asList(
+                        "triggerMe",
+                        "triggerHappy"
                 ))
         );
     }

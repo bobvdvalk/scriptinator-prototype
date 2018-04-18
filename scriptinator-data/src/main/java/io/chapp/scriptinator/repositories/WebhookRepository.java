@@ -15,21 +15,20 @@
  */
 package io.chapp.scriptinator.repositories;
 
-import io.chapp.scriptinator.model.AbstractEntity;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.Repository;
+import io.chapp.scriptinator.model.Webhook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
 
-@NoRepositoryBean
-public interface AbstractEntityRepository<E extends AbstractEntity> extends Repository<E, Long> {
-    Optional<E> findOne(long id);
+public interface WebhookRepository extends AbstractEntityRepository<Webhook> {
+    Optional<Webhook> findByProjectOwnerUsernameAndId(String username, long id);
 
-    E save(E entity);
+    Page<Webhook> findAllByProjectOwnerUsernameAndProjectName(String username, String projectName, Pageable pageable);
+
+    Optional<Webhook> findByUuid(String uuid);
 
     @Transactional
-    void deleteAll();
-
-    long count();
+    void deleteAllByProjectOwnerUsernameAndId(String username, long id);
 }

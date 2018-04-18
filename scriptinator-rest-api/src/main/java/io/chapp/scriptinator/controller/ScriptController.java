@@ -22,16 +22,15 @@ import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
-import org.springframework.http.HttpStatus;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("scripts")
@@ -46,8 +45,8 @@ public class ScriptController {
         this.objectMapper = objectMapper;
     }
 
-    @GetMapping("")
-    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:read')")
+    @GetMapping
+    @PreAuthorize("#oauth2.hasAnyScope('script', 'script:read')")
     public PageResult<Script> getScripts(HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts"),
@@ -64,7 +63,7 @@ public class ScriptController {
      * within the project.
      */
     @GetMapping("{scriptId}")
-    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:read')")
+    @PreAuthorize("#oauth2.hasAnyScope('script', 'script:read')")
     public Script getScriptById(@PathVariable long scriptId) {
         return scriptService.getOwnedByPrincipal(scriptId);
     }
@@ -81,21 +80,14 @@ public class ScriptController {
         );
     }
 
-    @PostMapping("{scriptId}/jobs")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:run')")
-    public Job runScript(@PathVariable long scriptId, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (InputStream data = request.getInputStream()) {
-            Job result = scriptService.run(
-                    scriptService.getOwnedByPrincipal(scriptId),
-                    null,
-                    StreamUtils.copyToString(data, Charset.defaultCharset())
-            );
-            response.setHeader("Location", objectMapper.convertValue(
-                    result.getUrl(),
-                    String.class
-            ));
-            return result;
-        }
+    @PostMapping(value = "{scriptId}/run", consumes = "application/json")
+    @PreAuthorize("#oauth2.hasAnyScope('script', 'script:run')")
+    public Map<String, Object> runScript(@PathVariable long scriptId, HttpServletRequest request) throws IOException {
+        // Get the request body as a map (or null).
+        String bodyString = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
+        Map bodyMap = StringUtils.isEmpty(bodyString) ? null : objectMapper.readValue(bodyString, Map.class);
+
+        scriptService.run(scriptService.getOwnedByPrincipal(scriptId), bodyMap);
+        return Collections.singletonMap("success", true);
     }
 }

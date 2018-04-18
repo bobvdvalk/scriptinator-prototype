@@ -37,7 +37,7 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @GetMapping("")
+    @GetMapping
     @PreAuthorize("#oauth2.hasScope('schedule:read')")
     public PageResult<Schedule> getSchedules(HttpServletRequest request) {
         Page<Schedule> result = scheduleService.findAllOwnedByPrincipal(

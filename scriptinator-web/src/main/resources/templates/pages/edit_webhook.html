@@ -1,0 +1,221 @@
+<!--
+
+    Copyright © 2018 Scriptinator (support@scriptinator.io)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/project}">
+<body>
+
+<div layout:fragment="content">
+    <h3 th:if="${webhook.id == null}" class="ui header">
+        New Webhook
+    </h3>
+    <h3 th:if="${webhook.id != null}" class="ui header">
+        <div class="content">
+            <span th:text="${webhook.name}"></span>
+            <div class="sub header" th:text="${webhook.description}"></div>
+        </div>
+    </h3>
+
+    <form th:action="''"
+          th:method="post"
+          th:object="${webhook}"
+          class="ui form"
+          th:classappend="${errors != null ? 'error': ''}">
+
+        <div class="ui clearing orange segment">
+            <div class="ui grid">
+                <div class="row">
+                    <div class="four wide column">
+                        <div class="field"
+                             th:classappend="${errors?.get('name') == null ? '' : 'error'}">
+                            <label>Name</label>
+                            <input type="text"
+                                   name="name"
+                                   placeholder="my-webhook"
+                                   th:field="*{name}">
+                        </div>
+                    </div>
+                    <div class="twelve wide column">
+                        <div class="field">
+                            <label>Description</label>
+                            <input type="text"
+                                   name="description"
+                                   placeholder="Description..."
+                                   th:field="*{description}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="four wide column">
+                        <div class="field" th:classappend="${errors?.get('scriptName') == null ? '' : 'error'}">
+                            <label>Script</label>
+                            <div class="ui search selection dropdown">
+                                <input type="hidden" name="scriptName" th:field="*{scriptName}">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">Select script</div>
+                                <div class="menu">
+                                    <div class="item"
+                                         th:each="script : ${scripts}"
+                                         th:text="${script.name}"
+                                         th:data-value="${script.name}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="twelve wide column">
+                        <div class="field" th:if="${webhook.id != null}">
+                            <label>Call</label>
+                            <div class="ui action input">
+                                <input id="webhook-url"
+                                       type="text"
+                                       readonly="readonly"
+                                       th:value="${webhookUrl}"
+                                       placeholder="https://scriptinator.io/webhook/{uuid}">
+                                <button type="button" class="ui icon button" onclick="copyWebhookUrl()">
+                                    <i class="copy icon"></i>
+                                </button>
+                            </div>
+                            <div>
+                                Last call:
+                                <span th:text="${webhook.lastCall}"></span>
+                                <span th:if="${webhook.lastCall == null}">never</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="twelve wide column">
+                        <div class="ui error message">
+                            <ul class="list" th:if="${errors != null}">
+                                <li th:each="error : ${errors.values()}" th:text="${error}"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="four wide column">
+                        <div class="ui right floated buttons">
+                            <a class="ui button" th:href="${'/project/' + project.id + '/webhooks'}">
+                                Cancel
+                            </a>
+                            <button class="ui primary button">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div th:if="${webhook.id != null}" class="ui red segment">
+        <h3>Danger Zone</h3>
+        <button class="ui button red" onclick="promptDeleteWebhook()">
+            Delete this webhook
+        </button>
+    </div>
+
+    <div id="delete-modal" class="ui basic modal">
+        <div class="ui icon header">
+            <i class="delete icon"></i>
+            Delete webhook: <span th:text="${webhook.name}"></span>?
+        </div>
+        <div class="content">
+            <p>Should you decide to delete this webhook, we will not be able to recover it for you.</p>
+        </div>
+        <div class="actions">
+            <button class="ui grey cancel button">
+                <i class="remove icon"></i>
+                Cancel
+            </button>
+            <button onclick="deleteWebhook()" class="ui red ok button">
+                <i class="checkmark icon"></i>
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    $(document).ready(function () {
+        $('.ui.dropdown').dropdown();
+    });
+
+    function promptDeleteWebhook() {
+        $('#delete-modal').modal('show');
+    }
+
+    function deleteWebhook() {
+        var token = $('#_csrf').attr('content');
+        var header = $('#_csrf_header').attr('content');
+
+        $.ajax({
+            type: "DELETE",
+            url: "",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            success: function () {
+                window.location = /*[[@{'/project/' + ${project.id} + '/webhooks'}]]*/ "/projects";
+            }
+        });
+    }
+
+    function copyWebhookUrl() {
+        $('#webhook-url').select();
+        document.execCommand('copy');
+    }
+
+    // Enable form validation
+    $('.ui.form')
+        .form({
+            fields: {
+                name: {
+                    identifier: 'name',
+                    rules: [
+                        {
+                            type: 'empty',
+                            prompt: 'What would you like to call this webhook?'
+                        },
+                        {
+                            type: 'regExp[/^[a-z0-9_-]*$/i]',
+                            prompt: 'Please rename your webhook to only use alphanumeric characters, underscores and dashes.'
+                        },
+                        {
+                            type: 'regExp[/^[a-z]/i]',
+                            prompt: 'Please rename your webhook to start with a letter.'
+                        }
+                    ]
+                },
+                scriptName: {
+                    identifier: 'scriptName',
+                    rules: [
+                        {
+                            type: 'empty',
+                            prompt: 'Which script would you like to call with this webhook?'
+                        }
+                    ]
+                }
+            }
+        });
+</script>
+
+</body>
+</html>

@@ -35,7 +35,7 @@ import java.util.Collections;
 @Listeners(ScriptinatorTestCase.class)
 public class ApiSecurityTest {
     @Autowired
-    OkHTTPClientConfig clientConfig;
+    private OkHTTPClientConfig clientConfig;
 
     @DataProvider
     public Object[][] endpoints() {
@@ -51,7 +51,7 @@ public class ApiSecurityTest {
                 new Object[]{"GET", "/scripts", null, 200, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_READ)},
                 new Object[]{"GET", "/scripts/5436", null, 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_READ)},
                 new Object[]{"GET", "/scripts/5436/jobs", null, 200, Collections.singletonList(ApiScope.JOB_READ)},
-                new Object[]{"POST", "/scripts/5436/jobs", RequestBody.create(MediaType.parse("application/json"), "{}"), 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_RUN)},
+                new Object[]{"POST", "/scripts/5436/run", RequestBody.create(MediaType.parse("application/json"), "{}"), 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_RUN)}
         };
     }
 
@@ -74,7 +74,7 @@ public class ApiSecurityTest {
             Assert.assertEquals(
                     response.code(),
                     requiresOneOf.contains(testScope) ? successCode : 403,
-                    method + " " + endpoint + " should require " + StringUtils.join(requiresOneOf, " or ") + " but returned an unexpected code with " + testScope + ":"
+                    method + " " + endpoint + " should require scope '" + StringUtils.join(requiresOneOf, "' or '") + "' but returned an unexpected code with scope '" + testScope + "':"
             );
         }
     }

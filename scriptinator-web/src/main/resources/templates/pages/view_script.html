@@ -150,7 +150,24 @@
                         </th:block>
                     </th:block>
 
-                    <th:block th:if="${job.triggeredByScheduleId == null && job.triggeredByJobId == null}">
+                    <th:block th:if="${job.triggeredByWebhookId}">
+                        <th:block th:if="${triggersById.containsKey(job.triggeredByWebhookId)}">
+                            <a class="ui circular icon button"
+                               th:href="${'/project/' + script.project.id + '/webhook/' + job.triggeredByWebhookId}"
+                               th:data-tooltip="${'Triggered by webhook: ' + triggersById.get(job.triggeredByWebhookId).name}">
+                                <i class="linkify icon"></i>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${triggersById.containsKey(job.triggeredByWebhookId)}">
+                            <button class="ui circular icon button"
+                                    data-tooltip="Triggered by an unknown webhook">
+                                <i class="linkify icon"></i>
+                            </button>
+                        </th:block>
+                    </th:block>
+
+                    <th:block
+                            th:if="${job.triggeredByScheduleId == null && job.triggeredByJobId == null && job.triggeredByWebhookId == null}">
                         <button class="ui circular icon button"
                                 data-tooltip="Triggered by the run button">
                             <i class="play icon"></i>

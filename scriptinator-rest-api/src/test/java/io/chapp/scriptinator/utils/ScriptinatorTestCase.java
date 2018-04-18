@@ -15,13 +15,11 @@
  */
 package io.chapp.scriptinator.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.ScriptinatorRestApi;
 import io.chapp.scriptinator.model.OAuthApp;
 import io.chapp.scriptinator.model.User;
 import io.chapp.scriptinator.repositories.OAuthAppRepository;
 import io.chapp.scriptinator.repositories.UserRepository;
-import okhttp3.OkHttpClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.testng.*;
@@ -31,9 +29,6 @@ public class ScriptinatorTestCase implements IClassListener, IInvokedMethodListe
     public static final String DEFAULT_CLIENT_ID = "012345678901234567890123456789";
     private static final String DEFAULT_PASSWORD = "thisispassword";
     private static final String DEFAULT_CLIENT_SECRET = "012345678901234567890123456789";
-
-    private final OkHttpClient client = new OkHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     private ApplicationContext context;
 

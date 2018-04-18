@@ -56,6 +56,11 @@ public class Project extends AbstractEntity {
     @JsonIgnore
     private List<Secret> secrets = new ArrayList<>();
 
+    @NotNull
+    @OneToMany(mappedBy = "project", orphanRemoval = true)
+    @JsonIgnore
+    private List<Webhook> webhooks = new ArrayList<>();
+
     public String getName() {
         return name;
     }
@@ -102,6 +107,14 @@ public class Project extends AbstractEntity {
 
     public void setSecrets(List<Secret> secrets) {
         this.secrets = secrets;
+    }
+
+    public List<Webhook> getWebhooks() {
+        return webhooks;
+    }
+
+    public void setWebhooks(List<Webhook> webhooks) {
+        this.webhooks = webhooks;
     }
 
     public Link getScriptsUrl() {

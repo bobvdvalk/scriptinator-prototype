@@ -37,7 +37,7 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @GetMapping("")
+    @GetMapping
     @PreAuthorize("#oauth2.hasScope('job:read')")
     public PageResult<Job> listJobs(HttpServletRequest request) {
         return PageResult.of(

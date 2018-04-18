@@ -29,6 +29,7 @@ import java.net.URI;
 @Controller
 public class LoginWebController {
     private static final String EMAIL_SESSION_ATTRIBUTE = "email";
+
     private final UserRegistrationService userRegistrationService;
 
     public LoginWebController(UserRegistrationService userRegistrationService) {
@@ -56,6 +57,7 @@ public class LoginWebController {
             model.addAttribute("error", "A user with that username already exists");
             return "pages/register";
         }
+        
         if (userRegistrationService.isEmailVerificationEnabled()) {
             httpSession.setAttribute(EMAIL_SESSION_ATTRIBUTE, user.getEmail());
         }

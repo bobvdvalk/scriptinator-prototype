@@ -15,23 +15,26 @@
  */
 package io.chapp.scriptinator.controller;
 
-import io.chapp.scriptinator.model.Link;
+import io.chapp.scriptinator.model.Webhook;
+import io.chapp.scriptinator.services.WebhookService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-public class RootController {
+@RequestMapping("webhooks")
+public class WebhookController {
+    private final WebhookService webhookService;
 
-    @GetMapping("/")
-    public Map<String, Link> getApiLinks() {
-        Map<String, Link> links = new HashMap<>();
-        links.put("jobsUrl", new Link("/jobs"));
-        links.put("projectsUrl", new Link("/projects"));
-        links.put("scriptsUrl", new Link("/scripts"));
-        links.put("webhooksUrl", new Link("/webhooks"));
-        return links;
+    public WebhookController(WebhookService webhookService) {
+        this.webhookService = webhookService;
+    }
+
+    @GetMapping("{webhookId}")
+    @PreAuthorize("#oauth2.hasScope('webhook:read')")
+    public Webhook getWebhookById(@PathVariable long webhookId) {
+        return webhookService.getOwnedByPrincipal(webhookId);
     }
 }

@@ -19,6 +19,7 @@ import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScheduleService;
 import io.chapp.scriptinator.services.ScriptService;
+import io.chapp.scriptinator.services.WebhookService;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,17 +39,21 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("projects")
 public class ProjectController {
+    private static final String PROJECTS_URL = "/projects";
+
     private final ProjectService projectService;
     private final ScriptService scriptService;
     private final ScheduleService scheduleService;
+    private final WebhookService webhookService;
 
-    public ProjectController(ProjectService projectService, ScriptService scriptService, ScheduleService scheduleService) {
+    public ProjectController(ProjectService projectService, ScriptService scriptService, ScheduleService scheduleService, WebhookService webhookService) {
         this.projectService = projectService;
         this.scriptService = scriptService;
         this.scheduleService = scheduleService;
+        this.webhookService = webhookService;
     }
 
-    @GetMapping("")
+    @GetMapping
     @PreAuthorize("#oauth2.hasScope('project:read')")
     public PageResult<Project> projectList(HttpServletRequest request) {
         Page<Project> result = projectService.findAllOwnedByPrincipal(
@@ -56,7 +61,7 @@ public class ProjectController {
         );
 
         return PageResult.of(
-                new Link("/projects"),
+                new Link(PROJECTS_URL),
                 result
         );
     }
@@ -71,7 +76,7 @@ public class ProjectController {
     @PreAuthorize("#oauth2.hasScope('script') or #oauth2.hasScope('script:read')")
     public PageResult<Script> getProjectScripts(@PathVariable String projectName, HttpServletRequest request) {
         return PageResult.of(
-                new Link("/projects/" + projectName + "/scripts"),
+                new Link(PROJECTS_URL + "/" + projectName + "/scripts"),
                 scriptService.getAllForProjectOwnedByPrincipal(
                         projectName,
                         PageResult.request(request)
@@ -83,8 +88,20 @@ public class ProjectController {
     @PreAuthorize("#oauth2.hasScope('schedule:read')")
     public PageResult<Schedule> getProjectSchedules(@PathVariable String projectName, HttpServletRequest request) {
         return PageResult.of(
-                new Link("/projects/" + projectName + "/schedules"),
+                new Link(PROJECTS_URL + "/" + projectName + "/schedules"),
                 scheduleService.getAllForProjectOwnedByPrincipal(
+                        projectName,
+                        PageResult.request(request)
+                )
+        );
+    }
+
+    @GetMapping("{projectName}/webhooks")
+    @PreAuthorize("#oauth2.hasScope('webhook:read')")
+    public PageResult<Webhook> getProjectWebhooks(@PathVariable String projectName, HttpServletRequest request) {
+        return PageResult.of(
+                new Link(PROJECTS_URL + "/" + projectName + "/webhooks"),
+                webhookService.getAllForProjectOwnedByPrincipal(
                         projectName,
                         PageResult.request(request)
                 )

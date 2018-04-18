@@ -15,22 +15,29 @@
  */
 package io.chapp.scriptinator.services;
 
-import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Schedule;
-import io.chapp.scriptinator.model.Script;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.repositories.ScriptRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
 public class ScriptService extends AbstractEntityService<Script, ScriptRepository> {
     private final JobService jobService;
+    private final WebhookService webhookService;
+    private final ObjectMapper objectMapper;
 
-    public ScriptService(JobService jobService) {
+    public ScriptService(JobService jobService, WebhookService webhookService, ObjectMapper objectMapper) {
         this.jobService = jobService;
+        this.webhookService = webhookService;
+        this.objectMapper = objectMapper;
     }
 
     public Optional<Script> findOwnedBy(String username, long projectId, long scriptId) {
@@ -39,6 +46,18 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
 
     public Optional<Script> findOwnedByPrincipal(long projectId, long scriptId) {
         return findOwnedBy(DataServiceUtils.getPrincipalName(), projectId, scriptId);
+    }
+
+    public Optional<Script> findOwnedBy(String username, String projectName, String scriptName) {
+        return getRepository().findByProjectOwnerUsernameAndProjectNameAndName(
+                username,
+                projectName,
+                scriptName
+        );
+    }
+
+    public Optional<Script> findOwnedByPrincipal(String projectName, String scriptName) {
+        return findOwnedBy(DataServiceUtils.getPrincipalName(), projectName, scriptName);
     }
 
     public Script getOwnedByPrincipal(long projectId, long scriptId) {
@@ -53,11 +72,8 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
     }
 
     public Script getOwnedBy(String username, String projectName, String scriptName) {
-        return getRepository().findByProjectOwnerUsernameAndProjectNameAndName(
-                username,
-                projectName,
-                scriptName
-        ).orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
+        return findOwnedBy(username, projectName, scriptName)
+                .orElseThrow(() -> noSuchElement(projectName + "/" + scriptName));
     }
 
     public Script getOwnedByPrincipal(String projectName, String scriptName) {
@@ -103,7 +119,7 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
     }
 
     /**
-     * Run a script triggered by a job.
+     * Run a script, optionally triggered by a job.
      *
      * @param script   The script to run.
      * @param trigger  The job that triggered the execution.
@@ -119,6 +135,17 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
     }
 
     /**
+     * Run a script with an argument. The argument will be parsed to a JSON string.
+     *
+     * @param script   The script to run.
+     * @param argument The argument object passed to the script.
+     * @return The created job.
+     */
+    public Job run(Script script, Object argument) {
+        return run(script, null, stringify(argument));
+    }
+
+    /**
      * Run a script triggered by a schedule.
      *
      * @param script The script to run.
@@ -127,6 +154,33 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         Job job = createJob(script, schedule.getArgument());
         job.setTriggeredByScheduleId(schedule.getId());
         jobService.create(job);
+    }
+
+    /**
+     * Run a script triggered by a webhook.
+     *
+     * @param webhookUuid The uuid of the webhook.
+     * @param argument    The argument from the request.
+     */
+    public void runWebhooked(String webhookUuid, WebhookArgument argument) {
+        // Get and update the webhook.
+        Webhook webhook = webhookService.getByUuid(webhookUuid);
+        webhook.setLastCall(Date.from(Instant.now(Clock.systemDefaultZone())));
+        webhookService.update(webhook);
+
+        // Get the script, create the job.
+        Script script = getOwnedBy(webhook.getProject().getOwner().getUsername(), webhook.getProject().getName(), webhook.getScriptName());
+        Job job = createJob(script, stringify(argument));
+        job.setTriggeredByWebhookId(webhook.getId());
+        jobService.create(job);
+    }
+
+    private String stringify(Object argument) {
+        try {
+            return objectMapper.writeValueAsString(argument);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Could not write argument as string.", e);
+        }
     }
 
     private Job createJob(Script script, String argument) {

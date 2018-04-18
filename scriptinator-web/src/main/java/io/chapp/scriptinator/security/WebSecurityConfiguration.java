@@ -54,7 +54,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/assets/**",
                         // Favicons
                         "/*.png",
-                        "/*.ico"
+                        "/*.ico",
+                        // Webhooks
+                        "/webhook/**"
                 )
                 .permitAll()
                 .anyRequest().authenticated()
@@ -62,7 +64,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login").permitAll()
                 .and()
-                .logout().permitAll();
+                .logout().permitAll()
+                .and()
+                // Disable CSRF validation for webhooks.
+                .csrf()
+                .ignoringAntMatchers("/webhook/**");
     }
 
     @Override

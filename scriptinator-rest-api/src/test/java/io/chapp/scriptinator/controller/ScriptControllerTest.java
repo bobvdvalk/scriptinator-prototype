@@ -28,7 +28,6 @@ import io.chapp.scriptinator.repositories.UserRepository;
 import io.chapp.scriptinator.utils.ScriptinatorTestCase;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testng.Assert;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -39,21 +38,22 @@ import java.util.HashSet;
 
 import static io.chapp.scriptinator.utils.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 @Listeners(ScriptinatorTestCase.class)
 public class ScriptControllerTest {
     private final OkHttpClient client = new OkHttpClient();
     @Autowired
-    Headers accessToken;
+    private Headers accessToken;
 
     @Autowired
-    ScriptRepository scriptRepository;
+    private ScriptRepository scriptRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
     @Autowired
-    JobRepository jobRepository;
+    private JobRepository jobRepository;
 
     @Test
     public void testWhenScriptIsRequestedItReturned() throws IOException {
@@ -265,17 +265,17 @@ public class ScriptControllerTest {
     }
 
     @Test
-    public void testRunScriptCreatesNewJobWithLocationHeader() throws IOException {
+    public void testRunningScriptCreatesAndReturnsJob() throws IOException {
         // Precondition
         User defaultUser = userRepository.findByUsername(DEFAULT_USERNAME).get();
 
         Project project = new Project();
-        project.setName("testRunScriptJob");
+        project.setName("testScriptRunning");
         project.setOwner(defaultUser);
         project = projectRepository.save(project);
 
         Script script = new Script();
-        script.setName("greetingScript");
+        script.setName("testScript");
         script.setProject(project);
         script.setCode("info('Hello!');");
         script = scriptRepository.save(script);
@@ -283,40 +283,15 @@ public class ScriptControllerTest {
         // Action
         Response response = client.newCall(
                 new Request.Builder()
-                        .post(RequestBody.create(MediaType.parse("application/octet-stream"), "{\"Hello\": \"World\"}"))
-                        .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .post(RequestBody.create(MediaType.parse("application/json"), ""))
+                        .url("http://localhost:8080/scripts/" + script.getId() + "/run")
                         .headers(accessToken)
                         .build()
         ).execute();
 
         // Validation
-        assertEquals(
-                response.code(),
-                201
-        );
-
         ReadContext json = JsonPath.parse(response.body().string());
-        String location = response.header("Location");
-        Assert.assertNotNull(location, "Location header is present");
 
-        // Pull the id from the location header
-        int jobId = Integer.parseInt(location.substring(location.lastIndexOf('/') + 1));
-
-        assertEquals(
-                (int) json.read("$.id"),
-                jobId
-        );
-        assertEquals(
-                json.read("$.scriptUrl"),
-                "http://localhost:8080/scripts/" + script.getId()
-        );
-        assertEquals(
-                json.read("$.status"),
-                "QUEUED"
-        );
-        assertEquals(
-                json.read("$.argument"),
-                "{\"Hello\": \"World\"}"
-        );
+        assertTrue(json.read("$.success"));
     }
 }

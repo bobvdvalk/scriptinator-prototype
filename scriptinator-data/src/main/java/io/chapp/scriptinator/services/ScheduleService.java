@@ -20,8 +20,9 @@ import io.chapp.scriptinator.repositories.ScheduleRepository;
 import net.redhogs.cronparser.CronExpressionDescriptor;
 import net.redhogs.cronparser.Options;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.quartz.CronExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import java.util.Optional;
 
 @Service
 public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRepository> {
-    private static final Logger LOGGER = Logger.getLogger(ScheduleService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleService.class);
     private static final Options CRON_DESCRIPTION_OPTIONS;
 
     static {
@@ -120,12 +121,12 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
     }
 
     /**
-     * Get the now date in UTC.
+     * Get the now date based on the system clock.
      *
      * @return The now date.
      */
     public Date now() {
-        return Date.from(Instant.now(Clock.systemUTC()));
+        return Date.from(Instant.now(Clock.systemDefaultZone()));
     }
 
     /**

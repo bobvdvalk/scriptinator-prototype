@@ -49,12 +49,14 @@ public class Job extends AbstractEntity {
     @Lob
     private String output = "";
 
-    private Long triggeredByJobId;
-
     @Lob
     private String argument;
 
+    private Long triggeredByJobId;
+
     private Long triggeredByScheduleId;
+
+    private Long triggeredByWebhookId;
 
     public String getDisplayName() {
         return displayName;
@@ -116,16 +118,14 @@ public class Job extends AbstractEntity {
         this.output = output;
     }
 
+    /**
+     * Append a message to the output.
+     *
+     * @param level   The log level.
+     * @param message The message.
+     */
     public void log(String level, String message) {
         output += String.format("%s - [%s]: %s%n", new Date(), level, message);
-    }
-
-    public Long getTriggeredByJobId() {
-        return triggeredByJobId;
-    }
-
-    public void setTriggeredByJobId(Long triggeredByJobId) {
-        this.triggeredByJobId = triggeredByJobId;
     }
 
     public String getArgument() {
@@ -136,12 +136,28 @@ public class Job extends AbstractEntity {
         this.argument = argument;
     }
 
+    public Long getTriggeredByJobId() {
+        return triggeredByJobId;
+    }
+
+    public void setTriggeredByJobId(Long triggeredByJobId) {
+        this.triggeredByJobId = triggeredByJobId;
+    }
+
     public Long getTriggeredByScheduleId() {
         return triggeredByScheduleId;
     }
 
     public void setTriggeredByScheduleId(Long triggeredByScheduleId) {
         this.triggeredByScheduleId = triggeredByScheduleId;
+    }
+
+    public Long getTriggeredByWebhookId() {
+        return triggeredByWebhookId;
+    }
+
+    public void setTriggeredByWebhookId(Long triggeredByWebhookId) {
+        this.triggeredByWebhookId = triggeredByWebhookId;
     }
 
     @Override

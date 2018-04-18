@@ -101,7 +101,7 @@ public class ScheduleWebController {
         schedule.setProject(project);
 
         // Check if the script exists.
-        if (scriptService.getOwnedByPrincipal(schedule.getProject().getName(), schedule.getScriptName()) == null) {
+        if (!scriptService.findOwnedByPrincipal(schedule.getProject().getName(), schedule.getScriptName()).isPresent()) {
             return saveError(schedule, model, "scriptName", "The referenced script could not be found.");
         }
 

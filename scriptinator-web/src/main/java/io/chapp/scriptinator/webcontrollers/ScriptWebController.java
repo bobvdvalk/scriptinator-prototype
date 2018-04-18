@@ -16,10 +16,7 @@
 package io.chapp.scriptinator.webcontrollers;
 
 import io.chapp.scriptinator.ScriptinatorConfiguration;
-import io.chapp.scriptinator.model.Job;
-import io.chapp.scriptinator.model.Project;
-import io.chapp.scriptinator.model.Schedule;
-import io.chapp.scriptinator.model.Script;
+import io.chapp.scriptinator.model.*;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScriptService;
@@ -113,6 +110,13 @@ public class ScriptWebController {
                 "schedulesById",
                 script.getProject().getSchedules().stream()
                         .collect(Collectors.toMap(Schedule::getId, Function.identity()))
+        );
+
+        // Add a map of all triggers by their id to the model.
+        model.addAttribute(
+                "triggersById",
+                script.getProject().getWebhooks().stream()
+                        .collect(Collectors.toMap(Webhook::getId, Function.identity()))
         );
 
         // Check if a job is running.

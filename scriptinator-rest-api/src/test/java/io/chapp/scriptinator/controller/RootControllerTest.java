@@ -60,12 +60,14 @@ public class RootControllerTest {
                 new HashSet<>(Arrays.asList(
                         "jobsUrl",
                         "scriptsUrl",
-                        "projectsUrl"
+                        "projectsUrl",
+                        "webhooksUrl"
                 ))
         );
         assertEquals(urls.get("jobsUrl"), "http://localhost:8080/jobs");
         assertEquals(urls.get("scriptsUrl"), "http://localhost:8080/scripts");
         assertEquals(urls.get("projectsUrl"), "http://localhost:8080/projects");
+        assertEquals(urls.get("webhooksUrl"), "http://localhost:8080/webhooks");
     }
 
     @Test
@@ -90,11 +92,13 @@ public class RootControllerTest {
                 new HashSet<>(Arrays.asList(
                         "jobsUrl",
                         "scriptsUrl",
-                        "projectsUrl"
+                        "projectsUrl",
+                        "webhooksUrl"
                 ))
         );
         assertEquals(urls.get("jobsUrl"), "http://custom_host/jobs");
         assertEquals(urls.get("scriptsUrl"), "http://custom_host/scripts");
         assertEquals(urls.get("projectsUrl"), "http://custom_host/projects");
+        assertEquals(urls.get("webhooksUrl"), "http://custom_host/webhooks");
     }
 }
