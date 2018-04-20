@@ -54,6 +54,7 @@ func main() {
 	startScheduler(dbConfig, queueConfig)
 }
 
+// Check if an error occurred. If so: panic.
 func failOnError(err error, msg string) {
 	if err != nil {
 		panic(fmt.Sprintf("%s: %s\n", msg, err))

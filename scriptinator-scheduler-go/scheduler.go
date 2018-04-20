@@ -7,17 +7,23 @@ import (
 	"strconv"
 )
 
+// Start the scheduler.
 func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
+	tick(dbConfig, queueConfig)
+}
+
+// Run the scheduler.
+func tick(dbConfig DbConfig, queueConfig QueueConfig) {
 	// Get and run all runnable schedules.
-	schedules := findSchedules(dbConfig)
+	schedules := findRunnableSchedules(dbConfig)
 	log.Printf("Running %d schedule(s).\n", len(schedules))
 	for _, schedule := range schedules {
 		runSchedule(schedule, dbConfig, queueConfig)
 	}
 }
 
-func findSchedules(dbConfig DbConfig) []Schedule {
-	// Find all enabled schedules with a next run before now.
+// Find all enabled schedules whose next run is before now.
+func findRunnableSchedules(dbConfig DbConfig) []Schedule {
 	rows, err := dbConfig.Db.Query("SELECT id, project_id, argument, script_name FROM schedule WHERE enabled = true AND next_run < now()")
 	failOnError(err, "Could not find schedules to run")
 	defer rows.Close()
@@ -36,6 +42,8 @@ func findSchedules(dbConfig DbConfig) []Schedule {
 	return schedules
 }
 
+// Run a schedule.
+// This creates a job in the database and publish the created job in the message queue.
 func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) {
 	// Get the id of the script to run.
 	scriptIdStmt, err := dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
@@ -62,6 +70,8 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
+// Create a job in the database.
+// This also sets the new job id and display name.
 func createJob(job *Job, dbConfig DbConfig) {
 	// Insert the job into the database.
 	insertStmt, err := dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, now(), '', 0)")
@@ -86,6 +96,7 @@ func createJob(job *Job, dbConfig DbConfig) {
 	failOnError(err, "Could not update job")
 }
 
+// Publish the job to the message queue.
 func publishJob(job Job, queueConfig QueueConfig) {
 	// Set the TypeId header so the receiver knows what type the body is.
 	headers := amqp.Table{}
