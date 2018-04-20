@@ -15,11 +15,14 @@
  */
 package io.chapp.scriptinator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.workerservices.MessageReceiver;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,8 +35,15 @@ public class RabbitMQReceiverConfiguration {
     }
 
     @Bean
-    MessageListenerAdapter executeJobListenerAdapter(MessageReceiver messageReceiver) {
-        return new MessageListenerAdapter(messageReceiver, "executeJob");
+    MessageConverter messageConverter(ObjectMapper objectMapper) {
+        return new Jackson2JsonMessageConverter(objectMapper);
+    }
+
+    @Bean
+    MessageListenerAdapter executeJobListenerAdapter(MessageReceiver messageReceiver, MessageConverter messageConverter) {
+        MessageListenerAdapter adapter = new MessageListenerAdapter(messageReceiver, "executeJob");
+        adapter.setMessageConverter(messageConverter);
+        return adapter;
     }
 
     @Bean
