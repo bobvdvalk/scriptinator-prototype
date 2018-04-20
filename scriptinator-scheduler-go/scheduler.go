@@ -93,6 +93,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
+// Updates the schedule next and last run, returns whether the schedule is valid.
 func updateSchedule(schedule Schedule, dbConfig DbConfig) bool {
 	cronExpr, err := cronexpr.Parse(schedule.CronString)
 
