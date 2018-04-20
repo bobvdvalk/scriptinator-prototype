@@ -1,11 +1,11 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/streadway/amqp"
 	"log"
-	"fmt"
-	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type DbConfig struct {

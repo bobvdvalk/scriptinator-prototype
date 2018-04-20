@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/streadway/amqp"
-	"strconv"
-	"log"
 	"fmt"
+	"github.com/streadway/amqp"
+	"log"
+	"strconv"
 )
 
 func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
