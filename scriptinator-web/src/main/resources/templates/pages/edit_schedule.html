@@ -88,7 +88,7 @@
                             <div class="ui action input">
                                 <input type="text"
                                        name="cronString"
-                                       placeholder="0 * * * * ?"
+                                       placeholder="* * * * *"
                                        autocomplete="off"
                                        th:field="*{cronString}">
                                 <button type="button" class="ui icon button" onclick="showCronHelp()">
@@ -192,15 +192,15 @@
 
             <h3>Quick Overview</h3>
             <pre class="ui segment">
-┌─────────────── second       (0 - 59)
+┌─────────────── second       (empty or 0 - 59)
 │ ┌───────────── minute       (0 - 59)
 │ │ ┌─────────── hour         (0 - 23)
 │ │ │ ┌───────── day of month (1 - 31)
 │ │ │ │ ┌─────── month        (1 - 12 or JAN - DEC)
 │ │ │ │ │ ┌───── day of week  (1 - 7 or SUN - SAT)
-│ │ │ │ │ │ ┌─── year         (1970 - 2099 or empty)
+│ │ │ │ │ │ ┌─── year         (empty or 1970 - 2099)
 │ │ │ │ │ │ │
-* * * * * ? *</pre>
+* * * * * * *</pre>
 
             <h3>Examples</h3>
             <table class="ui table">
@@ -213,25 +213,27 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td>Every minute</td>
+                    <td>Every hour</td>
                     <td>
-                        <pre>0 * * * * ?</pre>
+                        <pre>0 * * * *</pre>
+                        <pre>@hourly</pre>
                     </td>
                     <td>
                         This is one of the most simple schedules.
-                        The first 0 indicates the schedule should be triggered at second 0 of the minute.
+                        The first 0 indicates the schedule should be triggered at minute 0 of the hour.
                         All other signs are wildcards.
+                        Alternatively, you can use the predefined hourly schedule.
                     </td>
                 </tr>
                 <tr>
                     <td>Every Saturday at noon</td>
                     <td>
-                        <pre>0 0 12 ? * SAT</pre>
-                        <pre>0 0 12 ? * 7</pre>
+                        <pre>0 12 ? * SAT</pre>
+                        <pre>0 12 ? * 6</pre>
                     </td>
                     <td>
                         Days of the week can be specified either by its first 3 letters or its index.
-                        The days are 1-indexed and a weeks start on a Sunday, so 1=SUN, 2=MON, etc.
+                        The days are 0-indexed and a weeks start on a Sunday, so 0=SUN, 1=MON, etc.
                     </td>
                 </tr>
                 </tbody>
