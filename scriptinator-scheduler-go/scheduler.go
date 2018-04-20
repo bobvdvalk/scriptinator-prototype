@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorhill/cronexpr"
 	"github.com/streadway/amqp"
 	"log"
 	"strconv"
@@ -28,15 +29,20 @@ func tick(dbConfig DbConfig, queueConfig QueueConfig) {
 
 // Find all enabled schedules whose next run is before now.
 func findRunnableSchedules(dbConfig DbConfig) []Schedule {
-	rows, err := dbConfig.Db.Query("SELECT id, project_id, argument, script_name FROM schedule WHERE enabled = true AND next_run < now()")
-	failOnError(err, "Could not find schedules to run")
+	schedulesStmt, err := dbConfig.Db.Prepare("SELECT id, project_id, argument, script_name, cron_string FROM schedule WHERE enabled = true AND next_run < ?")
+	failOnError(err, "Could not prepare select schedules statement")
+	defer schedulesStmt.Close()
+
+	// Get all schedules scheduled before now.
+	rows, err := schedulesStmt.Query(time.Now())
+	failOnError(err, "Could not query schedules")
 	defer rows.Close()
 
 	// Convert all rows to schedules.
 	var schedules []Schedule
 	for rows.Next() {
 		nextSchedule := Schedule{}
-		err := rows.Scan(&nextSchedule.Id, &nextSchedule.ProjectId, &nextSchedule.Argument, &nextSchedule.ScriptName)
+		err := rows.Scan(&nextSchedule.Id, &nextSchedule.ProjectId, &nextSchedule.Argument, &nextSchedule.ScriptName, &nextSchedule.CronString)
 		failOnError(err, "Could not get row from result set")
 		schedules = append(schedules, nextSchedule)
 	}
@@ -53,11 +59,24 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	scriptIdStmt, err := dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
 	failOnError(err, "Could not prepare select script id statement")
 	defer scriptIdStmt.Close()
-
 	var scriptId int64
 	err = scriptIdStmt.QueryRow(schedule.ProjectId, schedule.ScriptName).Scan(&scriptId)
+
+	// Check if the script exists.
 	if err != nil {
-		log.Fatalf("Could not find script '%s' for schedule %d.\n", schedule.ScriptName, schedule.Id)
+		log.Printf("Could not find script '%s' for schedule %d.\n", schedule.ScriptName, schedule.Id)
+
+		// Set the schedule status to invalid script.
+		disableStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 2 WHERE id = ?")
+		failOnError(err, "Could not prepare disable schedule statement")
+		defer disableStmt.Close()
+		disableStmt.Exec(schedule.Id)
+
+		return
+	}
+
+	// Update the schedule.
+	if !updateSchedule(schedule, dbConfig) {
 		return
 	}
 
@@ -74,15 +93,41 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
+func updateSchedule(schedule Schedule, dbConfig DbConfig) bool {
+	cronExpr, err := cronexpr.Parse(schedule.CronString)
+
+	if err != nil {
+		log.Printf("Could not parse cron expression: '%s'.\n", schedule.CronString)
+
+		// Set the schedule status to invalid cron.
+		disableStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 1 WHERE id = ?")
+		failOnError(err, "Could not prepare disable schedule statement")
+		defer disableStmt.Close()
+		disableStmt.Exec(schedule.Id)
+
+		return false
+	} else {
+		updateStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET last_run = ?, next_run = ? WHERE id = ?")
+		failOnError(err, "Could not prepare update schedule statement")
+		defer updateStmt.Close()
+
+		// Set the schedule's last and next run.
+		now := time.Now()
+		updateStmt.Exec(now, cronExpr.Next(now), schedule.Id)
+
+		return true
+	}
+}
+
 // Create a job in the database.
 // This also sets the new job id and display name.
 func createJob(job *Job, dbConfig DbConfig) {
 	// Insert the job into the database.
-	insertStmt, err := dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, now(), '', 0)")
+	insertStmt, err := dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, ?, '', 0)")
 	failOnError(err, "Could not prepare insert job statement")
 	defer insertStmt.Close()
 
-	insertResult, err := insertStmt.Exec(job.DisplayName, job.ScriptId, job.Argument, job.TriggeredByScheduleId)
+	insertResult, err := insertStmt.Exec(job.DisplayName, job.ScriptId, job.Argument, job.TriggeredByScheduleId, time.Now())
 	failOnError(err, "Could not insert job")
 
 	// Set the job id and display name.

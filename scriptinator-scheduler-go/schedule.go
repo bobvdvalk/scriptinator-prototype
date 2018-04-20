@@ -5,4 +5,5 @@ type Schedule struct {
 	ProjectId  int64
 	Argument   string
 	ScriptName string
+	CronString string
 }

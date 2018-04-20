@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/streadway/amqp"
+	"log"
 )
 
 type DbConfig struct {
@@ -57,6 +57,6 @@ func main() {
 // Check if an error occurred. If so: panic.
 func failOnError(err error, msg string) {
 	if err != nil {
-		panic(fmt.Sprintf("%s: %s\n", msg, err))
+		log.Fatalf("%s: %s\n", msg, err)
 	}
 }
