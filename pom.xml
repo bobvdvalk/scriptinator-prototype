@@ -46,7 +46,6 @@
         <module>scriptinator-lib-http</module>
         <module>scriptinator-lib-core</module>
         <module>scriptinator-lib-assert</module>
-        <module>scriptinator-scheduler</module>
     </modules>
 
     <name>Scriptinator</name>
@@ -106,7 +105,6 @@
         <apache-commons-lang.version>3.7</apache-commons-lang.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
         <thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
-        <quartz.version>2.3.0</quartz.version>
         <cron-parser.version>3.4</cron-parser.version>
 
         <!-- Build Dependencies -->
@@ -182,11 +180,6 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${apache-commons-io.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz</artifactId>
-                <version>${quartz.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.redhogs.cronparser</groupId>

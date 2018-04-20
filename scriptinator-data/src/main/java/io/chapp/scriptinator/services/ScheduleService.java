@@ -20,29 +20,20 @@ import io.chapp.scriptinator.repositories.ScheduleRepository;
 import net.redhogs.cronparser.CronExpressionDescriptor;
 import net.redhogs.cronparser.Options;
 import org.apache.commons.lang3.StringUtils;
-import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
 public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRepository> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleService.class);
-    private static final Options CRON_DESCRIPTION_OPTIONS;
 
-    static {
-        // Set the cron parsing options according to how the Quartz cron expression operates.
-        Options options = Options.twentyFourHour();
-        options.setZeroBasedDayOfWeek(false);
-        CRON_DESCRIPTION_OPTIONS = options;
-    }
+    // Set the cron parsing options according to how the go cronexpr operates.
+    private static final Options CRON_DESCRIPTION_OPTIONS = Options.twentyFourHour();
 
     public Page<Schedule> findAllOwnedByPrincipal(Pageable pageable) {
         return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
@@ -92,43 +83,6 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         deleteIfOwnedBy(DataServiceUtils.getPrincipalName(), id);
     }
 
-    @Override
-    public Schedule create(Schedule entity) {
-        setNextRun(entity);
-        return super.create(entity);
-    }
-
-    @Override
-    public Schedule update(Schedule entity) {
-        setNextRun(entity);
-        return super.update(entity);
-    }
-
-    private void setNextRun(Schedule schedule) {
-        // The cron string needs to be sanitized for the expression parser.
-        schedule.setCronString(sanitizeCronString(schedule.getCronString()));
-
-        // Try to parse the cron expression.
-        // Format documentation: http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html
-        try {
-            CronExpression cron = new CronExpression(schedule.getCronString());
-            schedule.setNextRun(cron.getNextValidTimeAfter(now()));
-        } catch (Exception e) {
-            // This can actually throw any exception.
-            LOGGER.error("Could not parse cron expression: '" + schedule.getCronString() + "' for script '" + schedule.toString() + "'.", e);
-            schedule.setStatus(Schedule.Status.INVALID_CRON);
-        }
-    }
-
-    /**
-     * Get the now date based on the system clock.
-     *
-     * @return The now date.
-     */
-    public Date now() {
-        return Date.from(Instant.now(Clock.systemDefaultZone()));
-    }
-
     /**
      * Sanitize a cron string.
      * This trims all whitespaces, and replaces multiple whitespaces by a single one.
@@ -136,7 +90,10 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
      * @param cronString The cron string to sanitize.
      * @return The sanitized cron string.
      */
-    private String sanitizeCronString(String cronString) {
+    public String sanitizeCronString(String cronString) {
+        if (cronString == null) {
+            return "";
+        }
         return cronString.trim().replaceAll("\\s+", " ");
     }
 
@@ -147,16 +104,10 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
      * @return A description of the cron string.
      */
     public String getCronDescription(String cronString) {
-        if (cronString == null || cronString.isEmpty()) {
+        if (StringUtils.isEmpty(cronString)) {
             return "";
         }
-
         cronString = sanitizeCronString(cronString);
-
-        // Validate the cron expression.
-        if (!CronExpression.isValidExpression(cronString)) {
-            return "Invalid cron expression";
-        }
 
         // Try to get the description.
         try {
@@ -169,6 +120,19 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
             // This can actually throw any exception.
             LOGGER.trace("Could not get cron expression description for: '" + cronString + "'.", e);
             return "Invalid cron expression";
+        }
+    }
+
+    public boolean isValidCron(String cronString) {
+        cronString = sanitizeCronString(cronString);
+
+        try {
+            CronExpressionDescriptor.getDescription(cronString, CRON_DESCRIPTION_OPTIONS);
+            return true;
+        } catch (Exception e) {
+            // This can actually throw any exception.
+            LOGGER.trace("Could not get cron expression description for: '" + cronString + "'.", e);
+            return false;
         }
     }
 }

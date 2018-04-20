@@ -15,17 +15,10 @@
  */
 package io.chapp.scriptinator.services;
 
-import io.chapp.scriptinator.model.Schedule;
 import io.chapp.scriptinator.repositories.ScheduleRepository;
-import net.redhogs.cronparser.CronExpressionDescriptor;
 import org.mockito.Mockito;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.text.ParseException;
-import java.time.Year;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import static org.testng.Assert.assertEquals;
 
@@ -38,46 +31,6 @@ public class ScheduleServiceTest {
     }
 
     @Test
-    public void testCreateScheduleSetsNextRun() {
-        Schedule schedule = new Schedule();
-        schedule.setCronString("0 0 0 1 1 ?");
-        Calendar nextRun = new GregorianCalendar(Year.now().getValue() + 1, Calendar.JANUARY, 1);
-
-        scheduleService.create(schedule);
-        assertEquals(
-                schedule.getNextRun(),
-                nextRun.getTime()
-        );
-    }
-
-    @Test
-    public void testUpdateScheduleSetsNextRun() {
-        Schedule schedule = new Schedule();
-        schedule.setId(1L);
-        schedule.setCronString("0 0 0 1 1 ?");
-        Calendar nextRun = new GregorianCalendar(Year.now().getValue() + 1, Calendar.JANUARY, 1);
-
-        scheduleService.update(schedule);
-        assertEquals(
-                schedule.getNextRun(),
-                nextRun.getTime()
-        );
-    }
-
-    @Test
-    public void testCreateScheduleInvalidCron() {
-        Schedule schedule = new Schedule();
-        schedule.setCronString("nope");
-        schedule.setStatus(Schedule.Status.SUCCESS);
-
-        scheduleService.create(schedule);
-        assertEquals(
-                schedule.getStatus(),
-                Schedule.Status.INVALID_CRON
-        );
-    }
-
-    @Test
     public void testGetCronDescriptionNullOrEmpty() {
         assertEquals(scheduleService.getCronDescription(null), "");
         assertEquals(scheduleService.getCronDescription(""), "");
@@ -86,17 +39,6 @@ public class ScheduleServiceTest {
     @Test
     public void testGetCronDescriptionInvalid() {
         assertEquals(scheduleService.getCronDescription("nope"), "Invalid cron expression");
-    }
-
-    @Test
-    public void testGetCronDescriptionWeirdCase() throws ParseException {
-        /*
-        There are some weird cron expressions where the quartz library complains,
-        but the cron-parser library thinks it's fine.
-         */
-        String cron = "* * L-2 * ?";
-        CronExpressionDescriptor.getDescription(cron); // See? This doesn't throw an exception.
-        assertEquals(scheduleService.getCronDescription(cron), "Invalid cron expression");
     }
 
     @Test

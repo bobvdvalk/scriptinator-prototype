@@ -60,10 +60,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.redhogs.cronparser</groupId>
             <artifactId>cron-parser-core</artifactId>
         </dependency>
@@ -73,5 +69,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
 </project>

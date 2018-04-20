@@ -21,7 +21,6 @@ import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.ProjectService;
 import io.chapp.scriptinator.services.ScheduleService;
 import io.chapp.scriptinator.services.ScriptService;
-import org.quartz.CronExpression;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,6 +74,14 @@ public class ScheduleWebController {
         Schedule oldSchedule = scheduleService.getOwnedByPrincipal(projectId, scheduleId);
         schedule.setId(scheduleId);
         schedule.setLastRun(oldSchedule.getLastRun()); // Remember the last run.
+
+        // If the cron expression didn't change, remember the next run.
+        String oldCron = scheduleService.sanitizeCronString(oldSchedule.getCronString());
+        String newCron = scheduleService.sanitizeCronString(schedule.getCronString());
+        if (oldCron.equals(newCron)) {
+            schedule.setNextRun(oldSchedule.getNextRun());
+        }
+
         return saveSchedule(projectId, schedule, model);
     }
 
@@ -106,7 +113,7 @@ public class ScheduleWebController {
         }
 
         // Validate the cron expression.
-        if (!CronExpression.isValidExpression(schedule.getCronString())) {
+        if (!scheduleService.isValidCron(schedule.getCronString())) {
             return saveError(schedule, model, "cronString", "The cron expression is invalid.");
         }
 

@@ -49,7 +49,7 @@ public class Schedule extends AbstractEntity {
     private String argument;
 
     @NotNull
-    private String cronString;
+    private String cronString = "";
 
     private boolean enabled;
 
