@@ -58,9 +58,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	}
 
 	createJob(&job, dbConfig)
-	job.DisplayName = fmt.Sprintf("%s #%d", schedule.ScriptName, job.Id)
-
-	// publishJob(job, queueConfig)
+	publishJob(job, queueConfig)
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
