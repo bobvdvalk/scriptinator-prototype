@@ -5,7 +5,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/streadway/amqp"
-	"log"
 )
 
 type DbConfig struct {
@@ -53,12 +52,6 @@ func main() {
 	queueConfig := QueueConfig{Channel: channel, QueueName: queue.Name}
 
 	startScheduler(dbConfig, queueConfig)
-}
-
-func logError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s\n", msg, err)
-	}
 }
 
 func failOnError(err error, msg string) {
