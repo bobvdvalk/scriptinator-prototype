@@ -26,6 +26,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -34,6 +36,17 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
 
     // Set the cron parsing options according to how the go cronexpr operates.
     private static final Options CRON_DESCRIPTION_OPTIONS = Options.twentyFourHour();
+    private static final Map<String, String> CRON_PREDEFINED_SCHEDULES = new HashMap<>();
+
+    static {
+        // See: https://github.com/gorhill/cronexpr
+        CRON_PREDEFINED_SCHEDULES.put("@annually", "once a year at midnight in the morning of January 1");
+        CRON_PREDEFINED_SCHEDULES.put("@yearly", "once a year at midnight in the morning of January 1");
+        CRON_PREDEFINED_SCHEDULES.put("@monthly", "once a month at midnight in the morning of the first of the month");
+        CRON_PREDEFINED_SCHEDULES.put("@weekly", "once a week at midnight in the morning of Sunday");
+        CRON_PREDEFINED_SCHEDULES.put("@daily", "once a day at midnight");
+        CRON_PREDEFINED_SCHEDULES.put("@hourly", "once an hour at the beginning of the hour");
+    }
 
     public Page<Schedule> findAllOwnedByPrincipal(Pageable pageable) {
         return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
@@ -107,9 +120,31 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         if (StringUtils.isEmpty(cronString)) {
             return "";
         }
+
+        String description = getCronDescriptionOrNull(cronString);
+        return description != null ? description : "Invalid cron expression";
+    }
+
+    /**
+     * Check whether the cron string is valid.
+     *
+     * @param cronString The cron string to check.
+     * @return Whether the cron string is valid.
+     */
+    public boolean isValidCron(String cronString) {
+        return getCronDescriptionOrNull(cronString) != null;
+    }
+
+    private String getCronDescriptionOrNull(String cronString) {
         cronString = sanitizeCronString(cronString);
 
-        // Try to get the description.
+        // Check if there is a predefined schedule.
+        String predefined = CRON_PREDEFINED_SCHEDULES.get(cronString);
+        if (predefined != null) {
+            return "Runs " + predefined;
+        }
+
+        // Try to parse the cron to get a description.
         try {
             String description = CronExpressionDescriptor.getDescription(cronString, CRON_DESCRIPTION_OPTIONS);
 
@@ -119,20 +154,7 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         } catch (Exception e) {
             // This can actually throw any exception.
             LOGGER.trace("Could not get cron expression description for: '" + cronString + "'.", e);
-            return "Invalid cron expression";
-        }
-    }
-
-    public boolean isValidCron(String cronString) {
-        cronString = sanitizeCronString(cronString);
-
-        try {
-            CronExpressionDescriptor.getDescription(cronString, CRON_DESCRIPTION_OPTIONS);
-            return true;
-        } catch (Exception e) {
-            // This can actually throw any exception.
-            LOGGER.trace("Could not get cron expression description for: '" + cronString + "'.", e);
-            return false;
+            return null;
         }
     }
 }

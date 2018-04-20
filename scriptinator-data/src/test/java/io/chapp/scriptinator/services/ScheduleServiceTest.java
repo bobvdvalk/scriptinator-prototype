@@ -15,20 +15,12 @@
  */
 package io.chapp.scriptinator.services;
 
-import io.chapp.scriptinator.repositories.ScheduleRepository;
-import org.mockito.Mockito;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 public class ScheduleServiceTest {
     private final ScheduleService scheduleService = new ScheduleService();
-
-    @BeforeClass
-    public void mockScheduleRepository() {
-        scheduleService.setRepository(Mockito.mock(ScheduleRepository.class));
-    }
 
     @Test
     public void testGetCronDescriptionNullOrEmpty() {
@@ -50,5 +42,20 @@ public class ScheduleServiceTest {
     public void testGetCronDescriptionIsSanitized() {
         // The cron-parser library doesn't like excessive whitespaces.
         assertEquals(scheduleService.getCronDescription("  0 0   * *    DEC ?  "), "Runs every hour, only in December");
+    }
+
+    @Test
+    public void testGetCronDescriptionPredefinedSchedule() {
+        assertEquals(scheduleService.getCronDescription("@daily"), "Runs once a day at midnight");
+    }
+
+    @Test
+    public void testIsValidCronTrue() {
+        assertTrue(scheduleService.isValidCron("* * * * *"));
+    }
+
+    @Test
+    public void testIsValidCronFalse() {
+        assertFalse(scheduleService.isValidCron("noooope"));
     }
 }
