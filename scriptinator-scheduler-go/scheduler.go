@@ -39,7 +39,8 @@ func findSchedules(dbConfig DbConfig) []Schedule {
 func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) {
 	// Get the id of the script to run.
 	scriptIdStmt, err := dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
-	failOnError(err, "Could not prepare statement")
+	failOnError(err, "Could not prepare select script id statement")
+	defer scriptIdStmt.Close()
 
 	var scriptId int64
 	err = scriptIdStmt.QueryRow(schedule.ProjectId, schedule.ScriptName).Scan(&scriptId)
@@ -48,17 +49,43 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 		return
 	}
 
-	// Create the job.
-	jobName := fmt.Sprintf("%s #jobId", schedule.ScriptName)
+	// Create and publish the job.
 	job := Job{
-		DisplayName:           jobName,
+		DisplayName:           schedule.ScriptName,
 		ScriptId:              scriptId,
 		Argument:              schedule.Argument,
 		TriggeredByScheduleId: schedule.Id,
 	}
-	log.Printf("Creating job: %s.\n", job.DisplayName)
+
+	createJob(&job, dbConfig)
+	job.DisplayName = fmt.Sprintf("%s #%d", schedule.ScriptName, job.Id)
 
 	// publishJob(job, queueConfig)
+	log.Printf("Created job: %s.\n", job.DisplayName)
+}
+
+func createJob(job *Job, dbConfig DbConfig) {
+	// Insert the job into the database.
+	insertStmt, err := dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, now(), '', 0)")
+	failOnError(err, "Could not prepare insert job statement")
+	defer insertStmt.Close()
+
+	insertResult, err := insertStmt.Exec(job.DisplayName, job.ScriptId, job.Argument, job.TriggeredByScheduleId)
+	failOnError(err, "Could not insert job")
+
+	// Set the job id and display name.
+	lastId, err := insertResult.LastInsertId()
+	failOnError(err, "Could not get last id of inserted job")
+	job.Id = lastId
+	job.DisplayName = fmt.Sprintf("%s #%d", job.DisplayName, job.Id)
+
+	// Update the display name in the database.
+	updateStmt, err := dbConfig.Db.Prepare("UPDATE job SET display_name = ? WHERE id = ?")
+	failOnError(err, "Could not prepare update job statement")
+	defer updateStmt.Close()
+
+	_, err = updateStmt.Exec(job.DisplayName, job.Id)
+	failOnError(err, "Could not update job")
 }
 
 func publishJob(job Job, queueConfig QueueConfig) {
