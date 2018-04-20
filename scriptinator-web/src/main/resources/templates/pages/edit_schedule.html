@@ -118,7 +118,8 @@
                         </div>
                         <div th:if="${schedule.enabled}">
                             Next run:
-                            <span th:text="${nextRun}"></span>
+                            <span th:text="${schedule.nextRun}"></span>
+                            <span th:if="${schedule.nextRun == null}">soon&#8482;</span>
                         </div>
                     </div>
                     <div class="twelve wide column">

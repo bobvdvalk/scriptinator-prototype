@@ -18,7 +18,7 @@ type QueueConfig struct {
 
 func main() {
 	// Connect to the database.
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/scriptinator")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/scriptinator?parseTime=true")
 	failOnError(err, "Could not connect to database")
 	defer db.Close()
 

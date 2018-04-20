@@ -19,12 +19,37 @@ func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
 
 // Run the scheduler.
 func tick(dbConfig DbConfig, queueConfig QueueConfig) {
+	// Update all schedules whose next run time is not yet set.
+	setNextRunOnNewSchedules(dbConfig)
+
 	// Get and run all runnable schedules.
 	schedules := findRunnableSchedules(dbConfig)
 	log.Printf("Running %d schedule(s).\n", len(schedules))
 	for _, schedule := range schedules {
 		runSchedule(schedule, dbConfig, queueConfig)
 	}
+}
+
+// Set the next run on all enabled schedules where it is not null.
+func setNextRunOnNewSchedules(dbConfig DbConfig) {
+	log.Printf("Updating schedules.\n")
+
+	// Find all schedules where the next run is null.
+	rows, err := dbConfig.Db.Query("SELECT id, cron_string, last_run FROM schedule WHERE enabled = true AND next_run IS NULL")
+	failOnError(err, "Could not query schedules")
+	defer rows.Close()
+
+	// Update all schedules.
+	for rows.Next() {
+		schedule := Schedule{}
+		err := rows.Scan(&schedule.Id, &schedule.CronString, &schedule.LastRun)
+		failOnError(err, "Could not get row from result set")
+
+		log.Printf("Updating schedule %d.\n", schedule.Id)
+		updateSchedule(schedule, schedule.LastRun, dbConfig)
+	}
+
+	failOnError(rows.Err(), "An error occurred with the result set")
 }
 
 // Find all enabled schedules whose next run is before now.
@@ -76,7 +101,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	}
 
 	// Update the schedule.
-	if !updateSchedule(schedule, dbConfig) {
+	if !updateSchedule(schedule, time.Now(), dbConfig) {
 		return
 	}
 
@@ -94,7 +119,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 }
 
 // Updates the schedule next and last run, returns whether the schedule is valid.
-func updateSchedule(schedule Schedule, dbConfig DbConfig) bool {
+func updateSchedule(schedule Schedule, lastRun time.Time, dbConfig DbConfig) bool {
 	cronExpr, err := cronexpr.Parse(schedule.CronString)
 
 	if err != nil {
@@ -113,8 +138,7 @@ func updateSchedule(schedule Schedule, dbConfig DbConfig) bool {
 		defer updateStmt.Close()
 
 		// Set the schedule's last and next run.
-		now := time.Now()
-		updateStmt.Exec(now, cronExpr.Next(now), schedule.Id)
+		updateStmt.Exec(lastRun, cronExpr.Next(time.Now()), schedule.Id)
 
 		return true
 	}
