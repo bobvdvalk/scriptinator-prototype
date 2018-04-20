@@ -5,11 +5,15 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 	"strconv"
+	"time"
 )
 
 // Start the scheduler.
 func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
-	tick(dbConfig, queueConfig)
+	for {
+		go tick(dbConfig, queueConfig)
+		time.Sleep(5 * time.Second)
+	}
 }
 
 // Run the scheduler.
