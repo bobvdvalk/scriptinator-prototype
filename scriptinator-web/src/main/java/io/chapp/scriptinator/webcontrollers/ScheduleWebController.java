@@ -98,6 +98,7 @@ public class ScheduleWebController {
         model.addAttribute(Schedule.ATTRIBUTE, schedule);
         model.addAttribute(Script.LIST_ATTRIBUTE, project.getScripts());
         model.addAttribute("cronDescription", scheduleService.getCronDescription(schedule.getCronString()));
+        model.addAttribute("nextRun", schedule.getNextRun() == null ? "unknown" : schedule.getNextRun());
         return EDIT_SCHEDULE_PAGE;
     }
 
