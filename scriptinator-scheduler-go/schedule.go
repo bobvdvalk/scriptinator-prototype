@@ -1,7 +1,8 @@
 package main
 
 type Schedule struct {
-	Id         int    `sql:"id"`
-	Argument   string `sql:"argument"`
-	ScriptName string `sql:"script_name"`
+	Id         int64
+	ProjectId  int64
+	Argument   string
+	ScriptName string
 }

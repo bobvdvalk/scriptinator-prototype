@@ -4,6 +4,7 @@ import (
 	"github.com/streadway/amqp"
 	"strconv"
 	"log"
+	"fmt"
 )
 
 func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
@@ -17,30 +18,47 @@ func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
 
 func findSchedules(dbConfig DbConfig) []Schedule {
 	// Find all enabled schedules with a next run before now.
-	rows, err := dbConfig.Db.Query("SELECT id, argument, script_name FROM schedule WHERE enabled = true AND next_run < now()")
-	logError(err, "Could not query database")
+	rows, err := dbConfig.Db.Query("SELECT id, project_id, argument, script_name FROM schedule WHERE enabled = true AND next_run < now()")
+	failOnError(err, "Could not find schedules to run")
 	defer rows.Close()
 
-	var schedules []Schedule
-
 	// Convert all rows to schedules.
+	var schedules []Schedule
 	for rows.Next() {
 		nextSchedule := Schedule{}
-		err := rows.Scan(&nextSchedule.Id, &nextSchedule.Argument, &nextSchedule.ScriptName)
-		logError(err, "Could not get row from result set")
+		err := rows.Scan(&nextSchedule.Id, &nextSchedule.ProjectId, &nextSchedule.Argument, &nextSchedule.ScriptName)
+		failOnError(err, "Could not get row from result set")
 		schedules = append(schedules, nextSchedule)
 	}
 
-	logError(rows.Err(), "An error occurred with the result set")
+	failOnError(rows.Err(), "An error occurred with the result set")
 
 	return schedules
 }
 
 func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) {
-	// TODO
+	// Get the id of the script to run.
+	scriptIdStmt, err := dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
+	failOnError(err, "Could not prepare statement")
 
-	//testJob := Job{Id: 50}
-	//publishJob(testJob, queueConfig)
+	var scriptId int64
+	err = scriptIdStmt.QueryRow(schedule.ProjectId, schedule.ScriptName).Scan(&scriptId)
+	if err != nil {
+		log.Fatalf("Could not find script '%s' for schedule %d.\n", schedule.ScriptName, schedule.Id)
+		return
+	}
+
+	// Create the job.
+	jobName := fmt.Sprintf("%s #jobId", schedule.ScriptName)
+	job := Job{
+		DisplayName:           jobName,
+		ScriptId:              scriptId,
+		Argument:              schedule.Argument,
+		TriggeredByScheduleId: schedule.Id,
+	}
+	log.Printf("Creating job: %s.\n", job.DisplayName)
+
+	// publishJob(job, queueConfig)
 }
 
 func publishJob(job Job, queueConfig QueueConfig) {
@@ -61,5 +79,5 @@ func publishJob(job Job, queueConfig QueueConfig) {
 			Body:            []byte(strconv.FormatInt(job.Id, 10)),
 			Headers:         headers,
 		})
-	logError(err, "Could not publish job")
+	failOnError(err, "Could not publish job")
 }
