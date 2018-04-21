@@ -44,11 +44,6 @@
             Log Out
         </a>
     </form>
-    <a class="item"
-       th:href="@{/user}">
-        <img class="ui avatar image" th:src="${#authentication.principal.avatarUrl}">
-        <span sec:authentication="principal.displayName"></span>
-    </a>
 </div>
 
 <div th:fragment="settings" class="ui fluid vertical menu">
