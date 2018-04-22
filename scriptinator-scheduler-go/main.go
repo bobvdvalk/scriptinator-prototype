@@ -26,7 +26,7 @@ func main() {
 	err = db.Ping()
 	failOnError(err, "Could not ping database")
 
-	dbConfig := DbConfig{db}
+	dbConfig := &DbConfig{db}
 
 	// Connect to the queue.
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
@@ -49,7 +49,7 @@ func main() {
 	)
 	failOnError(err, "Could not declare queue")
 
-	queueConfig := QueueConfig{Channel: channel, QueueName: queue.Name}
+	queueConfig := &QueueConfig{Channel: channel, QueueName: queue.Name}
 
 	NewScheduler(dbConfig, queueConfig).Run()
 }

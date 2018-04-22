@@ -1,21 +1,33 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorhill/cronexpr"
-	"github.com/streadway/amqp"
 	"log"
-	"strconv"
 	"time"
 )
 
-type Scheduler struct {
-	dbConfig    DbConfig
-	queueConfig QueueConfig
+type Schedule struct {
+	Id         int64
+	ProjectId  int64
+	Argument   string
+	ScriptName string
+	CronString string
+	LastRun    time.Time
 }
 
-func NewScheduler(dbConfig DbConfig, queueConfig QueueConfig) *Scheduler {
-	return &Scheduler{dbConfig: dbConfig, queueConfig: queueConfig}
+type Scheduler struct {
+	dbConfig    *DbConfig
+	queueConfig *QueueConfig
+
+	jobService *JobService
+}
+
+func NewScheduler(dbConfig *DbConfig, queueConfig *QueueConfig) *Scheduler {
+	return &Scheduler{
+		dbConfig:    dbConfig,
+		queueConfig: queueConfig,
+		jobService:  &JobService{dbConfig: dbConfig, queueConfig: queueConfig},
+	}
 }
 
 // Start the scheduler.
@@ -123,16 +135,14 @@ func (scheduler *Scheduler) runSchedule(schedule Schedule) {
 		return
 	}
 
-	// Create and publish the job.
+	// Create the job.
 	job := Job{
 		DisplayName:           schedule.ScriptName,
 		ScriptId:              scriptId,
 		Argument:              schedule.Argument,
 		TriggeredByScheduleId: schedule.Id,
 	}
-
-	scheduler.createJob(&job)
-	scheduler.publishJob(job)
+	scheduler.jobService.CreateJob(&job)
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
@@ -160,52 +170,4 @@ func (scheduler *Scheduler) updateSchedule(schedule Schedule, lastRun time.Time)
 
 		return true
 	}
-}
-
-// Create a job in the database.
-// This also sets the new job id and display name.
-func (scheduler *Scheduler) createJob(job *Job) {
-	// Insert the job into the database.
-	insertStmt, err := scheduler.dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, ?, '', 0)")
-	failOnError(err, "Could not prepare insert job statement")
-	defer insertStmt.Close()
-
-	insertResult, err := insertStmt.Exec(job.DisplayName, job.ScriptId, job.Argument, job.TriggeredByScheduleId, time.Now())
-	failOnError(err, "Could not insert job")
-
-	// Set the job id and display name.
-	lastId, err := insertResult.LastInsertId()
-	failOnError(err, "Could not get last id of inserted job")
-	job.Id = lastId
-	job.DisplayName = fmt.Sprintf("%s #%d", job.DisplayName, job.Id)
-
-	// Update the display name in the database.
-	updateStmt, err := scheduler.dbConfig.Db.Prepare("UPDATE job SET display_name = ? WHERE id = ?")
-	failOnError(err, "Could not prepare update job statement")
-	defer updateStmt.Close()
-
-	_, err = updateStmt.Exec(job.DisplayName, job.Id)
-	failOnError(err, "Could not update job")
-}
-
-// Publish the job to the message queue.
-func (scheduler *Scheduler) publishJob(job Job) {
-	// Set the TypeId header so the receiver knows what type the body is.
-	headers := amqp.Table{}
-	headers["__TypeId__"] = "java.lang.Long"
-
-	// Publish the job.
-	err := scheduler.queueConfig.Channel.Publish(
-		"scriptinator-exchange",
-		scheduler.queueConfig.QueueName,
-		false,
-		false,
-		amqp.Publishing{
-			DeliveryMode:    2,
-			ContentType:     "application/json",
-			ContentEncoding: "UTF-8",
-			Body:            []byte(strconv.FormatInt(job.Id, 10)),
-			Headers:         headers,
-		})
-	failOnError(err, "Could not publish job")
 }
