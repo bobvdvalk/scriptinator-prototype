@@ -11,9 +11,18 @@ import (
 
 // Start the scheduler.
 func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
+	// Initial tick.
+	go tick(dbConfig, queueConfig)
+
+	// Tick every N seconds.
+	tickChannel := time.Tick(5 * time.Second)
 	for {
-		go tick(dbConfig, queueConfig)
-		time.Sleep(5 * time.Second)
+		select {
+		case <-tickChannel:
+			go tick(dbConfig, queueConfig)
+		default:
+			time.Sleep(time.Second)
+		}
 	}
 }
 
