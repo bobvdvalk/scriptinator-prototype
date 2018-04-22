@@ -51,7 +51,7 @@ func main() {
 
 	queueConfig := QueueConfig{Channel: channel, QueueName: queue.Name}
 
-	startScheduler(dbConfig, queueConfig)
+	NewScheduler(dbConfig, queueConfig).Run()
 }
 
 // Check if an error occurred.

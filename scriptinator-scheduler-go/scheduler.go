@@ -9,17 +9,26 @@ import (
 	"time"
 )
 
+type Scheduler struct {
+	dbConfig    DbConfig
+	queueConfig QueueConfig
+}
+
+func NewScheduler(dbConfig DbConfig, queueConfig QueueConfig) *Scheduler {
+	return &Scheduler{dbConfig: dbConfig, queueConfig: queueConfig}
+}
+
 // Start the scheduler.
-func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
+func (scheduler *Scheduler) Run() {
 	// Initial tick.
-	go tick(dbConfig, queueConfig)
+	go scheduler.tick()
 
 	// Tick every N seconds.
 	tickChannel := time.Tick(5 * time.Second)
 	for {
 		select {
 		case <-tickChannel:
-			go tick(dbConfig, queueConfig)
+			go scheduler.tick()
 		default:
 			time.Sleep(time.Second)
 		}
@@ -27,24 +36,24 @@ func startScheduler(dbConfig DbConfig, queueConfig QueueConfig) {
 }
 
 // Run the scheduler.
-func tick(dbConfig DbConfig, queueConfig QueueConfig) {
+func (scheduler *Scheduler) tick() {
 	// Update all schedules whose next run time is not yet set.
-	setNextRunOnNewSchedules(dbConfig)
+	scheduler.setNextRunOnNewSchedules()
 
 	// Get and run all runnable schedules.
-	schedules := findRunnableSchedules(dbConfig)
+	schedules := scheduler.findRunnableSchedules()
 	log.Printf("Running %d schedule(s).\n", len(schedules))
 	for _, schedule := range schedules {
-		runSchedule(schedule, dbConfig, queueConfig)
+		scheduler.runSchedule(schedule)
 	}
 }
 
 // Set the next run on all enabled schedules where it is not null.
-func setNextRunOnNewSchedules(dbConfig DbConfig) {
+func (scheduler *Scheduler) setNextRunOnNewSchedules() {
 	log.Printf("Updating schedules.\n")
 
 	// Find all schedules where the next run is null.
-	rows, err := dbConfig.Db.Query("SELECT id, cron_string, last_run FROM schedule WHERE enabled = true AND next_run IS NULL")
+	rows, err := scheduler.dbConfig.Db.Query("SELECT id, cron_string, last_run FROM schedule WHERE enabled = true AND next_run IS NULL")
 	failOnError(err, "Could not query schedules")
 	defer rows.Close()
 
@@ -55,15 +64,15 @@ func setNextRunOnNewSchedules(dbConfig DbConfig) {
 		failOnError(err, "Could not get row from result set")
 
 		log.Printf("Updating schedule %d.\n", schedule.Id)
-		updateSchedule(schedule, schedule.LastRun, dbConfig)
+		scheduler.updateSchedule(schedule, schedule.LastRun)
 	}
 
 	failOnError(rows.Err(), "An error occurred with the result set")
 }
 
 // Find all enabled schedules whose next run is before now.
-func findRunnableSchedules(dbConfig DbConfig) []Schedule {
-	schedulesStmt, err := dbConfig.Db.Prepare("SELECT id, project_id, argument, script_name, cron_string FROM schedule WHERE enabled = true AND next_run < ?")
+func (scheduler *Scheduler) findRunnableSchedules() []Schedule {
+	schedulesStmt, err := scheduler.dbConfig.Db.Prepare("SELECT id, project_id, argument, script_name, cron_string FROM schedule WHERE enabled = true AND next_run < ?")
 	failOnError(err, "Could not prepare select schedules statement")
 	defer schedulesStmt.Close()
 
@@ -88,9 +97,9 @@ func findRunnableSchedules(dbConfig DbConfig) []Schedule {
 
 // Run a schedule.
 // This creates a job in the database and publish the created job in the message queue.
-func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) {
+func (scheduler *Scheduler) runSchedule(schedule Schedule) {
 	// Get the id of the script to run.
-	scriptIdStmt, err := dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
+	scriptIdStmt, err := scheduler.dbConfig.Db.Prepare("SELECT id FROM script WHERE project_id = ? AND name = ?")
 	failOnError(err, "Could not prepare select script id statement")
 	defer scriptIdStmt.Close()
 	var scriptId int64
@@ -101,7 +110,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 		log.Printf("Could not find script '%s' for schedule %d.\n", schedule.ScriptName, schedule.Id)
 
 		// Set the schedule status to invalid script.
-		disableStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 2 WHERE id = ?")
+		disableStmt, err := scheduler.dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 2 WHERE id = ?")
 		failOnError(err, "Could not prepare disable schedule statement")
 		defer disableStmt.Close()
 		disableStmt.Exec(schedule.Id)
@@ -110,7 +119,7 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 	}
 
 	// Update the schedule.
-	if !updateSchedule(schedule, time.Now(), dbConfig) {
+	if !scheduler.updateSchedule(schedule, time.Now()) {
 		return
 	}
 
@@ -122,27 +131,27 @@ func runSchedule(schedule Schedule, dbConfig DbConfig, queueConfig QueueConfig) 
 		TriggeredByScheduleId: schedule.Id,
 	}
 
-	createJob(&job, dbConfig)
-	publishJob(job, queueConfig)
+	scheduler.createJob(&job)
+	scheduler.publishJob(job)
 	log.Printf("Created job: %s.\n", job.DisplayName)
 }
 
 // Updates the schedule next and last run, returns whether the schedule is valid.
-func updateSchedule(schedule Schedule, lastRun time.Time, dbConfig DbConfig) bool {
+func (scheduler *Scheduler) updateSchedule(schedule Schedule, lastRun time.Time) bool {
 	cronExpr, err := cronexpr.Parse(schedule.CronString)
 
 	if err != nil {
 		log.Printf("Could not parse cron expression: '%s'.\n", schedule.CronString)
 
 		// Set the schedule status to invalid cron.
-		disableStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 1 WHERE id = ?")
+		disableStmt, err := scheduler.dbConfig.Db.Prepare("UPDATE schedule SET enabled = false, status = 1 WHERE id = ?")
 		failOnError(err, "Could not prepare disable schedule statement")
 		defer disableStmt.Close()
 		disableStmt.Exec(schedule.Id)
 
 		return false
 	} else {
-		updateStmt, err := dbConfig.Db.Prepare("UPDATE schedule SET last_run = ?, next_run = ? WHERE id = ?")
+		updateStmt, err := scheduler.dbConfig.Db.Prepare("UPDATE schedule SET last_run = ?, next_run = ? WHERE id = ?")
 		failOnError(err, "Could not prepare update schedule statement")
 		defer updateStmt.Close()
 
@@ -155,9 +164,9 @@ func updateSchedule(schedule Schedule, lastRun time.Time, dbConfig DbConfig) boo
 
 // Create a job in the database.
 // This also sets the new job id and display name.
-func createJob(job *Job, dbConfig DbConfig) {
+func (scheduler *Scheduler) createJob(job *Job) {
 	// Insert the job into the database.
-	insertStmt, err := dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, ?, '', 0)")
+	insertStmt, err := scheduler.dbConfig.Db.Prepare("INSERT INTO job(display_name, script_id, argument, triggered_by_schedule_id, queued_time, output, status) VALUES(?, ?, ?, ?, ?, '', 0)")
 	failOnError(err, "Could not prepare insert job statement")
 	defer insertStmt.Close()
 
@@ -171,7 +180,7 @@ func createJob(job *Job, dbConfig DbConfig) {
 	job.DisplayName = fmt.Sprintf("%s #%d", job.DisplayName, job.Id)
 
 	// Update the display name in the database.
-	updateStmt, err := dbConfig.Db.Prepare("UPDATE job SET display_name = ? WHERE id = ?")
+	updateStmt, err := scheduler.dbConfig.Db.Prepare("UPDATE job SET display_name = ? WHERE id = ?")
 	failOnError(err, "Could not prepare update job statement")
 	defer updateStmt.Close()
 
@@ -180,15 +189,15 @@ func createJob(job *Job, dbConfig DbConfig) {
 }
 
 // Publish the job to the message queue.
-func publishJob(job Job, queueConfig QueueConfig) {
+func (scheduler *Scheduler) publishJob(job Job) {
 	// Set the TypeId header so the receiver knows what type the body is.
 	headers := amqp.Table{}
 	headers["__TypeId__"] = "java.lang.Long"
 
 	// Publish the job.
-	err := queueConfig.Channel.Publish(
+	err := scheduler.queueConfig.Channel.Publish(
 		"scriptinator-exchange",
-		queueConfig.QueueName,
+		scheduler.queueConfig.QueueName,
 		false,
 		false,
 		amqp.Publishing{
