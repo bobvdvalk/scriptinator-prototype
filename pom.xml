@@ -287,6 +287,7 @@
                             <java>SLASHSTAR_STYLE</java>
                             <Jenkinsfile>JAVADOC_STYLE</Jenkinsfile>
                             <adoc>DOUBLESLASH_STYLE</adoc>
+                            <go>SLASHSTAR_STYLE</go>
                         </mapping>
                         <excludes>
                             <exclude>**/node_modules/**</exclude>
