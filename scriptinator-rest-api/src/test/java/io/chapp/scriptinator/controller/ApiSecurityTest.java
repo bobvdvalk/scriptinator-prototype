@@ -51,7 +51,7 @@ public class ApiSecurityTest {
                 new Object[]{"GET", "/scripts", null, 200, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_READ)},
                 new Object[]{"GET", "/scripts/5436", null, 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_READ)},
                 new Object[]{"GET", "/scripts/5436/jobs", null, 200, Collections.singletonList(ApiScope.JOB_READ)},
-                new Object[]{"POST", "/scripts/5436/run", RequestBody.create(MediaType.parse("application/json"), "{}"), 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_RUN)}
+                new Object[]{"POST", "/scripts/5436/jobs", RequestBody.create(MediaType.parse("application/json"), "{}"), 404, Arrays.asList(ApiScope.SCRIPT, ApiScope.SCRIPT_RUN)}
         };
     }
 
@@ -65,7 +65,7 @@ public class ApiSecurityTest {
 
             Response response = client.newCall(
                     new Request.Builder()
-                            .url("http://localhost:8080" + endpoint)
+                            .url("http://localhost:8080/api" + endpoint)
                             .method(method, body)
                             .header("Authorization", "Bearer " + token)
                             .build()

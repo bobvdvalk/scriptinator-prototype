@@ -31,6 +31,7 @@ public class Link {
         if (!href.startsWith("/")) {
             throw new IllegalArgumentException("Links must start with a '/'");
         }
+
         this.href = href;
         this.parameters = parameters;
     }

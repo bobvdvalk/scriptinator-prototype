@@ -31,6 +31,7 @@ public class RootController {
         links.put("jobsUrl", new Link("/jobs"));
         links.put("projectsUrl", new Link("/projects"));
         links.put("scriptsUrl", new Link("/scripts"));
+        links.put("schedulesUrl", new Link("/schedules"));
         links.put("webhooksUrl", new Link("/webhooks"));
         return links;
     }

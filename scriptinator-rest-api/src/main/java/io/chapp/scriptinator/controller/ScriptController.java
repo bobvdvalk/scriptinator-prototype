@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.controller;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Link;
@@ -22,15 +23,14 @@ import io.chapp.scriptinator.model.PageResult;
 import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequestMapping("scripts")
@@ -80,14 +80,19 @@ public class ScriptController {
         );
     }
 
-    @PostMapping(value = "{scriptId}/run", consumes = "application/json")
+    @PostMapping(value = "{scriptId}/jobs", consumes = "application/json")
     @PreAuthorize("#oauth2.hasAnyScope('script', 'script:run')")
-    public Map<String, Object> runScript(@PathVariable long scriptId, HttpServletRequest request) throws IOException {
-        // Get the request body as a map (or null).
-        String bodyString = IOUtils.toString(request.getInputStream(), request.getCharacterEncoding());
-        Map bodyMap = StringUtils.isEmpty(bodyString) ? null : objectMapper.readValue(bodyString, Map.class);
+    public Job runScript(@PathVariable long scriptId, @RequestBody Job job, HttpServletResponse response) throws IOException {
+        try {
+            Script script = scriptService.getOwnedByPrincipal(scriptId);
+            Object argument = StringUtils.isEmpty(job.getArgument()) ? null : objectMapper.readValue(job.getArgument(), Object.class);
+            Job result = scriptService.run(script, argument);
 
-        scriptService.run(scriptService.getOwnedByPrincipal(scriptId), bodyMap);
-        return Collections.singletonMap("success", true);
+            response.setHeader("Location", objectMapper.convertValue(result.getUrl(), String.class));
+            response.setStatus(HttpStatus.CREATED.value());
+            return result;
+        } catch (JsonParseException e) {
+            throw new IllegalArgumentException("Invalid 'argument' field. Must be a json string.", e);
+        }
     }
 }

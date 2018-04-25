@@ -104,15 +104,19 @@ public class WebhookArgumentParser {
                 if (StringUtils.isEmpty(stringData) || isText(contentType)) {
                     return stringData;
                 } else if (isJson(contentType)) {
-                    try {
-                        return objectMapper.readValue(stringData, Map.class);
-                    } catch (JsonParseException e) {
-                        throw new IllegalArgumentException("Invalid json body: " + e.getMessage(), e);
-                    }
+                    return readJsonValueAsMap(stringData);
                 }
             }
         }
         return null;
+    }
+
+    private Map readJsonValueAsMap(String value) throws IOException {
+        try {
+            return objectMapper.readValue(value, Map.class);
+        } catch (JsonParseException e) {
+            throw new IllegalArgumentException("Invalid json body: " + e.getMessage(), e);
+        }
     }
 
     private boolean isSupportedType(String contentType) {

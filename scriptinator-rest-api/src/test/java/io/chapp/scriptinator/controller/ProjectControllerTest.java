@@ -66,7 +66,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects/hoiBobDitIsEenTest")
+                        .url("http://localhost:8080/api/projects/hoiBobDitIsEenTest")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -88,11 +88,11 @@ public class ProjectControllerTest {
         );
         assertEquals(
                 json.read("$.url"),
-                "http://localhost:8080/projects/hoiBobDitIsEenTest"
+                "http://localhost:8080/api/projects/hoiBobDitIsEenTest"
         );
         assertEquals(
                 json.read("$.scriptsUrl"),
-                "http://localhost:8080/projects/hoiBobDitIsEenTest/scripts"
+                "http://localhost:8080/api/projects/hoiBobDitIsEenTest/scripts"
         );
     }
 
@@ -113,7 +113,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects")
+                        .url("http://localhost:8080/api/projects")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -148,7 +148,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects?page=2")
+                        .url("http://localhost:8080/api/projects?page=2")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -192,7 +192,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects/aNiceProjectWithScripts/scripts")
+                        .url("http://localhost:8080/api/projects/aNiceProjectWithScripts/scripts")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -240,7 +240,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects/aSuperScheduledProject/schedules")
+                        .url("http://localhost:8080/api/projects/aSuperScheduledProject/schedules")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -288,7 +288,7 @@ public class ProjectControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/projects/sensitiveProject/webhooks")
+                        .url("http://localhost:8080/api/projects/sensitiveProject/webhooks")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -297,6 +297,10 @@ public class ProjectControllerTest {
         String body = response.body().string();
         ReadContext json = JsonPath.parse(body);
 
+        assertEquals(
+                response.code(),
+                200
+        );
         assertEquals(
                 new HashSet<>(json.read("$.items[*].name")),
                 new HashSet<>(Arrays.asList(

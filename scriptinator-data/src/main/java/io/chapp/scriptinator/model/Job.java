@@ -16,6 +16,9 @@
 package io.chapp.scriptinator.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
@@ -130,6 +133,15 @@ public class Job extends AbstractEntity {
 
     public String getArgument() {
         return argument;
+    }
+
+    @JsonSetter
+    public void setArgument(Object argument) {
+        try {
+            this.argument = new ObjectMapper().writeValueAsString(argument);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public void setArgument(String argument) {

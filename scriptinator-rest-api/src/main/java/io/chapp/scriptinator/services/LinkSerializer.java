@@ -22,6 +22,7 @@ import io.chapp.scriptinator.model.Link;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -34,9 +35,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class LinkSerializer extends StdSerializer<Link> {
+    private final String contextPath;
 
-    protected LinkSerializer() {
+    protected LinkSerializer(@Value("${server.contextPath:}") String contextPath) {
         super(Link.class);
+        this.contextPath = contextPath;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class LinkSerializer extends StdSerializer<Link> {
         URIBuilder resourceUrl = getRequestUrl()
                 .removeQuery()
                 .clearParameters()
-                .setPath(link.getHref());
+                .setPath(contextPath + link.getHref());
 
         List<NameValuePair> parameters = link.getParameters().entrySet().stream().map(
                 entry -> new BasicNameValuePair(entry.getKey(), entry.getValue())

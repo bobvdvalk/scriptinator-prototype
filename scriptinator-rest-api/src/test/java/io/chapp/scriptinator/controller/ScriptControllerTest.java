@@ -38,7 +38,6 @@ import java.util.HashSet;
 
 import static io.chapp.scriptinator.utils.ScriptinatorTestCase.DEFAULT_USERNAME;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 @Listeners(ScriptinatorTestCase.class)
 public class ScriptControllerTest {
@@ -78,7 +77,7 @@ public class ScriptControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/scripts/" + script.getId())
+                        .url("http://localhost:8080/api/scripts/" + script.getId())
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -130,7 +129,7 @@ public class ScriptControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/scripts/")
+                        .url("http://localhost:8080/api/scripts/")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -185,7 +184,7 @@ public class ScriptControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/scripts")
+                        .url("http://localhost:8080/api/scripts")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -247,7 +246,7 @@ public class ScriptControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/scripts/" + script.getId() + "/jobs")
+                        .url("http://localhost:8080/api/scripts/" + script.getId() + "/jobs")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -283,8 +282,8 @@ public class ScriptControllerTest {
         // Action
         Response response = client.newCall(
                 new Request.Builder()
-                        .post(RequestBody.create(MediaType.parse("application/json"), ""))
-                        .url("http://localhost:8080/scripts/" + script.getId() + "/run")
+                        .post(RequestBody.create(MediaType.parse("application/json"), "{\"argument\": {\"Hello\": \"World\"}}"))
+                        .url("http://localhost:8080/api/scripts/" + script.getId() + "/jobs")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -292,6 +291,31 @@ public class ScriptControllerTest {
         // Validation
         ReadContext json = JsonPath.parse(response.body().string());
 
-        assertTrue(json.read("$.success"));
+
+        assertEquals(
+                response.code(),
+                201
+        );
+
+        // Pull the id from the location header
+        String location = response.header("Location");
+        int jobId = Integer.parseInt(location.substring(location.lastIndexOf('/') + 1));
+
+        assertEquals(
+                (int) json.read("$.id"),
+                jobId
+        );
+        assertEquals(
+                json.read("$.scriptUrl"),
+                "http://localhost:8080/api/scripts/" + script.getId()
+        );
+        assertEquals(
+                json.read("$.status"),
+                "QUEUED"
+        );
+        assertEquals(
+                json.read("$.argument"),
+                "{\"Hello\":\"World\"}"
+        );
     }
 }

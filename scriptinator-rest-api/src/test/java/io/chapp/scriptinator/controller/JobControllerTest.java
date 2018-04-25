@@ -78,7 +78,7 @@ public class JobControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/jobs")
+                        .url("http://localhost:8080/api/jobs")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -113,7 +113,7 @@ public class JobControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/jobs/" + job.getId())
+                        .url("http://localhost:8080/api/jobs/" + job.getId())
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -125,7 +125,7 @@ public class JobControllerTest {
 
         assertEquals(
                 json.read("$.url"),
-                "http://localhost:8080/jobs/" + job.getId()
+                "http://localhost:8080/api/jobs/" + job.getId()
         );
         assertEquals(
                 json.read("$.status"),

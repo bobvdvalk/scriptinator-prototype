@@ -45,7 +45,7 @@ public class RootControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080")
+                        .url("http://localhost:8080/api")
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -61,13 +61,15 @@ public class RootControllerTest {
                         "jobsUrl",
                         "scriptsUrl",
                         "projectsUrl",
+                        "schedulesUrl",
                         "webhooksUrl"
                 ))
         );
-        assertEquals(urls.get("jobsUrl"), "http://localhost:8080/jobs");
-        assertEquals(urls.get("scriptsUrl"), "http://localhost:8080/scripts");
-        assertEquals(urls.get("projectsUrl"), "http://localhost:8080/projects");
-        assertEquals(urls.get("webhooksUrl"), "http://localhost:8080/webhooks");
+        assertEquals(urls.get("jobsUrl"), "http://localhost:8080/api/jobs");
+        assertEquals(urls.get("scriptsUrl"), "http://localhost:8080/api/scripts");
+        assertEquals(urls.get("projectsUrl"), "http://localhost:8080/api/projects");
+        assertEquals(urls.get("schedulesUrl"), "http://localhost:8080/api/schedules");
+        assertEquals(urls.get("webhooksUrl"), "http://localhost:8080/api/webhooks");
     }
 
     @Test
@@ -76,7 +78,7 @@ public class RootControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080")
+                        .url("http://localhost:8080/api/") // The trailing slash is needed otherwise this test fails for some arcane reason.
                         .headers(accessToken)
                         .header("Host", "custom_host")
                         .build()
@@ -93,12 +95,14 @@ public class RootControllerTest {
                         "jobsUrl",
                         "scriptsUrl",
                         "projectsUrl",
+                        "schedulesUrl",
                         "webhooksUrl"
                 ))
         );
-        assertEquals(urls.get("jobsUrl"), "http://custom_host/jobs");
-        assertEquals(urls.get("scriptsUrl"), "http://custom_host/scripts");
-        assertEquals(urls.get("projectsUrl"), "http://custom_host/projects");
-        assertEquals(urls.get("webhooksUrl"), "http://custom_host/webhooks");
+        assertEquals(urls.get("jobsUrl"), "http://custom_host/api/jobs");
+        assertEquals(urls.get("scriptsUrl"), "http://custom_host/api/scripts");
+        assertEquals(urls.get("projectsUrl"), "http://custom_host/api/projects");
+        assertEquals(urls.get("schedulesUrl"), "http://custom_host/api/schedules");
+        assertEquals(urls.get("webhooksUrl"), "http://custom_host/api/webhooks");
     }
 }

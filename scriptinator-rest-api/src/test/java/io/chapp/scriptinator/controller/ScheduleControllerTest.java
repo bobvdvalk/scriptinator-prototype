@@ -76,7 +76,7 @@ public class ScheduleControllerTest {
         Response response = client.newCall(
                 new Request.Builder()
                         .get()
-                        .url("http://localhost:8080/schedules/" + schedule.getId())
+                        .url("http://localhost:8080/api/schedules/" + schedule.getId())
                         .headers(accessToken)
                         .build()
         ).execute();
@@ -88,7 +88,7 @@ public class ScheduleControllerTest {
 
         assertEquals(
                 json.read("$.url"),
-                "http://localhost:8080/schedules/" + schedule.getId()
+                "http://localhost:8080/api/schedules/" + schedule.getId()
         );
         assertEquals(
                 json.read("$.name"),
