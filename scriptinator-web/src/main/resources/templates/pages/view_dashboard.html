@@ -60,7 +60,7 @@
                                 <a th:href="${'/project/' + job.script.project.id + '/script/' + job.script.id}"
                                    th:text="${job.displayName}"></a>
                             </td>
-                            <td>
+                            <td class="collapsing">
                                 <th:block th:switch="${job.status}">
                                     <div th:case="${job.status.QUEUED}"
                                          class="ui circular icon button"
