@@ -16,4 +16,6 @@
 
 = Contributing
 
-== Placeholder
+This project is still in development. This means we take your feedback very seriously.
+If you have any feedback, questions or feature requests you can let us know by email (support@scriptinator.io) or through https://slack-invite.scriptinator.io[slack].
+If you're a developer and would like to contribute to the code, head over to our https://github.com/ScriptinatorIO/scriptinator[GitHub] page.

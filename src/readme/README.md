@@ -16,8 +16,8 @@ And the best part of it: It is **super simple!**
 - 100% free & open source
 - Available in the [cloud](https://scriptinator.io) or on-premise
 
-> This project is still in development. This means we take your feedback very seriously. If you have any feedback,
-questions or feature requests. Please let us know by email (support@scriptinator.io) or through [slack](https://slack-invite.scriptinator.io).
+> This project is still in development. This means we take your feedback very seriously.
+If you have any feedback, questions or feature requests you can let us know by email (support@scriptinator.io) or through [slack](https://slack-invite.scriptinator.io).
 
 ## Screenshots
 
