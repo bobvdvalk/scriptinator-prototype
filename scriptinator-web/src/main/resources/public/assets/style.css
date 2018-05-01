@@ -18,6 +18,10 @@ body {
     background-color: #EAEAEA;
 }
 
+main {
+    height: calc(100% - 155px); /* 101px header + 54px footer */
+}
+
 h1#title {
     padding-top: 12px;
 }

@@ -16,34 +16,38 @@
 
 -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<div th:fragment="navigation" id="navigation" class="ui inverted attached labeled icon menu">
-    <div class="item">
-        <a th:href="@{/dashboard}">
-            <img id="logo" class="ui small image" th:src="@{/assets/logo_light.png}"/>
-        </a>
+<div th:fragment="navigation" class="ui inverted attached segment">
+    <div class="ui container">
+        <div class="ui inverted attached labeled borderless icon menu">
+            <div class="item">
+                <a th:href="@{/dashboard}">
+                    <img id="logo" class="ui small image" th:src="@{/assets/logo_light.png}"/>
+                </a>
+            </div>
+            <a class="item"
+               th:href="@{/projects}"
+               th:classappend="${#httpServletRequest.getRequestURI().startsWith('/projects') ? 'active':''}">
+                <i class="book icon"></i>
+                Projects
+            </a>
+            <a class="item"
+               href="/docs"
+               target="_blank">
+                <i class="question circle icon"></i>
+                Documentation
+            </a>
+            <div class="ui fluid container"></div>
+            <form th:action="@{/logout}" th:method="POST">
+                <a class="item" onclick="this.parentNode.submit()">
+                    <i class="sign out alternate icon"></i>
+                    Log Out
+                </a>
+            </form>
+        </div>
     </div>
-    <a class="item"
-       th:href="@{/projects}"
-       th:classappend="${#httpServletRequest.getRequestURI().startsWith('/projects') ? 'active':''}">
-        <i class="book icon"></i>
-        Projects
-    </a>
-    <a class="item"
-       href="/docs"
-       target="_blank">
-        <i class="question circle icon"></i>
-        Documentation
-    </a>
-    <div class="ui fluid container"></div>
-    <form th:action="@{/logout}" th:method="POST">
-        <a class="item" onclick="this.parentNode.submit()">
-            <i class="sign out alternate icon"></i>
-            Log Out
-        </a>
-    </form>
 </div>
 
 <div th:fragment="settings" class="ui fluid vertical menu">
@@ -65,6 +69,21 @@
         </div>
     </div>
 </div>
+
+<footer th:fragment="footer" id="footer" class="ui inverted attached borderless icon menu">
+    <div class="ui container">
+        <div class="ui fluid container"></div>
+        <a class="item" target="_blank" href="https://github.com/ScriptinatorIO/scriptinator">
+            <i class="big github icon"></i>
+        </a>
+        <a class="item" target="_blank" href="https://slack-invite.scriptinator.io/">
+            <i class="big slack icon"></i>
+        </a>
+        <a class="item" target="_blank" href="mailto:support@scriptinator.io">
+            <i class="big at icon"></i>
+        </a>
+    </div>
+</footer>
 
 </body>
 </html>
