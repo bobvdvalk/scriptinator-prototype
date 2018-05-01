@@ -15,20 +15,30 @@
  */
 package io.chapp.scriptinator.webcontrollers;
 
+import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.model.Project;
+import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ProjectService;
+import io.chapp.scriptinator.services.ScriptService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardWebController {
-    public static final int PROJECT_EXCERPT_COUNT = 5;
-    private final ProjectService projectService;
+    private static final int PROJECT_EXCERPT_COUNT = 5;
+    private static final int JOB_EXCERPT_COUNT = 10;
 
-    public DashboardWebController(ProjectService projectService) {
+    private final ProjectService projectService;
+    private final JobService jobService;
+    private final ScriptService scriptService;
+
+    public DashboardWebController(ProjectService projectService, JobService jobService, ScriptService scriptService) {
         this.projectService = projectService;
+        this.jobService = jobService;
+        this.scriptService = scriptService;
     }
 
     @GetMapping("/")
@@ -42,6 +52,16 @@ public class DashboardWebController {
                 0,
                 PROJECT_EXCERPT_COUNT
         )));
+
+        model.addAttribute(Job.LIST_ATTRIBUTE, jobService.getAllOwnedByPrincipal(new PageRequest(
+                0,
+                JOB_EXCERPT_COUNT,
+                new Sort(Sort.Direction.DESC, "id")
+        )));
+
+        model.addAttribute("jobCount", jobService.count());
+        model.addAttribute("scriptCount", scriptService.count());
+
         return "pages/view_dashboard";
     }
 }

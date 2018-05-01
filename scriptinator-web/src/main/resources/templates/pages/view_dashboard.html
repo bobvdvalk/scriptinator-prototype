@@ -33,9 +33,65 @@
     <div class="ui grid">
         <div class="ten wide column">
             <div class="ui attached segment">
-                <p>
-                    This is where the activity feed goes. But for now it is just a placeholder.
-                </p>
+                <h4 class="ui header">Newest Jobs</h4>
+                <div id="jobs">
+                    <table class="ui compact table">
+                        <thead>
+                        <tr>
+                            <th colspan="2">
+                                <div class="ui label">
+                                    Jobs
+                                    <div class="detail" th:text="${jobCount}"></div>
+                                </div>
+                                <div class="ui label">
+                                    Scripts
+                                    <div class="detail" th:text="${scriptCount}"></div>
+                                </div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tr th:if="${!jobs.hasContent()}">
+                            <td colspan="2">
+                                No jobs have been run yet.
+                            </td>
+                        </tr>
+                        <tr th:each="job : ${jobs}" class="job" th:classappend="${job.status.name().toLowerCase()}">
+                            <td>
+                                <a th:href="${'/project/' + job.script.project.id + '/script/' + job.script.id}"
+                                   th:text="${job.displayName}"></a>
+                            </td>
+                            <td>
+                                <th:block th:switch="${job.status}">
+                                    <div th:case="${job.status.QUEUED}"
+                                         class="ui circular icon button"
+                                         th:data-tooltip="'Queued at ' + ${job.queuedTime}">
+                                        <i class="wait icon"></i>
+                                    </div>
+                                    <div th:case="${job.status.RUNNING}"
+                                         class="ui circular icon button"
+                                         th:data-tooltip="'Started at ' + ${job.startedTime}">
+                                        <i class="play icon"></i>
+                                    </div>
+                                    <div th:case="${job.status.FINISHED}"
+                                         class="ui circular icon button"
+                                         th:data-tooltip="'Finished at ' + ${job.finishedTime}">
+                                        <i class="check icon"></i>
+                                    </div>
+                                    <div th:case="${job.status.FAILED}"
+                                         class="ui circular icon button"
+                                         th:data-tooltip="'Finished at ' + ${job.finishedTime}">
+                                        <i class="warning icon"></i>
+                                    </div>
+                                </th:block>
+                            </td>
+                        </tr>
+                        <tfoot>
+                        <tr>
+                            <th colspan="2"></th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="six wide column">
