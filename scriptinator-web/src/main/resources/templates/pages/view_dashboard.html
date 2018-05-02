@@ -58,7 +58,7 @@
                         <tr th:each="job : ${jobs}" class="job" th:classappend="${job.status.name().toLowerCase()}">
                             <td>
                                 <a th:href="${'/project/' + job.script.project.id + '/script/' + job.script.id}"
-                                   th:text="${job.displayName}"></a>
+                                   th:text="${job.script.project.name + '/' + job.displayName}"></a>
                             </td>
                             <td class="collapsing">
                                 <th:block th:switch="${job.status}">
