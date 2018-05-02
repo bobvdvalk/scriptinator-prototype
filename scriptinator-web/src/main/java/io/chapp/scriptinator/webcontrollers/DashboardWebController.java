@@ -61,6 +61,7 @@ public class DashboardWebController {
 
         model.addAttribute("jobCount", jobService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
         model.addAttribute("scriptCount", scriptService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
+        model.addAttribute("projectCount", projectService.findAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
 
         return "pages/view_dashboard";
     }
