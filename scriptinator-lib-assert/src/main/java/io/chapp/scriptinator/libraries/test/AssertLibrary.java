@@ -58,12 +58,12 @@ public class AssertLibrary {
             actual = listToMap((List) actual);
         }
 
-        if (!deepEquals(expected, actual)) {
+        if (!deepEquals(message, expected, actual)) {
             fail(message + "\nExpected '" + expected + "'\nFound: '" + actual + "'");
         }
     }
 
-    private boolean deepEquals(Object expected, Object actual) {
+    private boolean deepEquals(String message, Object expected, Object actual) {
         if (expected instanceof Map && actual instanceof Map) {
             Map<Object, Object> expectedMap = (Map<Object, Object>) expected;
             Map<Object, Object> actualMap = (Map<Object, Object>) actual;
@@ -72,8 +72,8 @@ public class AssertLibrary {
                 return false;
             }
 
-            return expectedMap.entrySet().stream()
-                    .allMatch(entry -> deepEquals(entry.getValue(), actualMap.get(entry.getKey())));
+            expectedMap.forEach((key, value) -> equal(message, value, actualMap.get(key)));
+            return true;
         } else {
             return Objects.equals(expected, actual);
         }

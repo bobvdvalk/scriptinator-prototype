@@ -67,6 +67,38 @@ public class AssertLibraryTest {
     }
 
     @Test
+    public void testNestedListAndMap() {
+        Map<Integer, Object> nestedMap = new HashMap<>();
+        nestedMap.put(0, "bar");
+        nestedMap.put(1, "baz");
+        List<Object> list = Arrays.asList(
+                "foo",
+                nestedMap
+        );
+
+        Map<Integer, Object> map = new HashMap<>();
+        map.put(0, "foo");
+        map.put(1, Arrays.asList("bar", "baz"));
+
+        assertLibrary.equal("list and map", list, map);
+        assertLibrary.equal("map and list", map, list);
+    }
+
+    @Test(expectedExceptions = UnmetAssertionException.class)
+    public void testNestedListAndMapNotEqual() {
+        List<Object> list = Arrays.asList(
+                "foo",
+                Collections.singletonList("bar")
+        );
+
+        Map<Integer, Object> map = new HashMap<>();
+        map.put(0, "foo");
+        map.put(1, Arrays.asList("bar", "baz"));
+
+        assertLibrary.equal("non-equal list and map", list, map);
+    }
+
+    @Test
     public void testEqualNull() {
         assertLibrary.equal("null and null", null, null);
     }
