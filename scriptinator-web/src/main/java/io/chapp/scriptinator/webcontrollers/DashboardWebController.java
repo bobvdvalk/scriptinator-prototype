@@ -59,8 +59,8 @@ public class DashboardWebController {
                 new Sort(Sort.Direction.DESC, "id")
         )));
 
-        model.addAttribute("jobCount", jobService.count());
-        model.addAttribute("scriptCount", scriptService.count());
+        model.addAttribute("jobCount", jobService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
+        model.addAttribute("scriptCount", scriptService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
 
         return "pages/view_dashboard";
     }
