@@ -86,7 +86,7 @@ public class ScriptWebController {
         model.addAttribute(Project.ATTRIBUTE, script.getProject());
 
         // Get all job pages.
-        Page<Job> jobs = jobService.getAllForScriptOwnedByPrincipal(
+        Page<Job> jobs = jobService.findAllForScriptOwnedByPrincipal(
                 scriptId,
                 new PageRequest(
                         0,

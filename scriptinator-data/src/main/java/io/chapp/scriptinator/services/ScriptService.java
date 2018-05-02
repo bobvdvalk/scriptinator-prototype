@@ -80,7 +80,7 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         return getOwnedBy(DataServiceUtils.getPrincipalName(), projectName, scriptName);
     }
 
-    public Page<Script> getAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
+    public Page<Script> findAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
         return getRepository().findAllByProjectOwnerUsernameAndProjectName(
                 username,
                 projectName,
@@ -88,16 +88,16 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
         );
     }
 
-    public Page<Script> getAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
-        return getAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
+    public Page<Script> findAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
+        return findAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
     }
 
-    public Page<Script> getAllOwnedBy(String username, Pageable pageable) {
+    public Page<Script> findAllOwnedBy(String username, Pageable pageable) {
         return getRepository().findAllByProjectOwnerUsername(username, pageable);
     }
 
-    public Page<Script> getAllOwnedByPrincipal(Pageable pageable) {
-        return getAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
+    public Page<Script> findAllOwnedByPrincipal(Pageable pageable) {
+        return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
     }
 
     public void deleteIfOwnedBy(String username, long scriptId) {

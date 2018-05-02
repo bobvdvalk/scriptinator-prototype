@@ -53,14 +53,14 @@ public class DashboardWebController {
                 PROJECT_EXCERPT_COUNT
         )));
 
-        model.addAttribute(Job.LIST_ATTRIBUTE, jobService.getAllOwnedByPrincipal(new PageRequest(
+        model.addAttribute(Job.LIST_ATTRIBUTE, jobService.findAllOwnedByPrincipal(new PageRequest(
                 0,
                 JOB_EXCERPT_COUNT,
                 new Sort(Sort.Direction.DESC, "id")
         )));
 
-        model.addAttribute("jobCount", jobService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
-        model.addAttribute("scriptCount", scriptService.getAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
+        model.addAttribute("jobCount", jobService.findAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
+        model.addAttribute("scriptCount", scriptService.findAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
         model.addAttribute("projectCount", projectService.findAllOwnedByPrincipal(new PageRequest(0, 1)).getTotalElements());
 
         return "pages/view_dashboard";

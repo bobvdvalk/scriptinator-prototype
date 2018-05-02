@@ -40,12 +40,12 @@ public class WebhookService extends AbstractEntityService<Webhook, WebhookReposi
         return getOwnedBy(DataServiceUtils.getPrincipalName(), webhookId);
     }
 
-    public Page<Webhook> getAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
+    public Page<Webhook> findAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
         return getRepository().findAllByProjectOwnerUsernameAndProjectName(username, projectName, pageable);
     }
 
-    public Page<Webhook> getAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
-        return getAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
+    public Page<Webhook> findAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
+        return findAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
     }
 
     public Webhook getByUuid(String uuid) {

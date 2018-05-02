@@ -76,12 +76,12 @@ public class ScheduleService extends AbstractEntityService<Schedule, ScheduleRep
         return findOwnedByPrincipal(id).orElseThrow(() -> noSuchElement(id));
     }
 
-    public Page<Schedule> getAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
+    public Page<Schedule> findAllForProjectOwnedBy(String username, String projectName, Pageable pageable) {
         return getRepository().findAllByProjectOwnerUsernameAndProjectName(username, projectName, pageable);
     }
 
-    public Page<Schedule> getAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
-        return getAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
+    public Page<Schedule> findAllForProjectOwnedByPrincipal(String projectName, Pageable pageable) {
+        return findAllForProjectOwnedBy(DataServiceUtils.getPrincipalName(), projectName, pageable);
     }
 
     public void deleteIfOwnedBy(String username, long id) {

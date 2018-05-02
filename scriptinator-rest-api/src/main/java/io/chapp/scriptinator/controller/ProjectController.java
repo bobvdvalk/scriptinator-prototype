@@ -77,7 +77,7 @@ public class ProjectController {
     public PageResult<Script> getProjectScripts(@PathVariable String projectName, HttpServletRequest request) {
         return PageResult.of(
                 new Link(PROJECTS_URL + "/" + projectName + "/scripts"),
-                scriptService.getAllForProjectOwnedByPrincipal(
+                scriptService.findAllForProjectOwnedByPrincipal(
                         projectName,
                         PageResult.request(request)
                 )
@@ -89,7 +89,7 @@ public class ProjectController {
     public PageResult<Schedule> getProjectSchedules(@PathVariable String projectName, HttpServletRequest request) {
         return PageResult.of(
                 new Link(PROJECTS_URL + "/" + projectName + "/schedules"),
-                scheduleService.getAllForProjectOwnedByPrincipal(
+                scheduleService.findAllForProjectOwnedByPrincipal(
                         projectName,
                         PageResult.request(request)
                 )
@@ -101,7 +101,7 @@ public class ProjectController {
     public PageResult<Webhook> getProjectWebhooks(@PathVariable String projectName, HttpServletRequest request) {
         return PageResult.of(
                 new Link(PROJECTS_URL + "/" + projectName + "/webhooks"),
-                webhookService.getAllForProjectOwnedByPrincipal(
+                webhookService.findAllForProjectOwnedByPrincipal(
                         projectName,
                         PageResult.request(request)
                 )

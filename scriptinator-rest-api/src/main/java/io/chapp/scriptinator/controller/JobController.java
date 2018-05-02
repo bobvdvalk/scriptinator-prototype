@@ -42,7 +42,7 @@ public class JobController {
     public PageResult<Job> listJobs(HttpServletRequest request) {
         return PageResult.of(
                 new Link("/jobs"),
-                jobService.getAllOwnedByPrincipal(
+                jobService.findAllOwnedByPrincipal(
                         PageResult.request(request)
                 )
         );

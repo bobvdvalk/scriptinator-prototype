@@ -33,15 +33,15 @@ public class JobService extends AbstractEntityService<Job, JobRepository> {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public Page<Job> getAllForScriptOwnedByPrincipal(long scriptId, Pageable pageable) {
-        return getAllForScriptOwnedBy(
+    public Page<Job> findAllForScriptOwnedByPrincipal(long scriptId, Pageable pageable) {
+        return findAllForScriptOwnedBy(
                 DataServiceUtils.getPrincipalName(),
                 scriptId,
                 pageable
         );
     }
 
-    public Page<Job> getAllForScriptOwnedBy(String username, long scriptId, Pageable pageable) {
+    public Page<Job> findAllForScriptOwnedBy(String username, long scriptId, Pageable pageable) {
         return getRepository().findAllByScriptProjectOwnerUsernameAndScriptId(
                 username,
                 scriptId,
@@ -49,12 +49,12 @@ public class JobService extends AbstractEntityService<Job, JobRepository> {
         );
     }
 
-    public Page<Job> getAllOwnedBy(String username, Pageable pageable) {
+    public Page<Job> findAllOwnedBy(String username, Pageable pageable) {
         return getRepository().findAllByScriptProjectOwnerUsername(username, pageable);
     }
 
-    public Page<Job> getAllOwnedByPrincipal(Pageable pageable) {
-        return getAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
+    public Page<Job> findAllOwnedByPrincipal(Pageable pageable) {
+        return findAllOwnedBy(DataServiceUtils.getPrincipalName(), pageable);
     }
 
     public Optional<Job> findOwnedBy(String username, long jobId) {

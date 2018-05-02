@@ -50,7 +50,7 @@ public class ScriptController {
     public PageResult<Script> getScripts(HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts"),
-                scriptService.getAllOwnedByPrincipal(
+                scriptService.findAllOwnedByPrincipal(
                         PageResult.request(request)
                 )
         );
@@ -73,7 +73,7 @@ public class ScriptController {
     public PageResult<Job> getJobs(@PathVariable long scriptId, HttpServletRequest request) {
         return PageResult.of(
                 new Link("/scripts/" + scriptId + "/jobs"),
-                jobService.getAllForScriptOwnedByPrincipal(
+                jobService.findAllForScriptOwnedByPrincipal(
                         scriptId,
                         PageResult.request(request)
                 )
