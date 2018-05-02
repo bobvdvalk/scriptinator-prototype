@@ -14,14 +14,6 @@
 // limitations under the License.
 //
 
-= Libraries
-
-:leveloffset: +1
-
-include::builtin.adoc[]
-
-include::http.adoc[]
-
-include::assert.adoc[]
-
-:leveloffset: -1
+<1> Import the Assert library
+<2> Make a request using the HTTP library
+<3> Assert that the returned ip is not null or empty

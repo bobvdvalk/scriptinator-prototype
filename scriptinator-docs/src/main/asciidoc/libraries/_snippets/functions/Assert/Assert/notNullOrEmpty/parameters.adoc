@@ -14,14 +14,10 @@
 // limitations under the License.
 //
 
-= Libraries
+| *property* +
+Type: <<String>>
+2+| The name of the property to check
 
-:leveloffset: +1
-
-include::builtin.adoc[]
-
-include::http.adoc[]
-
-include::assert.adoc[]
-
-:leveloffset: -1
+| *value* +
+Type: <<Any>>
+2+| The value to check for nullity and emptiness

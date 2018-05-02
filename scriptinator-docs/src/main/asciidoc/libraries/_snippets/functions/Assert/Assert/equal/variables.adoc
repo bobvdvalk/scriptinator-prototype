@@ -14,14 +14,5 @@
 // limitations under the License.
 //
 
-= Libraries
-
-:leveloffset: +1
-
-include::builtin.adoc[]
-
-include::http.adoc[]
-
-include::assert.adoc[]
-
-:leveloffset: -1
+:signature: equal(message, expected, actual)
+:description: Assert that two values are deeply equal

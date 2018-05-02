@@ -14,14 +14,31 @@
 // limitations under the License.
 //
 
-= Libraries
+:library_name: Assert
 
-:leveloffset: +1
+= Assert
+:type_name: Assert
 
-include::builtin.adoc[]
+The `Assert` library allows you to make assertions on variables,
+which can for example be used to validate inputs or HTTP responses.
 
-include::http.adoc[]
+=== Assert.fail
 
-include::assert.adoc[]
+:function_id: fail
+include::_snippets/function.adoc[]
 
-:leveloffset: -1
+=== Assert.equal
+
+:function_id: equal
+include::_snippets/function.adoc[]
+
+=== Assert.notNull
+
+:function_id: notNull
+include::_snippets/function.adoc[]
+
+=== Assert.notNullOrEmpty
+
+:function_id: notNullOrEmpty
+include::_snippets/function.adoc[]
+

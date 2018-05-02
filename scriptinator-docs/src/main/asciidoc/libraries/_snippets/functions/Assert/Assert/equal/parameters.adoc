@@ -14,14 +14,14 @@
 // limitations under the License.
 //
 
-= Libraries
+| *message* +
+Type: <<String>>
+2+| A description of the assertion
 
-:leveloffset: +1
+| *expected* +
+Type: <<Any>>
+2+| The expected value
 
-include::builtin.adoc[]
-
-include::http.adoc[]
-
-include::assert.adoc[]
-
-:leveloffset: -1
+| *actual* +
+Type: <<Any>>
+2+| The actual value
