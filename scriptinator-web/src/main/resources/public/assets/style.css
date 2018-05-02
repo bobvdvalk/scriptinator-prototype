@@ -19,7 +19,8 @@ body {
 }
 
 main {
-    height: calc(100% - 155px); /* 101px header + 54px footer */
+    min-height: calc(100% - 155px); /* 101px header + 54px footer */
+    padding: 4px 0 12px 0;
 }
 
 h1#title {
