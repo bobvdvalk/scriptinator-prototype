@@ -1,0 +1,3 @@
+server:
+  use-forward-headers: true
+  port: 8082

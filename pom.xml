@@ -37,6 +37,7 @@
         <module>scriptinator-rest-api</module>
         <module>scriptinator-web</module>
         <module>scriptinator-worker</module>
+        <module>scriptinator-reflect</module>
 
         <!-- Artifacts -->
         <module>scriptinator-docs</module>
