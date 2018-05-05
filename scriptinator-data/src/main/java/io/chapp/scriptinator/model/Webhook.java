@@ -57,6 +57,8 @@ public class Webhook extends AbstractEntity {
 
     private Date lastCall;
 
+    private boolean sendResponse = true;
+
     public String getUuid() {
         return uuid;
     }
@@ -103,6 +105,14 @@ public class Webhook extends AbstractEntity {
 
     public void setLastCall(Date lastCall) {
         this.lastCall = lastCall;
+    }
+
+    public boolean getSendResponse() {
+        return sendResponse;
+    }
+
+    public void setSendResponse(boolean sendResponse) {
+        this.sendResponse = sendResponse;
     }
 
     @Override

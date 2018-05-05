@@ -17,8 +17,7 @@ info(server);
 
 var Assert = library("Assert");
 
-Assert.equal(
-    "The server is described",
-    "meinheld/0.6.1",
+Assert.notNullOrEmpty(
+    "server description",
     server
 );

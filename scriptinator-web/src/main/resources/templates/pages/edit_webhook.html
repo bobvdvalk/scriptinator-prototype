@@ -81,6 +81,28 @@
                         </div>
                     </div>
                     <div class="twelve wide column">
+                        <div class="field">
+                            <label>Response</label>
+                            <div class="ui segment">
+                                <div class="ui toggle checkbox">
+                                    <input id="send-response-btn"
+                                           type="checkbox"
+                                           name="sendResponse"
+                                           th:field="*{sendResponse}">
+                                    <label>
+                                        Send a success response with a 200 status code when the webhook is triggered:
+                                        <code>{"success":true}</code><br>
+                                        If this is disabled, the response will be a 204 status code with an empty body.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="four wide column"></div>
+                    <div class="twelve wide column">
                         <div class="field" th:if="${webhook.id != null}">
                             <label>Call</label>
                             <div class="ui action input">
