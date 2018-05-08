@@ -23,12 +23,14 @@ import io.chapp.scriptinator.model.Job;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
 import io.chapp.scriptinator.services.SecretService;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.stereotype.Service;
 
 import javax.script.*;
+import java.io.IOException;
 
 @Service
 public class ScriptExecutor {
@@ -71,6 +73,7 @@ public class ScriptExecutor {
         try {
             jobService.changeStatus(job, Job.Status.RUNNING);
             script.eval();
+            invokeMain(engine, job);
             jobService.changeStatus(job, Job.Status.FINISHED);
         } catch (ScriptinatorExecutionException e) {
             job.log("FATAL", e.getMessage());
@@ -90,6 +93,31 @@ public class ScriptExecutor {
             job.log("COMPILE", "Something didn't look right on line " + e.getLineNumber() + ": " + e.getMessage());
             jobService.changeStatus(job, Job.Status.FAILED);
             return null;
+        }
+    }
+
+    private void invokeMain(ScriptEngine engine, Job job) {
+        // Get the main object.
+        var mainObj = engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE).get("main");
+        if (mainObj instanceof ScriptObjectMirror) {
+            var main = (ScriptObjectMirror) mainObj;
+
+            // Invoke it with the job argument.
+            if (main.isFunction()) {
+                main.call(null, parseArgument(job));
+            }
+        }
+    }
+
+    private Object parseArgument(Job job) {
+        if (job.getArgument() == null) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(job.getArgument(), Object.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to retrieve argument, please contact support.", e);
         }
     }
 }
