@@ -64,17 +64,17 @@ If you want to try out Scriptinator on your own infrastructure, you can take the
             traefik.port: 8081
             traefik.frontend.rule: PathPrefix:/
         command: |
-          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
+          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=true&verifyServerCertificate=false&autoReconnect=true
           --spring.rabbitmq.host=rabbitmq
       worker:
         image: scriptinator/scriptinator-worker:@project.version@
         command: |
-          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
+          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=true&verifyServerCertificate=false&autoReconnect=true
           --spring.rabbitmq.host=rabbitmq
       scheduler:
         image: scriptinator/scriptinator-scheduler:1.0-SNAPSHOT
         command: |
-          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=false
+          --spring.datasource.url=jdbc:mysql://mysql:3306/scriptinator?useSSL=true&verifyServerCertificate=false&autoReconnect=true
           --spring.rabbitmq.host=rabbitmq
       docs:
         image: scriptinator/scriptinator-docs:@project.version@
