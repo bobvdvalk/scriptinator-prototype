@@ -22,6 +22,8 @@
 The `Assert` library allows you to make assertions on variables,
 which can for example be used to validate inputs or HTTP responses.
 
+== Assert
+
 === Assert.fail
 
 :function_id: fail
