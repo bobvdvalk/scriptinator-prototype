@@ -14,5 +14,5 @@
 // limitations under the License.
 //
 
-<1> Get the script argument
+<1> Declare a `main` function which accepts the script argument
 <2> If an argument is given, log it

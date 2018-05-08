@@ -60,11 +60,6 @@ include::_snippets/function.adoc[]
 :function_id: run_argument
 include::_snippets/function.adoc[]
 
-=== argument
-
-:function_id: argument
-include::_snippets/function.adoc[]
-
 == Using Secrets
 
 === secret

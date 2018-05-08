@@ -55,7 +55,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         try (ClosableContext context = new ClosableContext()) {
-            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService, objectMapper);
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             scriptLibrary.apply(bindings);
 

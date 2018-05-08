@@ -16,7 +16,10 @@
 package io.chapp.scriptinator.libraries;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.chapp.scriptinator.libraries.builtins.*;
+import io.chapp.scriptinator.libraries.builtins.BuiltInLogFunction;
+import io.chapp.scriptinator.libraries.builtins.LibraryFunction;
+import io.chapp.scriptinator.libraries.builtins.RunFunction;
+import io.chapp.scriptinator.libraries.builtins.SecretFunction;
 import io.chapp.scriptinator.libraries.core.ClosableContext;
 import io.chapp.scriptinator.libraries.core.ObjectConverter;
 import io.chapp.scriptinator.libraries.http.HttpLibrary;
@@ -45,12 +48,10 @@ public class ScriptLibrary {
     private final ObjectConverter converter;
     private final ClosableContext closableContext;
     private final SecretService secretService;
-    private final ObjectMapper objectMapper;
 
-    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ClosableContext closableContext, SecretService secretService, ObjectMapper objectMapper) {
+    public ScriptLibrary(JobService jobService, Job job, ScriptService scriptService, ClosableContext closableContext, SecretService secretService) {
         this.jobService = jobService;
         this.job = job;
-        this.objectMapper = objectMapper;
         this.converter = new ObjectConverter(new ObjectMapper());
         this.closableContext = closableContext;
         this.scriptService = scriptService;
@@ -64,7 +65,6 @@ public class ScriptLibrary {
         bindings.put("error", new BuiltInLogFunction("ERROR", jobService, job, secretService));
         bindings.put("library", new LibraryFunction(this));
         bindings.put("run", new RunFunction(job, scriptService));
-        bindings.put("argument", new ArgumentFunction(job, objectMapper));
         bindings.put("secret", new SecretFunction(secretService, job));
     }
 
