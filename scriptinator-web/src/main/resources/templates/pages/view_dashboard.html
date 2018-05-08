@@ -56,7 +56,7 @@
                         </thead>
                         <tr th:if="${!jobs.hasContent()}">
                             <td colspan="2">
-                                No jobs have been run yet.
+                                No jobs have been created yet.
                             </td>
                         </tr>
                         <tr th:each="job : ${jobs}" class="job" th:classappend="${job.status.name().toLowerCase()}">
