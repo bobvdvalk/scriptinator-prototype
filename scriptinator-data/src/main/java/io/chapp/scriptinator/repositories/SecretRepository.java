@@ -27,7 +27,7 @@ public interface SecretRepository extends AbstractEntityRepository<Secret> {
     @Transactional
     void deleteAllByProjectOwnerUsernameAndId(String username, long id);
 
-    Optional<Secret> findOneByProjectIdAndName(long projectId, String name);
+    Optional<Secret> findByProjectIdAndName(long projectId, String name);
 
     List<Secret> findAllByProjectId(long projectId);
 }

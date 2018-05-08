@@ -15,17 +15,23 @@
 #
 
 spring:
+  main:
+    web-application-type: none
   thymeleaf:
     mode: HTML
   jpa:
    hibernate:
      ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost:3306/scriptinator?useSSL=false
+    url: jdbc:mysql://localhost:3306/scriptinator?useSSL=true&verifyServerCertificate=false&autoReconnect=true
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     host: localhost
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
 #   G-Suite Example
 #
 #   Note: This requires an authorized ip address

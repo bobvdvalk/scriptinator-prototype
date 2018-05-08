@@ -34,7 +34,7 @@ public class MessageReceiver {
 
     public void executeJob(long jobId) {
         LOGGER.debug("Received job message {}", jobId);
-        jobRepository.findOne(jobId)
+        jobRepository.findById(jobId)
                 .ifPresent(job -> {
                     LOGGER.debug("Found job: {}", job.getDisplayName());
                     scriptExecutor.execute(job);

@@ -15,14 +15,20 @@
  */
 package io.chapp.scriptinator.libraries.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import jdk.nashorn.internal.objects.NativeJSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Base64;
 
 public class EncodeUtils {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(EncodeUtils.class);
+
     private EncodeUtils() {
     }
 
@@ -47,6 +53,11 @@ public class EncodeUtils {
             return null;
         }
 
-        return NativeJSON.stringify(null, argument, null, null).toString();
+        try {
+            return MAPPER.writeValueAsString(argument);
+        } catch (JsonProcessingException e) {
+            LOGGER.debug("Failed to parse argument as json", e);
+            return argument.toString();
+        }
     }
 }

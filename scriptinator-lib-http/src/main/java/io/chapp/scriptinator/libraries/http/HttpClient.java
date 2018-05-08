@@ -85,7 +85,8 @@ public class HttpClient extends HttpRequestExecutor {
 
             return new HttpResponse(
                     request,
-                    response
+                    response,
+                    objectMapper
             );
         } catch (IOException e) {
             throw new IllegalArgumentException(e);

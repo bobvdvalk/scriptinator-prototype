@@ -1,7 +1,7 @@
 [![Scriptinator](src/readme/logo.png)](https://scriptinator.io)
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Sonarcloud](https://sonarcloud.io/api/badges/gate?key=io.chapp.scriptinator:scriptinator-parent)](https://sonarcloud.io/dashboard?id=io.chapp.scriptinator%3Ascriptinator-parent)
+[![Sonarcloud](https://sonarcloud.io/api/project_badges/measure?project=io.chapp.scriptinator%3Ascriptinator-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=io.chapp.scriptinator%3Ascriptinator-parent)
 [![Slack](https://slack-invite.scriptinator.io/badge.svg)](https://slack-invite.scriptinator.io)
 [![CircleCI](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master.svg?style=shield)](https://circleci.com/gh/ScriptinatorIO/scriptinator/tree/master)
 [![Waffle](https://badge.waffle.io/ScriptinatorIO/scriptinator.svg?columns=In%20Progress,Review)](https://waffle.io/ScriptinatorIO/scriptinator)
@@ -17,7 +17,7 @@ And the best part of it: It is **super simple!**
 - Available in the [cloud](https://scriptinator.io) or on-premise
 
 > This project is still in development. This means we take your feedback very seriously. If you have any feedback,
-questions or feature requests. Please let us know by email (support@scriptinator.io) or through [slack](https://slack-invite.scriptinator.io).
+questions or feature requests please let us know by email (support@scriptinator.io) or through [slack](https://slack-invite.scriptinator.io).
 
 ## Screenshots
 
