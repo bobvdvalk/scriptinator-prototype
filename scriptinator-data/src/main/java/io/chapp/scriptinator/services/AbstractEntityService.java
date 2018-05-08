@@ -31,15 +31,6 @@ public class AbstractEntityService<E extends AbstractEntity, R extends AbstractE
     private R repository;
 
     /**
-     * Count the amount of entities.
-     *
-     * @return The amount of entities in the repository.
-     */
-    public long count() {
-        return repository.count();
-    }
-
-    /**
      * Create a new entity.
      *
      * @param entity the entity
