@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-FROM openjdk:8
+FROM openjdk:10
 
 COPY "target/*-exec.jar" /app.jar
 EXPOSE 8081

@@ -44,7 +44,7 @@ public class ProjectsWebController {
     @GetMapping("/projects/{pageId}")
     public String projectList(@PathVariable @Min(1) int pageId, Model model) {
         model.addAttribute(
-                Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(new PageRequest(
+                Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(PageRequest.of(
                         pageId - 1,
                         configuration.getDefaultPageSize()
                 ))

@@ -66,7 +66,7 @@ public class OAuthAppService extends AbstractEntityService<OAuthApp, OAuthAppRep
 
     public OAuthApp getOwnedBy(String username, long appId) {
         return getRepository()
-                .findOneByOwnerUsernameAndId(username, appId)
+                .findByOwnerUsernameAndId(username, appId)
                 .orElseThrow(() -> noSuchElement(appId));
     }
 }

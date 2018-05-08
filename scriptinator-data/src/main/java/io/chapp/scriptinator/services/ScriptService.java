@@ -159,12 +159,11 @@ public class ScriptService extends AbstractEntityService<Script, ScriptRepositor
     /**
      * Run a script triggered by a webhook.
      *
-     * @param webhookUuid The uuid of the webhook.
-     * @param argument    The argument from the request.
+     * @param webhook  The webhook.
+     * @param argument The argument from the request.
      */
-    public void runWebhooked(String webhookUuid, WebhookArgument argument) {
+    public void runWebhooked(Webhook webhook, WebhookArgument argument) {
         // Get and update the webhook.
-        Webhook webhook = webhookService.getByUuid(webhookUuid);
         webhook.setLastCall(Date.from(Instant.now(Clock.systemDefaultZone())));
         webhookService.update(webhook);
 

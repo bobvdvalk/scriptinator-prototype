@@ -15,16 +15,19 @@
  */
 package io.chapp.scriptinator.libraries.builtins;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.model.Job;
-import jdk.nashorn.internal.runtime.JSONFunctions;
 
+import java.io.IOException;
 import java.util.function.Supplier;
 
 public class ArgumentFunction implements Supplier<Object> {
     private final Job job;
+    private final ObjectMapper objectMapper;
 
-    public ArgumentFunction(Job job) {
+    public ArgumentFunction(Job job, ObjectMapper objectMapper) {
         this.job = job;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -33,6 +36,10 @@ public class ArgumentFunction implements Supplier<Object> {
             return null;
         }
 
-        return JSONFunctions.parse(job.getArgument(), null);
+        try {
+            return objectMapper.readValue(job.getArgument(), Object.class);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to retrieve argument... Please contact a system administrator", e);
+        }
     }
 }

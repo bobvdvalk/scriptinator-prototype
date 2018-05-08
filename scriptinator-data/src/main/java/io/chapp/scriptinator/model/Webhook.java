@@ -15,7 +15,7 @@
  */
 package io.chapp.scriptinator.model;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -56,6 +56,8 @@ public class Webhook extends AbstractEntity {
     private String scriptName;
 
     private Date lastCall;
+
+    private boolean sendResponse = true;
 
     public String getUuid() {
         return uuid;
@@ -103,6 +105,14 @@ public class Webhook extends AbstractEntity {
 
     public void setLastCall(Date lastCall) {
         this.lastCall = lastCall;
+    }
+
+    public boolean getSendResponse() {
+        return sendResponse;
+    }
+
+    public void setSendResponse(boolean sendResponse) {
+        this.sendResponse = sendResponse;
     }
 
     @Override

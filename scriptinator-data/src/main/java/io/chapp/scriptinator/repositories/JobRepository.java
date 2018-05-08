@@ -23,7 +23,7 @@ import java.util.Optional;
 
 public interface JobRepository extends AbstractEntityRepository<Job> {
 
-    Optional<Job> findOneByScriptProjectOwnerUsernameAndId(String username, long scriptId);
+    Optional<Job> findByScriptProjectOwnerUsernameAndId(String username, long scriptId);
 
     Page<Job> findAllByScriptProjectOwnerUsernameAndScriptId(String username, long scriptId, Pageable pageable);
 

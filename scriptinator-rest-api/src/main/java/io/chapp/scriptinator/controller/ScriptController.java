@@ -24,12 +24,13 @@ import io.chapp.scriptinator.model.Script;
 import io.chapp.scriptinator.services.JobService;
 import io.chapp.scriptinator.services.ScriptService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
@@ -82,15 +83,20 @@ public class ScriptController {
 
     @PostMapping(value = "{scriptId}/jobs", consumes = "application/json")
     @PreAuthorize("#oauth2.hasAnyScope('script', 'script:run')")
-    public Job runScript(@PathVariable long scriptId, @RequestBody Job job, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Job> runScript(@PathVariable long scriptId, @RequestBody Job job) throws IOException {
         try {
             Script script = scriptService.getOwnedByPrincipal(scriptId);
             Object argument = StringUtils.isEmpty(job.getArgument()) ? null : objectMapper.readValue(job.getArgument(), Object.class);
             Job result = scriptService.run(script, argument);
 
-            response.setHeader("Location", objectMapper.convertValue(result.getUrl(), String.class));
-            response.setStatus(HttpStatus.CREATED.value());
-            return result;
+            var headers = new HttpHeaders();
+            headers.add(HttpHeaders.LOCATION, objectMapper.convertValue(result.getUrl(), String.class));
+
+            return new ResponseEntity<>(
+                    result,
+                    headers,
+                    HttpStatus.CREATED
+            );
         } catch (JsonParseException e) {
             throw new IllegalArgumentException("Invalid 'argument' field. Must be a json string.", e);
         }

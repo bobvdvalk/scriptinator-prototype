@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProjectService extends AbstractEntityService<Project, ProjectRepository> {
     public Project getOwnedBy(String username, long id) {
-        return getRepository().findOneByOwnerUsernameAndId(
+        return getRepository().findByOwnerUsernameAndId(
                 username,
                 id
         )
@@ -39,7 +39,7 @@ public class ProjectService extends AbstractEntityService<Project, ProjectReposi
     }
 
     public Project getOwnedBy(String username, String name) {
-        return getRepository().findOneByOwnerUsernameAndName(
+        return getRepository().findByOwnerUsernameAndName(
                 username,
                 name
         )

@@ -58,7 +58,7 @@ public class JobService extends AbstractEntityService<Job, JobRepository> {
     }
 
     public Optional<Job> findOwnedBy(String username, long jobId) {
-        return getRepository().findOneByScriptProjectOwnerUsernameAndId(username, jobId);
+        return getRepository().findByScriptProjectOwnerUsernameAndId(username, jobId);
     }
 
     public Optional<Job> findOwnedByPrincipal(long jobId) {

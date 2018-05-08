@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class LinkSerializer extends StdSerializer<Link> {
     private final String contextPath;
 
-    protected LinkSerializer(@Value("${server.contextPath:}") String contextPath) {
+    protected LinkSerializer(@Value("${server.servlet.context-path:}") String contextPath) {
         super(Link.class);
         this.contextPath = contextPath;
     }

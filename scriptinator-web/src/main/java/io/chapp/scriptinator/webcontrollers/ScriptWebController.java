@@ -88,7 +88,7 @@ public class ScriptWebController {
         // Get all job pages.
         Page<Job> jobs = jobService.findAllForScriptOwnedByPrincipal(
                 scriptId,
-                new PageRequest(
+                PageRequest.of(
                         0,
                         configuration.getDefaultPageSize(),
                         new Sort(Sort.Direction.DESC, "id")

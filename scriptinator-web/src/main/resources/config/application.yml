@@ -17,3 +17,7 @@
 # Override the default port for the web interface because the API is running on that
 server:
   port: 8081
+  use-forward-headers: true
+spring:
+  main:
+    web-application-type: servlet

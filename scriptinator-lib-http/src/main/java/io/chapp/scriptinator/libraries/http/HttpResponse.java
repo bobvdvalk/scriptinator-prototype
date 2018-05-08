@@ -15,6 +15,7 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.libraries.core.DataValue;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -26,10 +27,12 @@ import java.util.Map;
 public class HttpResponse extends DataValue {
     private final HttpRequest request;
     private final Response response;
+    private final ObjectMapper objectMapper;
 
-    public HttpResponse(HttpRequest request, Response response) {
+    public HttpResponse(HttpRequest request, Response response, ObjectMapper objectMapper) {
         this.request = request;
         this.response = response;
+        this.objectMapper = objectMapper;
     }
 
     public HttpRequest request() {
@@ -69,7 +72,7 @@ public class HttpResponse extends DataValue {
         if (body == null) {
             return null;
         }
-        return new HttpResponseBody(body);
+        return new HttpResponseBody(body, objectMapper);
     }
 
     @Override

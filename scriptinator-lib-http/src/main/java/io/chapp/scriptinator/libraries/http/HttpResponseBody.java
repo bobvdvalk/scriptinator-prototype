@@ -15,8 +15,9 @@
  */
 package io.chapp.scriptinator.libraries.http;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.libraries.core.DataValue;
-import jdk.nashorn.internal.runtime.JSONFunctions;
+import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 
@@ -24,9 +25,11 @@ import java.io.IOException;
 
 public class HttpResponseBody extends DataValue {
     private final ResponseBody body;
+    private final ObjectMapper objectMapper;
 
-    public HttpResponseBody(ResponseBody body) {
+    public HttpResponseBody(ResponseBody body, ObjectMapper objectMapper) {
         this.body = body;
+        this.objectMapper = objectMapper;
     }
 
     public String contentType() {
@@ -46,6 +49,10 @@ public class HttpResponseBody extends DataValue {
     }
 
     public Object asJson() {
-        return JSONFunctions.parse(asString(), null);
+        try {
+            return objectMapper.readValue(asString(), Object.class);
+        } catch (IOException e) {
+            throw new ScriptinatorExecutionException("Invalid json response body: " + e.getMessage(), e);
+        }
     }
 }

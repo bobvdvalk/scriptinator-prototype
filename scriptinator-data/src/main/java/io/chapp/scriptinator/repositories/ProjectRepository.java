@@ -25,9 +25,9 @@ import java.util.Optional;
 public interface ProjectRepository extends AbstractEntityRepository<Project> {
     Page<Project> findAllByOwnerUsername(String username, Pageable pageable);
 
-    Optional<Project> findOneByOwnerUsernameAndId(String username, long id);
+    Optional<Project> findByOwnerUsernameAndId(String username, long id);
 
-    Optional<Project> findOneByOwnerUsernameAndName(String username, String name);
+    Optional<Project> findByOwnerUsernameAndName(String username, String name);
 
     @Transactional
     void deleteAllByOwnerUsernameAndId(String username, long id);
