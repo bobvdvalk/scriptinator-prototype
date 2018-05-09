@@ -15,7 +15,6 @@
  */
 package io.chapp.scriptinator.workerservices;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.chapp.scriptinator.libraries.ScriptLibrary;
 import io.chapp.scriptinator.libraries.core.ClosableContext;
 import io.chapp.scriptinator.libraries.core.ScriptinatorExecutionException;
@@ -38,14 +37,12 @@ public class ScriptExecutor {
     private final JobService jobService;
     private final ScriptService scriptService;
     private final SecretService secretService;
-    private final ObjectMapper objectMapper;
 
-    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, SecretService secretService, ObjectMapper objectMapper) {
+    public ScriptExecutor(ObjectFactory<ScriptEngine> scriptEngineFactory, JobService jobService, ScriptService scriptService, SecretService secretService) {
         this.scriptEngineFactory = scriptEngineFactory;
         this.jobService = jobService;
         this.scriptService = scriptService;
         this.secretService = secretService;
-        this.objectMapper = objectMapper;
     }
 
     public void execute(Job job) {
@@ -53,7 +50,7 @@ public class ScriptExecutor {
         ScriptEngine engine = scriptEngineFactory.getObject();
 
         try (ClosableContext context = new ClosableContext()) {
-            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService, objectMapper);
+            ScriptLibrary scriptLibrary = new ScriptLibrary(jobService, job, scriptService, context, secretService);
             Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
             scriptLibrary.apply(bindings);
 

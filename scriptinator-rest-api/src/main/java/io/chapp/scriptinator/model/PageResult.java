@@ -93,7 +93,7 @@ public class PageResult<T> {
         String pageParam = request.getParameter(PAGE_PARAMETER);
         int page = StringUtils.isEmpty(pageParam) ? PAGE_PARAMETER_DEFAULT : Integer.parseInt(pageParam);
 
-        return PageRequest.of(
+        return new PageRequest(
                 page - 1,
                 size
         );

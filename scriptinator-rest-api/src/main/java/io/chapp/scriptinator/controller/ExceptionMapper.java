@@ -17,30 +17,35 @@ package io.chapp.scriptinator.controller;
 
 import io.chapp.scriptinator.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class ExceptionMapper {
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handle(NoSuchElementException e, HttpServletRequest request) {
-        return handle(e, request, HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(NoSuchElementException e, HttpServletRequest request, HttpServletResponse response) {
+        return handle(e, request, response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handle(Exception e, HttpServletRequest request, HttpStatus status) {
-        return new ResponseEntity<>(
-                createResponse(e, request, status),
-                status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(Exception e, HttpServletRequest request, HttpServletResponse response, HttpStatus status) {
+        response.setStatus(status.value());
+        return handle(
+                e,
+                request,
+                status
         );
     }
 
-    private ErrorResponse createResponse(Exception e, HttpServletRequest request, HttpStatus status) {
+    private ErrorResponse handle(Exception e, HttpServletRequest request, HttpStatus status) {
         return new ErrorResponse(
                 status,
                 e,

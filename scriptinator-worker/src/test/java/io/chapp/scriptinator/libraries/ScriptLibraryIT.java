@@ -45,8 +45,8 @@ import java.util.stream.Collectors;
 import static org.awaitility.Awaitility.await;
 
 @ContextConfiguration(classes = ScriptinatorWorker.class)
-public class ScriptLibraryTest extends AbstractTestNGSpringContextTests {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibraryTest.class);
+public class ScriptLibraryIT extends AbstractTestNGSpringContextTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptLibraryIT.class);
     @Autowired
     private ScriptService scriptService;
     @Autowired
@@ -130,9 +130,9 @@ public class ScriptLibraryTest extends AbstractTestNGSpringContextTests {
 
         await("Wait for test to complete: " + file)
                 .atMost(1, TimeUnit.MINUTES)
-                .until(() -> jobRepository.findById(jobId).get().getFinishedTime() != null);
+                .until(() -> jobRepository.findOne(jobId).get().getFinishedTime() != null);
 
-        Job finishedJob = jobRepository.findById(jobId).get();
+        Job finishedJob = jobRepository.findOne(jobId).get();
 
         LOGGER.info(
                 "Job {} [{} ms]: {}",

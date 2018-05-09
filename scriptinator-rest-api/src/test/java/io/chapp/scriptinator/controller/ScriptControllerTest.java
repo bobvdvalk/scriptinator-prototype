@@ -289,14 +289,12 @@ public class ScriptControllerTest {
         ).execute();
 
         // Validation
-        var responseBody = response.body().string();
-        ReadContext json = JsonPath.parse(responseBody);
+        ReadContext json = JsonPath.parse(response.body().string());
 
 
         assertEquals(
                 response.code(),
-                201,
-                responseBody
+                201
         );
 
         // Pull the id from the location header

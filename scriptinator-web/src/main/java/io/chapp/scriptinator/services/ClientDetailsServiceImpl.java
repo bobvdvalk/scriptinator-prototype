@@ -40,7 +40,7 @@ public class ClientDetailsServiceImpl implements ClientDetailsService {
     @Override
     public ClientDetails loadClientByClientId(String clientId) {
         return new CustomClientDetails(
-                appRepository.findByClientId(clientId).orElseThrow(
+                appRepository.findOneByClientId(clientId).orElseThrow(
                         () -> new ClientRegistrationException(clientId)
                 )
         );

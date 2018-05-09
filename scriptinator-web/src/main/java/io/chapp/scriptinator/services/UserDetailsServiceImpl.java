@@ -84,7 +84,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         @Override
         public boolean isEnabled() {
-            return user.getEmailActivationToken() == null;
+            return true;
         }
 
         public String getDisplayName() {

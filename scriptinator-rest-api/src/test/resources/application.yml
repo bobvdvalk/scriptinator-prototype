@@ -18,6 +18,3 @@ spring:
   jpa:
    hibernate:
     ddl-auto: create
-  jackson:
-    serialization:
-      write-dates-as-timestamps: true

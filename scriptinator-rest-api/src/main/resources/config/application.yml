@@ -15,8 +15,4 @@
 #
 
 server:
-  servlet:
-    context-path: /api
-spring:
-  main:
-    web-application-type: servlet
+  contextPath: /api

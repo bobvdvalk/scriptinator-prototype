@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.1.RELEASE</version>
+        <version>1.5.9.RELEASE</version>
     </parent>
 
     <modules>
@@ -99,18 +99,15 @@
 
     <properties>
         <!-- Runtime Dependencies -->
-        <java.version>10</java.version>
-        <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
+        <java.version>1.8</java.version>
+        <thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
         <okhttp.version>3.9.1</okhttp.version>
         <apache-commons-lang.version>3.7</apache-commons-lang.version>
         <apache-commons-io.version>2.6</apache-commons-io.version>
         <thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
         <quartz.version>2.3.0</quartz.version>
         <cron-parser.version>3.4</cron-parser.version>
-        <spring-oauth.version>2.3.2.RELEASE</spring-oauth.version>
-        <spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
-        <javax-activation.version>1.2.0</javax-activation.version>
-        <mysql.version>8.0.11</mysql.version>
 
         <!-- Build Dependencies -->
         <node.version>9.3.0</node.version>
@@ -118,7 +115,7 @@
         <license.plugin.version>3.0</license.plugin.version>
         <frontend-plugin.version>1.6</frontend-plugin.version>
         <reflections.version>0.9.11</reflections.version>
-        <jacoco-plugin.version>0.8.1</jacoco-plugin.version>
+        <jacoco-plugin.version>0.8.0</jacoco-plugin.version>
         <asciidoctor-plugin.version>1.5.6</asciidoctor-plugin.version>
         <testng.version>6.14.2</testng.version>
         <awaitility.version>3.0.0</awaitility.version>
@@ -201,37 +198,6 @@
                 <artifactId>spring-security-core</artifactId>
                 <version>${spring-security.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.security.oauth</groupId>
-                <artifactId>spring-security-oauth2</artifactId>
-                <version>${spring-oauth.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-jwt</artifactId>
-                <version>${spring-security-jwt.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${javax-jaxb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${javax-jaxb.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.activation</groupId>
-                <artifactId>javax.activation</artifactId>
-                <version>${javax-activation.version}</version>
-            </dependency>
-
 
             <!-- Test Dependencies -->
             <dependency>
@@ -291,7 +257,6 @@
                     <configuration>
                         <executable>true</executable>
                         <classifier>exec</classifier>
-                        <jvmArguments>--add-modules java.xml.bind</jvmArguments>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -436,9 +401,6 @@
     <profiles>
         <profile>
             <id>readme</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

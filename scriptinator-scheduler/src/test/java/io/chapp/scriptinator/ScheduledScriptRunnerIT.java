@@ -36,7 +36,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 @ContextConfiguration(classes = ScriptinatorScheduler.class)
-public class ScheduledScriptRunnerTest extends AbstractTestNGSpringContextTests {
+public class ScheduledScriptRunnerIT extends AbstractTestNGSpringContextTests {
     @Autowired
     private ScriptRepository scriptRepository;
     @Autowired
@@ -96,12 +96,12 @@ public class ScheduledScriptRunnerTest extends AbstractTestNGSpringContextTests 
         */
         await("Wait until schedule is processed.")
                 .atMost(3, TimeUnit.SECONDS) // Less than 3 seconds resulted in inconsistency as well. *sigh*
-                .until(() -> scheduleRepository.findById(scheduleId).get().getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
         Page<Job> jobs = jobRepository.findAllByScriptProjectOwnerUsernameAndScriptId(
                 project.getOwner().getUsername(),
                 script.getId(),
-                PageRequest.of(0, 1)
+                new PageRequest(0, 1)
         );
 
         for (Job job : jobs) {
@@ -116,9 +116,9 @@ public class ScheduledScriptRunnerTest extends AbstractTestNGSpringContextTests 
 
         await("Wait until schedule is processed.")
                 .atMost(2, TimeUnit.SECONDS)
-                .until(() -> scheduleRepository.findById(scheduleId).get().getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        Schedule schedule = scheduleRepository.findOne(scheduleId).get();
         assertFalse(schedule.isEnabled());
         assertEquals(schedule.getStatus(), Schedule.Status.INVALID_SCRIPT);
     }
@@ -129,9 +129,9 @@ public class ScheduledScriptRunnerTest extends AbstractTestNGSpringContextTests 
 
         await("Wait until schedule is processed.")
                 .atMost(2, TimeUnit.SECONDS)
-                .until(() -> scheduleRepository.findById(scheduleId).get().getLastRun() != null);
+                .until(() -> scheduleRepository.findOne(scheduleId).get().getLastRun() != null);
 
-        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        Schedule schedule = scheduleRepository.findOne(scheduleId).get();
         assertFalse(schedule.isEnabled());
         assertEquals(schedule.getStatus(), Schedule.Status.INVALID_CRON);
     }

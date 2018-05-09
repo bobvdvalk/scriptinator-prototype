@@ -119,7 +119,7 @@ public class WebhookHandlerWebControllerTest {
         );
         Assert.assertEquals(response.code(), 200);
 
-        Page<Job> jobs = jobRepository.findAllByScriptProjectOwnerUsernameAndScriptId("webhook-test", scriptId, PageRequest.of(0, 1));
+        Page<Job> jobs = jobRepository.findAllByScriptProjectOwnerUsernameAndScriptId("webhook-test", scriptId, new PageRequest(0, 1));
 
         Assert.assertEquals(jobs.getTotalElements(), 1);
         Assert.assertEquals(

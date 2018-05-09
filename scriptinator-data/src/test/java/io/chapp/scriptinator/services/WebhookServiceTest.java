@@ -32,7 +32,7 @@ public class WebhookServiceTest {
     @BeforeClass
     public void mockWebhookRepository() {
         WebhookRepository webhookRepository = Mockito.mock(WebhookRepository.class);
-        when(webhookRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(webhookRepository.save(any())).thenAnswer(invocation -> invocation.getArgumentAt(0, Webhook.class));
         webhookService.setRepository(webhookRepository);
     }
 

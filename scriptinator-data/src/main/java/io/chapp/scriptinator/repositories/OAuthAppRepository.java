@@ -23,9 +23,9 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 public interface OAuthAppRepository extends AbstractEntityRepository<OAuthApp> {
-    Optional<OAuthApp> findByClientId(String clientId);
+    Optional<OAuthApp> findOneByClientId(String clientId);
 
-    Optional<OAuthApp> findByOwnerUsernameAndId(String username, long id);
+    Optional<OAuthApp> findOneByOwnerUsernameAndId(String username, long id);
 
     Page<OAuthApp> findAllByOwnerUsername(String username, Pageable pageable);
 

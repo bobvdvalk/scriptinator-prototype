@@ -69,7 +69,7 @@ public class SecretService extends AbstractEntityService<Secret, SecretRepositor
      * @return The value of the secret, or null if none was found.
      */
     public String getValue(long projectId, String name) {
-        return getRepository().findByProjectIdAndName(projectId, name)
+        return getRepository().findOneByProjectIdAndName(projectId, name)
                 .map(Secret::getValue)
                 .orElse(null);
     }

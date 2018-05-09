@@ -44,7 +44,7 @@ public class UserWebController {
     @GetMapping("apps")
     public String listOAuthApps(Model model) {
         model.addAttribute(OAuthApp.LIST_ATTRIBUTE, appService.findAllOwnedByPrincipal(
-                PageRequest.of(
+                new PageRequest(
                         0,
                         Integer.MAX_VALUE
                 )

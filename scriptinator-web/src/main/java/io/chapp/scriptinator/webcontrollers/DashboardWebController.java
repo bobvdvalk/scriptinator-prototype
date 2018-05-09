@@ -38,7 +38,7 @@ public class DashboardWebController {
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        model.addAttribute(Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(PageRequest.of(
+        model.addAttribute(Project.LIST_ATTRIBUTE, projectService.findAllOwnedByPrincipal(new PageRequest(
                 0,
                 PROJECT_EXCERPT_COUNT
         )));

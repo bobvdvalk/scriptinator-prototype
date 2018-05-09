@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @NoRepositoryBean
 public interface AbstractEntityRepository<E extends AbstractEntity> extends Repository<E, Long> {
-    Optional<E> findById(long id);
+    Optional<E> findOne(long id);
 
     E save(E entity);
 

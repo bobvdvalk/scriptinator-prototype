@@ -15,7 +15,6 @@
  */
 package io.chapp.scriptinator.model;
 
-
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
